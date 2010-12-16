@@ -1,0 +1,15 @@
+application: supermeeple-sk
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /.*
+  script: main.py
+
+- url: /css 
+  static_dir: stylesheets
+  
+- url: /js
+  static_dir: javascript
+  
