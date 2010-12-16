@@ -6,7 +6,7 @@ from google.appengine.ext import db
 class Game(db.Model):
   freebaseID = db.StringProperty(required=True)
   freebaseGUID = db.StringProperty(required=True)
-  bggURL = db.Link()
+  bggURL = db.LinkProperty(required=False)
   totalRating = db.IntegerProperty(required=True)
   updated = db.DateTimeProperty(required=True, auto_now=True)
 

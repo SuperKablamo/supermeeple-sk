@@ -14,18 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import os
-import freebase
 
+import os
+import cgi
+import freebase
+import logging
+
+from google.appengine.ext import db
 from google.appengine.ext import webapp
-from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
+from google.appengine.ext.webapp.util import run_wsgi_app
 
 import models
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        
+        logging.info('########### MainHandler::get ###########')
         query = [{
           "type" : "/games/game",
           "name" : None,
@@ -43,8 +48,16 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values))  
       
 
+class PostGame(webapp.RequestHandler):
+    def post(self):
+        logging.info('########### GetGame::get ###########')
+        print "I AM HERE"
+        self.redirect('blah')    
+
+
 application = webapp.WSGIApplication(
-                                     [('/', MainHandler)],
+                                     [('/', MainHandler),
+                                     ('/game-profile', PostGame)],
                                      debug=True)
 
 def main():
