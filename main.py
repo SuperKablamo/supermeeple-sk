@@ -31,6 +31,7 @@ import models
 class MainHandler(webapp.RequestHandler):
     def get(self):
         logging.info('########### MainHandler::get ###########')
+
         query = [{
           "type" : "/games/game",
           "name" : None,
@@ -38,22 +39,35 @@ class MainHandler(webapp.RequestHandler):
         }]
         result = freebase.sandbox.mqlread(query)
         games = result
-        #for g in games:
-        #  print g.name
-        
         template_values = {
-            'games': games        
-        }
-        path = os.path.join(os.path.dirname(__file__), 'index.html')
-        self.response.out.write(template.render(path, template_values))  
-      
+            'games': games
+        }        
 
+        directory = os.path.dirname(__file__)
+        path = os.path.join(directory, os.path.join('templates', 'index.html'))
+        self.response.out.write(template.render(path, template_values, debug=True))
+ 
 class PostGame(webapp.RequestHandler):
     def post(self):
-        logging.info('########### GetGame::get ###########')
-        print "I AM HERE"
-        self.redirect('blah')    
+        logging.info('########### GetGame::post ###########')
+        gameID = self.request.get('gameID')
+        gameName = self.request.get('gameName')
+        logging.info('gameID = ' + str(gameID) + 'gameName = ' + str(gameName))
 
+        query = {
+          "type" : "/games/game",
+          "id" : gameID,
+          "name" : None
+        }
+        result = freebase.sandbox.mqlread(query)
+        game = result
+        template_values = {
+            'game': game
+        }
+
+        directory = os.path.dirname(__file__)
+        path = os.path.join(directory, os.path.join('templates', 'game.html'))
+        self.response.out.write(template.render(path, template_values, debug=True))
 
 application = webapp.WSGIApplication(
                                      [('/', MainHandler),
