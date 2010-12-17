@@ -43,10 +43,26 @@ class PostGame(webapp.RequestHandler):
 
         # query Freebase for Game data
         query = {
-          "type" : "/games/game",
-          "id" : gameID,
-          "guid" : None,
-          "name" : None
+          "id":            "/en/settlers_of_catan",
+          "type":          "/games/game",
+          "guid":          None,
+          "name":          None,
+          "creator":       None,
+          "expansions":    None,
+          "introduced":    None,
+          "genre":         None,
+          "designer":      None,
+          "maximum_playing_time_minutes": None,
+          "minimum_age_years": None,
+          "number_of_players": None,
+          "origin":        None,
+          "playing_time_minutes": None,
+          "publisher":     [],
+          "derivative_games": [],
+          "key": [{
+            "namespace": "/user/pak21/boardgamegeek/boardgame",
+            "value":     None
+          }]
         }
         result = freebase.sandbox.mqlread(query)
 
@@ -72,7 +88,8 @@ class PostGame(webapp.RequestHandler):
         entity.put()
                               
         template_values = {
-            'game': entity
+            'game': entity,
+            'result': result
         }  
 
         directory = os.path.dirname(__file__)

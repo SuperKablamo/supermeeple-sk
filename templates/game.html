@@ -2,7 +2,32 @@
   <head>
   </head>	
   <body>
-    <p>{{ game.name }}</p>
-    <p>{{ game.freebaseID }}</p>
+	<h1>{{ game.name}}</h1>
+    <p>
+	  <ul>
+	    <li>Freebase ID: {{ game.freebaseID }}</li>
+	    <li>Creator: {{ result.creator }}</li>	
+	    <li>Expansions: {{ result.expansions }}</li>	
+	    <li>Introduced: {{ result.introduced }}</li>	
+	    <li>Genre: {{ result.genre }}</li>	
+	    <li>Playing Time: {{ result.playing_time_minutes }} minutes</li>	
+	    <li>Origin: {{ result.origin }}</li>
+	    <li>Designer: {{ result.designer }}</li>	
+	    <li>Publisher:
+	      <ul>
+		    {% for p in result.publisher %}
+		    <li>{{ p }}</li>
+		    {% endfor %}		
+		  </ul>	
+		</li>	
+		<li>Derivative Games:
+	      <ul>
+		    {% for d in result.derivative_games %}
+		    <li>{{ d }}</li>
+		    {% endfor %}		
+		  </ul>	
+		</li>
+	  </ul>
+	</p>
   </body>
 </html>
