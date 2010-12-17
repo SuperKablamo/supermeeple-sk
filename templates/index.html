@@ -13,6 +13,8 @@
 	</script>
   </head>	
   <body>
+    <h1>SuperMeeple</h1>
+    <p>Search for a game on Freebase and then hit 'Go' to see more about the game.</p>
 	<form name="input" action="/game-profile" method="post">
       <input class="search-box" name="fbSelect" type="text" id="game-search"/>
       <input type="hidden" name="gameID" id="game-id" />
@@ -21,12 +23,6 @@
     </form>
 
     <br/><br/><br/><br/>
-    <p> 
-	  <ul>
-	  {% for g in games %}
-        <li>{{ g.name }}</li>
-      {% endfor %}
-	  </ul>
-	</p>
+
   </body>
 </html>
