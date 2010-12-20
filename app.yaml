@@ -8,8 +8,8 @@ builtins:
 - appstats: on
 
 handlers:
-- url: /css 
-  static_dir: stylesheets
+- url: /static
+  static_dir: static
   
 - url: /js
   static_dir: javascript
