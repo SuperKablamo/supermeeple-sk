@@ -16,25 +16,44 @@ import models
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        logging.info('########### MainHandler::get ###########')
-        #envelope = {"extended":True}
-        #asof = None;
-        query = {
-            "id": "/en/settlers_of_catan",
-            "/common/topic/weblink": [{
-                "description": "BoardGameGeek",
-                "url": None
-            }]
-        }
-        result = freebase.sandbox.mqlread(query, extended=True)
+        # Get the Spiel Des Jahres award winners.
+        query = [{
+          "type": "/games/game",
+          "id":   None,
+          "name": None,
+          "guid": None,
+          "!/award/award_honor/honored_for": {
+            "award": {
+              "id": "/en/spiel_des_jahres"
+            },
+            "year": {
+              "value": None,
+              "limit": 1
+            },
+            "limit": 1
+          },
+          "sort": "-!/award/award_honor/honored_for.year.value"
+        }]
+        result = freebase.sandbox.mqlread(query)
         logging.info(result)
-        
-        foo = result["/common/topic/weblink"][0].url
-        
-        logging.info(foo) 
-        
+
+        # Keys with special characters, like "!/award/award_honor/honored_for"
+        # cannot be accessed from a Django template, so rebuild the result
+        # into a array of key-value pair dictionaries.
+        games = []
+        count = 0
+        for r in result:
+            name = r.name
+            guid = r.guid
+            year = r["!/award/award_honor/honored_for"].year.value
+            game = {}
+            game["name"] = name
+            game["guid"] = guid
+            game["year"] = year
+            games.append(game)
+            
         template_values = {
-            'result': result
+            'games': games
         }
         
         directory = os.path.dirname(__file__)
@@ -50,7 +69,7 @@ class PostGame(webapp.RequestHandler):
         gameName = self.request.get('gameName')
         logging.info('gameID = ' + str(gameID) + 'gameName = ' + str(gameName))
 
-        # query Freebase for Game data
+        # Get Game data
         query = {
             "id":            str(gameID),
             "type":          "/games/game",

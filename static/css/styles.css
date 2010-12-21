@@ -10,26 +10,41 @@ del { text-decoration: line-through; }
 table { border-collapse: collapse; border-spacing: 0; }
 
 /*TEXT STYLES*/
-body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: 1em; color: #eee;}
+body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: .8em; color: #eee;}
 a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none; }
 #container { text-align: left; }
-h1 { font-weight: normal; margin: 5px 0; font-size: 1.75em; }
+#title span { font-weight: normal; margin: 5px 0; font-size: 1.8em; }
+h1 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.8em; }
+h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.6em; }
 #game-list caption { color: #999; font-size: 1.2em; text-align: left; }
+#game-list .year { text-align: right; } 
+#game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
+#freebase-tag .logo { color: #999999; }
+#gae-tag .logo { color: #3885C7;  }
+#footer #plus { font-size: 1.4em; font-weight: bold; }
 
 /*LAYOUT*/
 body { background-color: #333; }
 #container { width:100%;  height: 100%; }
 
 /*HEADER*/
-#header { height: 120px; margin: 14px; }
+#header { height: 60px; margin: 14px; }
 #title { float: left;}
 #search { float: right;  }
 
 /*MAIN*/
-#main { margin: 4px 14px; }
-table#game-list { border-collapse: collapse; width 100%; }
+#main { margin: 4px 56px 4px 14px; }
+table#game-list { border-collapse: collapse; width: 100%; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
+#game-detail { margin-bottom: 12px; }
+#game-detail dl { margin: 6px 0; }
+#game-detail dt { padding: 10px 0 6px; } 
+#game-detail dd { line-height: 1.4em; margin-left: 12px; }
 
 /*FOOTER*/
 #footer { }
+#freebase-tag, #gae-tag { background-color: #222222;  padding: 10px 8px; position: absolute;  bottom: 0; }
+#freebase-tag { right: 56px; }
+#gae-tag { right: 228px; }
+#plus { padding: 10px 8px; position: absolute; bottom: 0; right: 196px; }

@@ -1,33 +1,53 @@
-<html><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-  <head>
-  </head>	
-  <body>
-	<h1>{{ game.name}}</h1>
-    <p>
-	  <ul>
-	    <li>Freebase ID: {{ game.freebaseID }}</li>
-	    <li>Creator: {{ result.creator }}</li>	
-	    <li>Expansions: {{ result.expansions }}</li>	
-	    <li>Introduced: {{ result.introduced }}</li>	
-	    <li>Genre: {{ result.genre }}</li>	
-	    <li>Playing Time: {{ result.playing_time_minutes }} minutes</li>	
-	    <li>Origin: {{ result.origin }}</li>
-	    <li>Designer: {{ result.designer }}</li>	
-	    <li>Publisher:
-	      <ul>
-		    {% for p in result.publisher %}
-		    <li>{{ p }}</li>
-		    {% endfor %}		
-		  </ul>	
-		</li>	
-		<li>Derivative Games:
-	      <ul>
-		    {% for d in result.derivative_games %}
-		    <li>{{ d }}</li>
-		    {% endfor %}		
-		  </ul>	
-		</li>
-	  </ul>
-	</p>
-  </body>
-</html>
+{% extends "base.html" %}
+
+	{% block title %}SuperMeeple - {{ game.name }}{% endblock %}
+	
+		{% block main %}
+			<h1>{{ game.name}}</h1>
+		  <div id="game-detail">	
+    		<dl>
+    			<dt>Designed by</dt>
+					<dd>{{ result.designer }}</dd>
+    		</dl>
+    		<dl>
+    			<dt>Introduced</dt>
+					<dd>{{ result.introduced }}</dd>
+    		</dl>
+    		<dl>
+    			<dt>Playing time</dt>
+					<dd>{{ result.playing_time_minutes }} minutes</dd>
+    		</dl>
+    		<dl>
+    			<dt>Origin</dt>
+					<dd>{{ result.origin }}</dd>
+    		</dl>
+  			<dl>
+    			<dt>Published by</dt>
+    			{% for p in result.publisher %}
+    				<dd>{{ p }}</dd>
+    			{% endfor %}		
+  		  </dl>	
+  			<dl>
+    			<dt>Expansions</dt>
+    			{% for e in result.expansions %}
+    				<dd>{{ e }}</dd>
+    			{% endfor %}		
+  		  </dl>
+  			<dl>
+    			<dt>Derivative games</dt>
+    			{% for d in result.derivative_games %}
+    				<dd>{{ d }}</dd>
+    			{% endfor %}		
+  		  </dl>
+  			<dl>
+    			<dt>Genres</dt>
+    			{% for g in result.genre %}
+    				<dd>{{ g }}</dd>
+    			{% endfor %}		
+  		  </dl>
+			</div><!-- /game-detail -->	
+
+
+
+	    			
+		{% endblock %}	
