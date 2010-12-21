@@ -89,17 +89,23 @@ class PostGame(webapp.RequestHandler):
           "playing_time_minutes": None,
           "/games/game/number_of_players": {
             "high_value": None,
-            "low_value":  None
+            "low_value":  None,
+            "optional": True
+          },  
+          "/common/topic/weblink": {
+            "description": "BoardGameGeek",
+            "url":        None,
+            "optional": True
           }
         }        
 
-        result = freebase.sandbox.mqlread(query)
+        result = freebase.sandbox.mqlread(query, extended=True)
         
         # Can't access properties with special charactes in Django, so create
         # a dictionary.
-        players = result["/games/game/number_of_players"]
-        logging.info('gameID = ' + str(gameID) + 'gameName = ' + str(gameName))
-        
+        playerMinMax = result["/games/game/number_of_players"]
+        weblink = result["/common/topic/weblink"]
+
         # create/update Game data
         entity = models.Game.get_by_key_name(result.guid)
         if not entity:
@@ -124,7 +130,8 @@ class PostGame(webapp.RequestHandler):
         template_values = {
             'game': entity,
             'result': result,
-            'players': players
+            'playerMinMax': playerMinMax,
+            'weblink': weblink
         }  
 
         directory = os.path.dirname(__file__)

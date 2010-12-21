@@ -5,57 +5,79 @@
 		{% block main %}
 			<h1>{{ game.name}}</h1>
 		  <div id="game-detail">	
+			  {% if result.designer %}
     		<dl>
     			<dt>Designed by</dt>
 					<dd>{{ result.designer }}</dd>
     		</dl>
+ 				{% endif %}
+				{% if result.introduced %}
     		<dl>
     			<dt>Introduced</dt>
 					<dd>{{ result.introduced }}</dd>
     		</dl>
+				{% endif %}
+				{% if result.play_time_minutes and result.maximum_playing_time_minutes %}
     		<dl>
     			<dt>Playing time</dt>
 					<dd>{{ result.playing_time_minutes|floatformat }} - {{ result.maximum_playing_time_minutes|floatformat }} minutes</dd>
     		</dl>
+				{% endif %}
+     		{% if playerMinMax %}
     		<dl>
     			<dt># of players</dt>
-					<dd>{{ players.low_value }} - {{ players.high_value }}</dd>
+					<dd>{{ playerMinMax.low_value }} - {{ playerMinMax.high_value }}</dd>
     		</dl>
+				{% endif %}
+				{% if result.minimum_age_years %}
  	   		<dl>
 	    			<dt>Suggested age</dt>
 						<dd>{{ result.minimum_age_years|floatformat }} years and up</dd>
     		</dl>
+				{% endif %}
+				{% if result.origin %}
     		<dl>
     			<dt>Origin</dt>
 					<dd>{{ result.origin }}</dd>
     		</dl>
+				{% endif %}
+				{% if result.publisher %}
   			<dl>
     			<dt>Published by</dt>
     			{% for p in result.publisher %}
     				<dd>{{ p }}</dd>
     			{% endfor %}		
   		  </dl>	
+				{% endif %}
+				{% if result.expansions %}
   			<dl>
     			<dt>Expansions</dt>
     			{% for e in result.expansions %}
     				<dd>{{ e }}</dd>
     			{% endfor %}		
   		  </dl>
+				{% endif %}
+				{% if derivative %}
   			<dl>
     			<dt>Derivative games</dt>
     			{% for d in result.derivative_games %}
     				<dd>{{ d }}</dd>
     			{% endfor %}		
   		  </dl>
+				{% endif %}
+				{% if result.genre %}
   			<dl>
     			<dt>Genres</dt>
     			{% for g in result.genre %}
     				<dd>{{ g }}</dd>
     			{% endfor %}		
   		  </dl>
-			</div><!-- /game-detail -->	
-
-
-
-	    			
+				{% endif %}
+				{% if weblink %}
+    		<dl>
+    			<dt>Weblinks</dt>
+					<dd><a href="{{ weblink.url|cut:"/{name}" }}">{{ weblink.description }}</a></dd>
+    		</dl>
+				{% endif %}
+			</div><!-- /game-detail -->		    			
 		{% endblock %}	
