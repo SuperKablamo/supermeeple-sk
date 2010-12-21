@@ -37,9 +37,10 @@ class MainHandler(webapp.RequestHandler):
         result = freebase.sandbox.mqlread(query)
         logging.info(result)
 
-        # Keys with special characters, like "!/award/award_honor/honored_for"
-        # cannot be accessed from a Django template, so rebuild the result
-        # into a array of key-value pair dictionaries.
+        # Properties with special characters, like 
+        # "!/award/award_honor/honored_for" cannot be accessed from a Django
+        # template, so rebuild the result into a array of key-value pair 
+        # dictionaries.
         games = []
         count = 0
         for r in result:
@@ -71,24 +72,32 @@ class PostGame(webapp.RequestHandler):
 
         # Get Game data
         query = {
-            "id":            str(gameID),
-            "type":          "/games/game",
-            "guid":          None,
-            "name":          None,
-            "creator":       None,
-            "expansions":    [],
-            "introduced":    None,
-            "genre":         [],
-            "designer":      None,
-            "maximum_playing_time_minutes": None,
-            "minimum_age_years": None,
-            "number_of_players": None,
-            "origin":        None,
-            "playing_time_minutes": None,
-            "publisher":     [],
-            "derivative_games": [],
-        }
+          "id":            str(gameID),
+          "type":          "/games/game",
+          "guid":          None,
+          "name":          None,
+          "creator":       None,
+          "expansions":    [],
+          "introduced":    None,
+          "genre":         [],
+          "designer":      None,
+          "minimum_age_years": None,
+          "origin":        None,
+          "publisher":     [],
+          "derivative_games": [],
+          "maximum_playing_time_minutes": None,
+          "playing_time_minutes": None,
+          "/games/game/number_of_players": {
+            "high_value": None,
+            "low_value":  None
+          }
+        }        
+
         result = freebase.sandbox.mqlread(query)
+        
+        # Can't access properties with special charactes in Django, so create
+        # a dictionary.
+        players = result["/games/game/number_of_players"]
         logging.info('gameID = ' + str(gameID) + 'gameName = ' + str(gameName))
         
         # create/update Game data
@@ -114,7 +123,8 @@ class PostGame(webapp.RequestHandler):
                               
         template_values = {
             'game': entity,
-            'result': result
+            'result': result,
+            'players': players
         }  
 
         directory = os.path.dirname(__file__)

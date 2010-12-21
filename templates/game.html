@@ -15,7 +15,15 @@
     		</dl>
     		<dl>
     			<dt>Playing time</dt>
-					<dd>{{ result.playing_time_minutes }} minutes</dd>
+					<dd>{{ result.playing_time_minutes|floatformat }} - {{ result.maximum_playing_time_minutes|floatformat }} minutes</dd>
+    		</dl>
+    		<dl>
+    			<dt># of players</dt>
+					<dd>{{ players.low_value }} - {{ players.high_value }}</dd>
+    		</dl>
+ 	   		<dl>
+	    			<dt>Suggested age</dt>
+						<dd>{{ result.minimum_age_years|floatformat }} years and up</dd>
     		</dl>
     		<dl>
     			<dt>Origin</dt>
