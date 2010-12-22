@@ -34,8 +34,8 @@ body { background-color: #333; }
 #search { float: right;  }
 #search p { padding: 4px 0 4px 4px; }
 
-/*MAIN*/
-#main { margin: 4px 56px 4px 14px; }
+/*MAINBAR*/
+#mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }
 table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
@@ -43,6 +43,10 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 #game-detail dl { margin: 6px 0; }
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
+
+/*SIDEBAR*/
+#sidebar { margin: 4px 14px 4px 14px; width: 300px; float: left; }
+#sidebar .block { padding-bottom: 12px; }
 
 /*FOOTER*/
 #footer {  }

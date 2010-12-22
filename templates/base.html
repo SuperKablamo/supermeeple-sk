@@ -33,23 +33,14 @@
      	</div>  
     </div><!-- /header -->
       
-    <div id="main">
+    <div id="mainbar">
     {% block main %}
-      <table id="game-list">
-        <caption>Spiel Des Jahres Winners</caption>
-        {% for g in games %}
-  			<tr>
-					<td>
-						<span><a href="game/?guid={{ g.guid }}">{{ g.name }}</a></span>
-					</td>
-					<td>
-						<div class="year">{{ g.year }}</div>
-					</td>
-	      </tr>
-				{% endfor %}
-    	</table>
     {% endblock %} 
     </div><!-- /main -->
+		<div id="sidebar">
+		{% block sidebar %}
+		{% endblock %}	
+		</div><!-- /sidebar -->	
  		<div id="footer">
 	    <div id="freebase-tag">
 				<a href="http://freebase.com">powered by <span class="logo">freebase</span></a>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+	{% block title %}SuperMeeple - Board Game Database, Tools and Apps{% endblock %}
+	
+		{% block main %}
+      <table id="game-list">
+        <caption>Spiel Des Jahres Winners</caption>
+        {% for g in games %}
+  			<tr>
+					<td>
+						<span><a href="game-profile{{ g.mid }}">{{ g.name }}</a></span>
+					</td>
+					<td>
+						<div class="year">{{ g.year }}</div>
+					</td>
+	      </tr>
+				{% endfor %}
+    	</table>
+    {% endblock %}
