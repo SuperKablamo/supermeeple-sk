@@ -5,22 +5,22 @@
 		{% block main %}
 			<h1>{{ game.name}}</h1>
 		  <div id="game-detail">	
-			  {% if result.designer %}
+			  {% if game.designer %}
     		<dl>
     			<dt>Designed by</dt>
-					<dd>{{ result.designer }}</dd>
+					<dd>{{ game.designer }}</dd>
     		</dl>
  				{% endif %}
-				{% if result.introduced %}
+				{% if game.introduced %}
     		<dl>
     			<dt>Introduced</dt>
-					<dd>{{ result.introduced }}</dd>
+					<dd>{{ game.introduced }}</dd>
     		</dl>
 				{% endif %}
-				{% if result.play_time_minutes and result.maximum_playing_time_minutes %}
+				{% if game.play_time_minutes and game.maximum_playing_time_minutes %}
     		<dl>
     			<dt>Playing time</dt>
-					<dd>{{ result.playing_time_minutes|floatformat }} - {{ result.maximum_playing_time_minutes|floatformat }} minutes</dd>
+					<dd>{{ game.playing_time_minutes|floatformat }} - {{ game.maximum_playing_time_minutes|floatformat }} minutes</dd>
     		</dl>
 				{% endif %}
      		{% if playerMinMax %}
@@ -29,30 +29,30 @@
 					<dd>{{ playerMinMax.low_value }} - {{ playerMinMax.high_value }}</dd>
     		</dl>
 				{% endif %}
-				{% if result.minimum_age_years %}
+				{% if game.minimum_age_years %}
  	   		<dl>
 	    			<dt>Suggested age</dt>
-						<dd>{{ result.minimum_age_years|floatformat }} years and up</dd>
+						<dd>{{ game.minimum_age_years|floatformat }} years and up</dd>
     		</dl>
 				{% endif %}
-				{% if result.origin %}
+				{% if game.origin %}
     		<dl>
     			<dt>Origin</dt>
-					<dd>{{ result.origin }}</dd>
+					<dd>{{ game.origin }}</dd>
     		</dl>
 				{% endif %}
-				{% if result.publisher %}
+				{% if game.publisher %}
   			<dl>
     			<dt>Published by</dt>
-    			{% for p in result.publisher %}
+    			{% for p in game.publisher %}
     				<dd>{{ p }}</dd>
     			{% endfor %}		
   		  </dl>	
 				{% endif %}
-				{% if result.expansions %}
+				{% if game.expansions %}
   			<dl>
     			<dt>Expansions</dt>
-    			{% for e in result.expansions %}
+    			{% for e in game.expansions %}
     				<dd>{{ e }}</dd>
     			{% endfor %}		
   		  </dl>
@@ -60,15 +60,15 @@
 				{% if derivative %}
   			<dl>
     			<dt>Derivative games</dt>
-    			{% for d in result.derivative_games %}
+    			{% for d in game.derivative_games %}
     				<dd>{{ d }}</dd>
     			{% endfor %}		
   		  </dl>
 				{% endif %}
-				{% if result.genre %}
+				{% if game.genre %}
   			<dl>
     			<dt>Genres</dt>
-    			{% for g in result.genre %}
+    			{% for g in game.genre %}
     				<dd>{{ g }}</dd>
     			{% endfor %}		
   		  </dl>

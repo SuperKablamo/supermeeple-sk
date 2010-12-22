@@ -11,17 +11,19 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+from urlparse import urlparse
 
 import models
 
 class MainHandler(webapp.RequestHandler):
+    """Return content for index.html.    
+    """
     def get(self):
         # Get the Spiel Des Jahres award winners.
         query = [{
           "type": "/games/game",
-          "id":   None,
+          "mid": None,
           "name": None,
-          "guid": None,
           "!/award/award_honor/honored_for": {
             "award": {
               "id": "/en/spiel_des_jahres"
@@ -45,25 +47,69 @@ class MainHandler(webapp.RequestHandler):
         count = 0
         for r in result:
             name = r.name
-            guid = r.guid
             year = r["!/award/award_honor/honored_for"].year.value
+            mid = r.mid
             game = {}
             game["name"] = name
-            game["guid"] = guid
             game["year"] = year
+            game["mid"] = mid
             games.append(game)
             
         template_values = {
             'games': games
-        }
-        
+        }        
         directory = os.path.dirname(__file__)
         path = os.path.join(directory, os.path.join('templates', 'index.html'))
         self.response.out.write(template.render(path, template_values, debug=True))
  
-class PostGame(webapp.RequestHandler):
+class GameProfile(webapp.RequestHandler):
+    """Returns a Game data
+    
+    GET - uses a guid to look up a Game on Freebase.  The datastore is 
+    updated with Game data and the data is passed to a template.
+    
+    POST - uses gameID and gameName to look up a Game on Freebase.  The
+    datastore is updated with Game data and the data is passed to a template.
+    """
+    # Direct linking to Game Profile
+    def get(self, mid=None):
+        logging.info('########### GameProfile::get ###########')
+        logging.info('########### uri = ' + self.request.url + ' ###########')
+        logging.info('########### mid = ' + mid + ' ###########')
+
+        data = getGame(mid)
+        
+        # Can't access properties with special charactes in Django, so create
+        # a dictionary.
+        playerMinMax = data["/games/game/number_of_players"]
+        weblink = data["/common/topic/weblink"]
+
+        # create/update Game data
+        entity = models.Game.get_by_key_name(data.mid)
+        if not entity:
+            entity = models.Game(key_name=data.mid, name=data.name)
+            logging.info('## CREATING NEW ENTITY: KEY: ' + str(entity.key()) + 
+                         ' | NAME: ' + entity.name)
+                              
+        else:
+            entity.name = data.name            
+            logging.info('## UPDATING ENTITY: KEY: ' + str(entity.key()) + 
+                         ' | NAME: ' + entity.name)
+        
+        entity.put()
+                              
+        template_values = {
+            'game': data,
+            'playerMinMax': playerMinMax,
+            'weblink': weblink
+        }  
+
+        directory = os.path.dirname(__file__)
+        path = os.path.join(directory, os.path.join('templates', 'game.html'))
+        self.response.out.write(template.render(path, template_values, debug=True))    
+    # Game search POST
     def post(self):
-        logging.info('########### GetGame::post ###########')
+        logging.info('########### GameProfile::post ###########')
         
         # store POST variables
         gameID = self.request.get('gameID')
@@ -72,32 +118,32 @@ class PostGame(webapp.RequestHandler):
 
         # Get Game data
         query = {
-          "id":            str(gameID),
-          "type":          "/games/game",
-          "guid":          None,
-          "name":          None,
-          "creator":       None,
-          "expansions":    [],
-          "introduced":    None,
-          "genre":         [],
-          "designer":      None,
-          "minimum_age_years": None,
-          "origin":        None,
-          "publisher":     [],
-          "derivative_games": [],
-          "maximum_playing_time_minutes": None,
-          "playing_time_minutes": None,
-          "/games/game/number_of_players": {
-            "high_value": None,
-            "low_value":  None,
-            "optional": True
-          },  
-          "/common/topic/weblink": {
-            "description": "BoardGameGeek",
-            "url":        None,
-            "optional": True
-          }
-        }        
+            "id":            str(gameID),
+            "type":          "/games/game",
+            "guid":          None,
+            "name":          None,
+            "creator":       None,
+            "expansions":    [],
+            "introduced":    None,
+            "genre":         [],
+            "designer":      None,
+            "minimum_age_years": None,
+            "origin":        None,
+            "publisher":     [],
+            "derivative_games": [],
+            "maximum_playing_time_minutes": None,
+            "playing_time_minutes": None,
+            "/games/game/number_of_players": {
+                "high_value": None,
+                "low_value":  None,
+                "optional": True
+                },  
+            "/common/topic/weblink": {
+                "description": "BoardGameGeek",
+                "url":        None,
+                "optional": True
+                }
+            }         
 
         result = freebase.sandbox.mqlread(query, extended=True)
         
@@ -140,8 +186,42 @@ class PostGame(webapp.RequestHandler):
 
 application = webapp.WSGIApplication(
                                      [('/', MainHandler),
-                                     ('/game-profile', PostGame)],
+                                     ('/game-profile', GameProfile),
+                                     (r'/game-profile(/m/.*)', GameProfile)],
                                      debug=True)
+
+def getGame(mid):
+    """Returns a Freebase emql result for Game data.    
+    """
+    query = {
+      "mid":           mid,
+      "id":            None,
+      "type":          "/games/game",
+      "name":          None,
+      "creator":       None,
+      "expansions":    [],
+      "introduced":    None,
+      "genre":         [],
+      "designer":      None,
+      "minimum_age_years": None,
+      "origin":        None,
+      "publisher":     [],
+      "derivative_games": [],
+      "maximum_playing_time_minutes": None,
+      "playing_time_minutes": None,
+      "/games/game/number_of_players": {
+        "high_value": None,
+        "low_value":  None,
+        "optional": True
+      },  
+      "/common/topic/weblink": {
+        "description": "BoardGameGeek",
+        "url":        None,
+        "optional": True
+      }
+    }        
+    result = freebase.sandbox.mqlread(query, extended=True)   
+    return result
 
 def main():
     run_wsgi_app(application)

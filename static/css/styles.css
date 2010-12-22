@@ -16,6 +16,7 @@ a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none
 #title span { font-weight: normal; margin: 5px 0; font-size: 2em; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 1.8em; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.6em; }
+#search p { font-size:.8em; text-transform: uppercase; }
 #game-list caption { color: #999; font-size: 1.2em; text-align: left; }
 #game-list .year { text-align: right; } 
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
@@ -31,10 +32,11 @@ body { background-color: #333; }
 #header { height: 60px; margin: 14px; }
 #title { float: left;}
 #search { float: right;  }
+#search p { padding: 4px 0 4px 4px; }
 
 /*MAIN*/
 #main { margin: 4px 56px 4px 14px; }
-table#game-list { border-collapse: collapse; width: 100%; padding-right: 40px; }
+table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
 #game-detail { margin-bottom: 12px; }

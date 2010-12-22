@@ -7,7 +7,6 @@ class User(db.Model):
     rating = db.IntegerProperty(required=True)
 
 class Game(db.Model):
-    freebaseID = db.StringProperty(required=True)
     name = db.StringProperty(required=True)
     bggURL = db.LinkProperty(required=False)
     totalRating = db.IntegerProperty(required=False)
