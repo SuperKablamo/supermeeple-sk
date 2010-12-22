@@ -8,7 +8,9 @@
 			  {% if game.designer %}
     		<dl>
     			<dt>Designed by</dt>
-					<dd>{{ game.designer }}</dd>
+					{% for d in game.designer %}
+					<dd>{{ d }}</dd>
+					{% endfor %}
     		</dl>
  				{% endif %}
 				{% if game.introduced %}

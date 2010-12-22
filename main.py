@@ -36,7 +36,7 @@ class MainHandler(webapp.RequestHandler):
           },
           "sort": "-!/award/award_honor/honored_for.year.value"
         }]
-        result = freebase.sandbox.mqlread(query)
+        result = freebase.mqlread(query)
         logging.info(result)
 
         # Properties with special characters, like 
@@ -119,14 +119,14 @@ class GameProfile(webapp.RequestHandler):
         # Get Game data
         query = {
             "id":            str(gameID),
+            "mid":           None,
             "type":          "/games/game",
-            "guid":          None,
             "name":          None,
-            "creator":       None,
+            "creator":       [],
             "expansions":    [],
             "introduced":    None,
             "genre":         [],
-            "designer":      None,
+            "designer":      [],
             "minimum_age_years": None,
             "origin":        None,
             "publisher":     [],
@@ -145,7 +145,7 @@ class GameProfile(webapp.RequestHandler):
                 }
             }         
 
-        result = freebase.sandbox.mqlread(query, extended=True)
+        result = freebase.mqlread(query, extended=True)
         
         # Can't access properties with special charactes in Django, so create
         # a dictionary.
@@ -153,22 +153,15 @@ class GameProfile(webapp.RequestHandler):
         weblink = result["/common/topic/weblink"]
 
         # create/update Game data
-        entity = models.Game.get_by_key_name(result.guid)
+        entity = models.Game.get_by_key_name(result.mid)
         if not entity:
-            entity = models.Game(key_name=result.guid,
-                                 freebaseID=result.id,
-                                 name=result.name)
-                                 
+            entity = models.Game(key_name=result.mid, name=result.name)
             logging.info('## CREATING NEW ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | FREEBASEID: ' + entity.freebaseID +
                          ' | NAME: ' + entity.name)
                               
         else:
-            entity.freebaseID = result.id  
             entity.name = result.name            
-
             logging.info('## UPDATING ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | FREEBASEID: ' + entity.freebaseID +
                          ' | NAME: ' + entity.name)
         
         entity.put()
@@ -195,14 +188,13 @@ def getGame(mid):
     """
     query = {
       "mid":           mid,
-      "id":            None,
       "type":          "/games/game",
       "name":          None,
       "creator":       None,
       "expansions":    [],
       "introduced":    None,
       "genre":         [],
-      "designer":      None,
+      "designer":      [],
       "minimum_age_years": None,
       "origin":        None,
       "publisher":     [],
@@ -220,7 +212,7 @@ def getGame(mid):
         "optional": True
       }
     }        
-    result = freebase.sandbox.mqlread(query, extended=True)   
+    result = freebase.mqlread(query, extended=True)   
     return result
 
 def main():
