@@ -26,13 +26,16 @@ h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.6em; }
 
 /*LAYOUT*/
 body { background-color: #333; }
-#container { width:100%;  height: 100%; }
+#container { width: 800px;  height: 100%; margin: 0; }
+#content { width: 100%; margin: 0; }
 
 /*HEADER*/
-#header { height: 60px; margin: 14px; }
-#title { float: left;}
-#search { float: right;  }
-#search p { padding: 4px 0 4px 4px; }
+#header { height: 60px; margin: 14px 0; }
+#title { width: 400px; margin: 0 56px 0 14px; float: left; }
+#fb-login { margin: 4px 14px 4px 14px; width: 300px; float: left; }
+#fb-button { float: left; }
+#fb-profile { float: left; padding-right: 12px; }
+#fb-profile img { border: 3px solid #222; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }
@@ -47,6 +50,8 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 /*SIDEBAR*/
 #sidebar { margin: 4px 14px 4px 14px; width: 300px; float: left; }
 #sidebar .block { padding-bottom: 12px; }
+#search { }
+#search p { padding: 4px 0 4px 4px; }
 
 /*FOOTER*/
 #footer {  }

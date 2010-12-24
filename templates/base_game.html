@@ -87,13 +87,16 @@
 		
 		{% block sidebar %}	
 			<div class="block">
-		    <h1>Connect JavaScript - jQuery Login Example</h1>
-				<fb:login-button autologoutlink="true"></fb:login-button>
-		    {% if current_user %}
-		      <p><a href="{{ current_user.profile_url }}"><img src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square"/></a></p>
-		      <p>Hello, {{ current_user.name|escape }}</p>
-		    {% endif %}
-			</div>		
+	    	<div id="search">
+	     		<form name="input" action="/game-profile" method="post">
+	         	<input class="search-box" name="fbSelect" type="text" id="game-search"/>
+	         	<input type="hidden" name="gameID" id="game-id" />
+	         	<input type="hidden" name="gameName" id="game-name" />
+	         	<input class="button" value="Go" type="submit"/>
+	       	</form>
+					<p>search for more games</p>
+	     	</div>
+			</div>	
 			<div class="block">
 				<h2>Chicken</h2>
 				<div id="checkin">

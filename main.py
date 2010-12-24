@@ -31,6 +31,8 @@ class BaseHandler(webapp.RequestHandler):
     """
     @property
     def current_user(self):
+        logging.info('########### BaseHandler:: current_user ###########')
+        logging.info('########### ' +FACEBOOK_APP_ID+'###########')
         if not hasattr(self, "_current_user"):
             self._current_user = None
             cookie = facebook.get_user_from_cookie(
@@ -53,6 +55,7 @@ class BaseHandler(webapp.RequestHandler):
                     user.put()
                 self._current_user = user
         return self._current_user
+
 
 
 class MainHandler(BaseHandler):
@@ -96,7 +99,9 @@ class MainHandler(BaseHandler):
             games.append(game)
             
         template_values = {
-            'games': games
+            'games': games,
+            'current_user': self.current_user,
+            'facebook_app_id': FACEBOOK_APP_ID
         }        
         directory = os.path.dirname(__file__)
         path = os.path.join(directory, os.path.join('templates', 'base_index.html'))
@@ -213,7 +218,9 @@ class GameProfile(BaseHandler):
             'game': entity,
             'result': result,
             'playerMinMax': playerMinMax,
-            'weblink': weblink
+            'weblink': weblink, 
+            'current_user': self.current_user,
+            'facebook_app_id': FACEBOOK_APP_ID
         }  
 
         directory = os.path.dirname(__file__)
@@ -249,7 +256,9 @@ class GameCheckin(BaseHandler):
         template_values = {
             'game': data,
             'playerMinMax': playerMinMax,
-            'weblink': weblink
+            'weblink': weblink, 
+            'current_user': self.current_user,
+            'facebook_app_id': FACEBOOK_APP_ID
         }
         
         directory = os.path.dirname(__file__)
