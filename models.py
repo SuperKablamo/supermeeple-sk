@@ -21,10 +21,11 @@ class GameData(db.Model):
 
 class GameSession(db.Model):
     game = db.ReferenceProperty(Game)
-    location = db.StringProperty(required=True)
+    name = db.StringProperty(required=True)
+    location = db.StringProperty(required=False)
 
 class GameCheckin(db.Model):
-    gameSession = db.ReferenceProperty(GameSession)
+    game = db.ReferenceProperty(Game)
     user = db.ReferenceProperty(User)
     created = db.DateTimeProperty(required=True, auto_now=True)
 

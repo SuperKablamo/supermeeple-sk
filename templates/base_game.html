@@ -3,7 +3,7 @@
 	{% block title %}SuperMeeple - {{ game.name }}{% endblock %}
 	
 		{% block main %}
-			<h1>{{ game.name}}</h1>
+			<h1>{{ game.name }}</h1>
 		  <div id="game-detail">	
 			  {% if game.designer %}
     		<dl>
@@ -82,8 +82,7 @@
     		</dl>
 				{% endif %}
 			</div><!-- /game-detail -->		    			
-		{% endblock %}
-		
+		{% endblock %}		
 		
 		{% block sidebar %}	
 			<div class="block">
@@ -97,15 +96,22 @@
 					<p>search for more games</p>
 	     	</div>
 			</div>	
+			
 			<div class="block">
-				<h2>Chicken</h2>
-				<div id="checkin">
-					<p>chickens go here</p>
+				{% if not checkin %}
+	      <div id="checkin">
+					<h2>Checkin</h2>
 					<form name="input" action="/game-checkin" method="post">
 	         	<input type="hidden" name="mid" id="game-mid" value={{game.mid}} />
 	         	<input class="button" value="Checkin" type="submit"/>
 	       	</form>
 				</div>
+				{% else %}
+	      <div id="checkin">
+					<h2>Checkin</h2>
+					<p>You are checked into {{ game.name }}.</p>
+				</div>				
+	    	{% endif %}
 			</div>
 		{% endblock %}
 		

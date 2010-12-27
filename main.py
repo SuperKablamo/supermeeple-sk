@@ -4,6 +4,8 @@
 
 FACEBOOK_APP_ID = "149881721731503"
 FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
+DEBUG = True
+CHECKIN_FREQUENCY = 900 # Checkin frequency in seconds
 
 import os
 import cgi
@@ -11,6 +13,7 @@ import freebase
 import logging
 import facebook
 import models
+import datetime
 
 from django.utils import simplejson
 from google.appengine.ext import db
@@ -56,7 +59,10 @@ class BaseHandler(webapp.RequestHandler):
                 self._current_user = user
         return self._current_user
 
-
+    def generate(self, template_name, template_values):
+        directory = os.path.dirname(__file__)
+        path = os.path.join(directory, os.path.join('templates', template_name))
+        self.response.out.write(template.render(path, template_values, debug=DEBUG))
 
 class MainHandler(BaseHandler):
     """Return content for index.html.    
@@ -102,10 +108,8 @@ class MainHandler(BaseHandler):
             'games': games,
             'current_user': self.current_user,
             'facebook_app_id': FACEBOOK_APP_ID
-        }        
-        directory = os.path.dirname(__file__)
-        path = os.path.join(directory, os.path.join('templates', 'base_index.html'))
-        self.response.out.write(template.render(path, template_values, debug=True))
+        }  
+        self.generate('base_index.html', template_values) 
  
 class GameProfile(BaseHandler):
     """Returns a Game data
@@ -122,38 +126,37 @@ class GameProfile(BaseHandler):
         logging.info('########### uri = ' + self.request.url + ' ###########')
         logging.info('########### mid = ' + mid + ' ###########')
 
-        data = getGame(mid)
-        
+        gameResult = getGame(mid)
+        user = self.current_user
         # Can't access properties with special charactes in Django, so create
         # a dictionary.
-        playerMinMax = data["/games/game/number_of_players"]
-        weblink = data["/common/topic/weblink"]
+        playerMinMax = gameResult["/games/game/number_of_players"]
+        weblink = gameResult["/common/topic/weblink"]
 
-        # create/update Game data
-        entity = models.Game.get_by_key_name(data.mid)
-        if not entity:
-            entity = models.Game(key_name=data.mid, name=data.name)
-            logging.info('## CREATING NEW ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | NAME: ' + entity.name)
+        # Create/Update Game data
+        game = models.Game.get_by_key_name(gameResult.mid)
+        if not game:
+            game = models.Game(key_name=gameResult.mid, name=gameResult.name)
+            logging.info('## CREATING NEW ENTITY: KEY: ' + str(game.key()) + 
+                         ' | NAME: ' + game.name)
                               
         else:
-            entity.name = data.name            
-            logging.info('## UPDATING ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | NAME: ' + entity.name)
+            game.name = gameResult.name            
+            logging.info('## UPDATING ENTITY: KEY: ' + str(game.key()) + 
+                         ' | NAME: ' + game.name)
         
-        entity.put()
-                              
+        game.put()
+        checkin = getCheckin(game, user) 
+                                                  
         template_values = {
-            'game': data,
+            'game': gameResult,
             'playerMinMax': playerMinMax,
             'weblink': weblink,
-            'current_user': self.current_user,
+            'checkin': checkin,
+            'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
-
-        directory = os.path.dirname(__file__)
-        path = os.path.join(directory, os.path.join('templates', 'base_game.html'))
-        self.response.out.write(template.render(path, template_values, debug=True))  
+        self.generate('base_game.html', template_values) 
           
     # Game search POST
     def post(self):
@@ -192,7 +195,6 @@ class GameProfile(BaseHandler):
                 "optional": True
                 }
             }         
-
         result = freebase.mqlread(query, extended=True)
         
         # Can't access properties with special charactes in Django, so create
@@ -222,48 +224,32 @@ class GameProfile(BaseHandler):
             'current_user': self.current_user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
-
-        directory = os.path.dirname(__file__)
-        path = os.path.join(directory, os.path.join('templates', 'base_game.html'))
-        self.response.out.write(template.render(path, template_values, debug=True))
+        self.generate('base_game.html', template_values) 
 
 class GameCheckin(BaseHandler):
     
     # Checkin to Game
     def post(self):
         logging.info('########### GameCheckin::post ###########')
-        data = getGame(self.request.get('mid'))
-        
-        # Can't access properties with special charactes in Django, so create
-        # a dictionary.
-        playerMinMax = data["/games/game/number_of_players"]
-        weblink = data["/common/topic/weblink"]
+        user = self.current_user
+        mid = self.request.get('mid')
+        game = models.Game.get_by_key_name(mid)
+        logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
 
-        # create/update Game data
-        entity = models.Game.get_by_key_name(data.mid)
-        if not entity:
-            entity = models.Game(key_name=data.mid, name=data.name)
-            logging.info('## CREATING NEW ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | NAME: ' + entity.name)
-                              
-        else:
-            entity.name = data.name            
-            logging.info('## UPDATING ENTITY: KEY: ' + str(entity.key()) + 
-                         ' | NAME: ' + entity.name)
-        
-        entity.put()
+        gameCheckin = models.GameCheckin(user=user, game=game)
+                                         
+        gameCheckin.put()   
+        q = models.GameCheckin.all()
+        q = q.filter("game", game)
+        checkin = q.fetch(1)    
+        logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
+                                              
                               
         template_values = {
-            'game': data,
-            'playerMinMax': playerMinMax,
-            'weblink': weblink, 
-            'current_user': self.current_user,
+            'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }
-        
-        directory = os.path.dirname(__file__)
-        path = os.path.join(directory, os.path.join('templates', 'base_game.html'))
-        self.response.out.write(template.render(path, template_values, debug=True))
+        self.generate('base_game.html', template_values) 
 
 ######################## METHODS #############################################
 
@@ -295,9 +281,21 @@ def getGame(mid):
         "url":        None,
         "optional": True
       }
-    }        
-    result = freebase.mqlread(query, extended=True)   
-    return result
+    }       
+    return freebase.mqlread(query, extended=True)   
+
+def getCheckin(game, user):
+    time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
+    q = models.GameCheckin.all()
+    q.filter("game", game)
+    q.filter("user", user)
+    q.filter("created >", time)
+    q.order("-created")
+    checkin = q.get()
+    logging.info("################ getCheckin:: checkin: " + str(checkin) +  " ###############")
+    logging.info("#####" + str(datetime.datetime.now())  + "#####")
+    logging.info("#####" + str(datetime.datetime.now() - datetime.timedelta(minutes=15))  + "#####")
+    return checkin
     
 ##############################################################################
 application = webapp.WSGIApplication(
