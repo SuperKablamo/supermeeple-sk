@@ -23,7 +23,6 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 from urlparse import urlparse
 
-
 class BaseHandler(webapp.RequestHandler):
     """Provides access to the active Facebook user in self.current_user
 
@@ -35,7 +34,6 @@ class BaseHandler(webapp.RequestHandler):
     @property
     def current_user(self):
         logging.info('########### BaseHandler:: current_user ###########')
-        logging.info('########### ' +FACEBOOK_APP_ID+'###########')
         if not hasattr(self, "_current_user"):
             self._current_user = None
             cookie = facebook.get_user_from_cookie(
@@ -68,6 +66,7 @@ class MainHandler(BaseHandler):
     """Return content for index.html.    
     """
     def get(self):
+        logging.info('########### MainHandler:: get() ###########')
         # Get the Spiel Des Jahres award winners.
         query = [{
           "type": "/games/game",
@@ -251,6 +250,31 @@ class GameCheckin(BaseHandler):
         }
         self.generate('base_game.html', template_values) 
 
+class GameCheckinTest(BaseHandler):
+    # Checkin to Game
+    def post(self):
+        logging.info('########### GameCheckin::post ###########')
+        user = self.current_user
+        mid = self.request.get('mid')
+        game = models.Game.get_by_key_name(mid)
+        logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
+
+        gameCheckin = models.GameCheckin(user=user, game=game)
+
+        gameCheckin.put()   
+        q = models.GameCheckin.all()
+        q = q.filter("game", game)
+        checkin = q.fetch(1)    
+        logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
+
+
+        template_values = {
+            'current_user': user,
+            'facebook_app_id': FACEBOOK_APP_ID
+        }
+        
+
+
 ######################## METHODS #############################################
 
 def getGame(mid):
@@ -285,6 +309,10 @@ def getGame(mid):
     return freebase.mqlread(query, extended=True)   
 
 def getCheckin(game, user):
+    """Returns a checkin for the user and game.  Checkins that are not older
+    than the CHECKIN_FREQUENCY are not returned, indicating that the user
+    cannot checkin again.    
+    """
     time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
     q = models.GameCheckin.all()
     q.filter("game", game)
@@ -292,9 +320,6 @@ def getCheckin(game, user):
     q.filter("created >", time)
     q.order("-created")
     checkin = q.get()
-    logging.info("################ getCheckin:: checkin: " + str(checkin) +  " ###############")
-    logging.info("#####" + str(datetime.datetime.now())  + "#####")
-    logging.info("#####" + str(datetime.datetime.now() - datetime.timedelta(minutes=15))  + "#####")
     return checkin
     
 ##############################################################################
@@ -302,7 +327,8 @@ application = webapp.WSGIApplication(
                                      [('/', MainHandler),
                                      ('/game-profile', GameProfile),
                                      (r'/game-profile(/m/.*)', GameProfile),
-                                     ('/game-checkin', GameCheckin)],
+                                     ('/game-checkin', GameCheckin),
+                                     ('/game-checkin-test', GameCheckinTest)],
                                      debug=True)
 
 def main():

@@ -96,15 +96,18 @@
 					<p>search for more games</p>
 	     	</div>
 			</div>	
-			
+			<!--
 			<div class="block">
 				{% if not checkin %}
 	      <div id="checkin">
 					<h2>Checkin</h2>
-					<form name="input" action="/game-checkin" method="post">
-	         	<input type="hidden" name="mid" id="game-mid" value={{game.mid}} />
-	         	<input class="button" value="Checkin" type="submit"/>
-	       	</form>
+					<div id="status"></div>
+					<div id="form">
+						<form id="game-checkin" name="input" action="javascript:alert('success!');" method="post">
+	         		<input type="hidden" name="mid" id="game-mid" value={{game.mid}} />
+	         		<input class="button" value="Checkin" name="submit" type="submit"/>
+	       		</form>
+					</div>
 				</div>
 				{% else %}
 	      <div id="checkin">
@@ -112,6 +115,23 @@
 					<p>You are checked into {{ game.name }}.</p>
 				</div>				
 	    	{% endif %}
+			</div>
+			-->
+			<div class="block">
+				{% if not checkin %}
+				<div id="checkin-form">  
+			  	<form name="input" action="">  
+			   		<fieldset>  
+							<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>  
+			       	<input type="submit" name="submit" class="button" id="submit_btn" value="Checkin" />  
+			     	</fieldset>  
+			   	</form>  
+			  </div>			
+				{% else %}
+				<div id="checkin">
+					<h2>You are checked in!</h2>
+				</div>
+				{% endif %}
 			</div>
 		{% endblock %}
 		

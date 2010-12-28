@@ -52,6 +52,8 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 #sidebar .block { padding-bottom: 12px; }
 #search { }
 #search p { padding: 4px 0 4px 4px; }
+#checkmark { float: left; }
+
 
 /*FOOTER*/
 #footer {  }

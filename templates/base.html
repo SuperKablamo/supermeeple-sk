@@ -15,6 +15,26 @@
     });
   });
   </script>
+	<script>
+  	$(function() {  
+      $('.error').hide();  
+      $(".button").click(function() { 
+	      var mid = $("input#mid").val();
+	      var dataString = 'mid='+ mid;  
+				//alert (dataString);return false;  
+				$.ajax({  
+					type: "POST",  
+				  url: "/game-checkin-test",  
+				  data: dataString,  
+				  success: function() {  
+				  	$('#checkin-form').html("<div id='message'></div>");  
+				    $('#message').html("<h2>You are checked in!</h2>");  
+				  }  
+				});  
+				return false;
+    	});  
+   	});
+	</script>
   </head> 
   <body>
   <div id="container">
