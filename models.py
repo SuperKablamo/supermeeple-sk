@@ -9,10 +9,13 @@ class User(db.Model):
     name = db.StringProperty(required=True)
     profile_url = db.StringProperty(required=True)
     access_token = db.StringProperty(required=True)
+    # TODO: provide a common way to define places for Users of FB, Twitter . . .
+    #current_location = db.ReferenceProperty(Location, required=False)
 
 class Game(db.Model):
     name = db.StringProperty(required=True)
     bggURL = db.LinkProperty(required=False)
+    bggID = db.IntegerProperty(required=False)
     totalRating = db.IntegerProperty(required=False)
     updated = db.DateTimeProperty(required=True, auto_now=True)
 

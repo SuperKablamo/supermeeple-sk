@@ -5,7 +5,7 @@
 FACEBOOK_APP_ID = "149881721731503"
 FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
 DEBUG = True
-CHECKIN_FREQUENCY = 900 # Checkin frequency in seconds
+CHECKIN_FREQUENCY = 600 # Checkin frequency in seconds
 
 import os
 import cgi
@@ -192,7 +192,11 @@ class GameProfile(BaseHandler):
                 "description": "BoardGameGeek",
                 "url":        None,
                 "optional": True
-                }
+                },
+            "key" : {
+              "namespace" : "/user/pak21/boardgamegeek/boardgame",
+              "value" : None
+              }
             }         
         result = freebase.mqlread(query, extended=True)
         
@@ -204,7 +208,7 @@ class GameProfile(BaseHandler):
         # create/update Game data
         entity = models.Game.get_by_key_name(result.mid)
         if not entity:
-            entity = models.Game(key_name=result.mid, name=result.name)
+            entity = models.Game(key_name=result.mid, name=result.name, bggID=result.key.value)
             logging.info('## CREATING NEW ENTITY: KEY: ' + str(entity.key()) + 
                          ' | NAME: ' + entity.name)
                               
@@ -259,15 +263,21 @@ class GameCheckinTest(BaseHandler):
         game = models.Game.get_by_key_name(mid)
         logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
 
+        # Check user into game
         gameCheckin = models.GameCheckin(user=user, game=game)
-
         gameCheckin.put()   
         q = models.GameCheckin.all()
         q = q.filter("game", game)
         checkin = q.fetch(1)    
         logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
 
-
+        # Announce checkin on Facebook Wall
+        logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
+        message = "I'm playing " + game.name
+        results = facebook.GraphAPI(user.access_token).put_wall_post(message)
+        
+        
+        
         template_values = {
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -304,6 +314,10 @@ def getGame(mid):
         "description": "BoardGameGeek",
         "url":        None,
         "optional": True
+      },
+      "key" : {
+        "namespace" : "/user/pak21/boardgamegeek/boardgame",
+        "value" : None
       }
     }       
     return freebase.mqlread(query, extended=True)   
