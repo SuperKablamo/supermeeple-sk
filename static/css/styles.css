@@ -13,13 +13,15 @@ table { border-collapse: collapse; border-spacing: 0; }
 body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: .8em; color: #eee;}
 a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none; }
 #container { text-align: left; }
-#title span { font-weight: normal; margin: 5px 0; font-size: 2em; }
-h1 { font-weight: normal; margin: 5px 0; font-size: 1.8em; }
-h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.6em; }
+#title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
+h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
+h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
 #search p { font-size:.8em; text-transform: uppercase; }
 #game-list caption { color: #999; font-size: 1.2em; text-align: left; }
 #game-list .year { text-align: right; } 
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
+#game-title span.name {   }
+#game-title span.year { font-size: 0.8em; color: #999; }
 #freebase-tag .logo { color: #999999; }
 #gae-tag .logo { color: #3885C7;  }
 #footer #plus { font-size: 1.4em; font-weight: bold; }
@@ -30,8 +32,8 @@ body { background-color: #333; }
 #content { width: 100%; margin: 0; }
 
 /*HEADER*/
-#header { height: 60px; margin: 14px 0; }
-#title { width: 400px; margin: 0 56px 0 14px; float: left; }
+#header { height: 60px; margin: 4px 0 0 0; clear: both; }
+#title { width: 400px; margin: 8px 56px 0 14px; float: left; }
 #fb-login { margin: 4px 14px 4px 14px; width: 300px; float: left; }
 #fb-button { float: left; }
 #fb-profile { float: left; padding-right: 12px; }
@@ -42,10 +44,14 @@ body { background-color: #333; }
 table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
-#game-detail { margin-bottom: 12px; }
+#game-detail { margin: 12px 0; }
 #game-detail dl { margin: 6px 0; }
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
+#game-image { padding-top: 10px; }
+#game-image img { max-width: 200px; border: 3px solid #222; }
+#description { height: 10em; overflow: hidden; }
+#more-less-container { text-align: right; } 
 
 /*SIDEBAR*/
 #sidebar { margin: 4px 14px 4px 14px; width: 300px; float: left; }
@@ -53,7 +59,6 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 #search { }
 #search p { padding: 4px 0 4px 4px; }
 #checkmark { float: left; }
-
 
 /*FOOTER*/
 #footer {  }

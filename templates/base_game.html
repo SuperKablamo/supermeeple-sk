@@ -3,8 +3,35 @@
 	{% block title %}SuperMeeple - {{ game.name }}{% endblock %}
 	
 		{% block main %}
-			<h1>{{ fb_game.name }}</h1>
+			<h1 id="game-title">
+				<span class="name" property="v:itemreviewed">{{ fb_game.name }}</span>
+				<span class="year">({{ bgg_game.year_published}})</span>
+			</h1>
 		  <div id="game-detail">	
+				{% if bgg_game.description %}
+  			<h2>Overview</h2>
+				<div id="description">
+					{{ bgg_game.description }}
+				</div>
+				<div id="more-less-container">
+					<a href="#" id="more-less">show more >></a>
+				</div>	
+				<script>
+				var open = false;
+				$('#more-less').click(function() {
+				    if (open) {
+				        $('#description').animate({height:'10em'}); 
+				        $('#more-less').text('show more >>');				
+				    }
+				    else {
+				        $('#description').animate({height:'100%'});
+				 				$('#more-less').text('show less <<');	
+				    }
+				    open = !open;
+				});
+				</script>
+
+				{% endif %}
 			  {% if game.designer %}
     		<dl>
     			<dt>Designed by</dt>
@@ -84,22 +111,25 @@
 				{% if bgg_game.expansions %}
   			<dl>
     			<dt>Expansions</dt>
-    			{% for e in expansions %}
+    			{% for e in bgg_game.expansions %}
     				<dd>{{ e }}</dd>
     			{% endfor %}		
   		  </dl>
 				{% endif %}
-				{% if bgg_game.description %}
-  			<dl>
-    			<dt>Description</dt>
-    			<dd>{{ bgg_game.description }}</dd>
-  		  </dl>
-				{% endif %}				
+
+						
 			</div><!-- /game-detail -->		    			
 		{% endblock %}		
 		
 		{% block sidebar %}	
 			<div class="block">
+				{% if bgg_game.bgg_img_url %}
+  			<div id="game-image">
+					<img src="{{ bgg_game.bgg_img_url }}"/>
+				</div>
+				{% endif %}	
+			</div>
+			<div class="block">			
 	    	<div id="search">
 	     		<form name="input" action="/game-profile" method="post">
 	         	<input class="search-box" name="fbSelect" type="text" id="game-search"/>

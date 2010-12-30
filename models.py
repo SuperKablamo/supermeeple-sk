@@ -14,9 +14,10 @@ class User(db.Model):
 
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
-    bgg_url = db.LinkProperty(required=False)
-    bgg_id = db.IntegerProperty(required=False) # BoardGameGeek id
+    bgg_id = db.StringProperty(required=False) # BoardGameGeek id
     mid = db.StringProperty(required=False) # Freebase mid
+    bgg_url = db.LinkProperty(required=False)
+    bgg_img_url = db.LinkProperty(required=False)
     description = db.TextProperty(required=False)
     year_published = db.IntegerProperty(required=False)
     min_players = db.IntegerProperty(required=False)

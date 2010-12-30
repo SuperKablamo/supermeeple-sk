@@ -22,6 +22,7 @@ from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
 from google.appengine.api import urlfetch
+from google.appengine.ext import blobstore
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
@@ -316,7 +317,7 @@ def getBGGGame(bgg_id, mid):
     expansions = buildDataList(xml.findall(".//boardgameexpansion"))
     categories = buildDataList(xml.findall(".//boardgamecategory"))
     mechanics = buildDataList(xml.findall(".//boardgamemechanic"))
-
+    image_url = xml.findtext(".//image")
     
     # Create/Update Game
     game = models.Game.get_by_key_name(mid)
@@ -326,6 +327,8 @@ def getBGGGame(bgg_id, mid):
         # Only update if the last update is older than the allowed time
         if game.updated < time:
             game.name = name
+            game.bgg_id = bgg_id
+            game.bgg_img_url = image_url
             game.description = description
             game.year_published = year_published
             game.min_players = min_players
@@ -338,10 +341,13 @@ def getBGGGame(bgg_id, mid):
             game.categories = categories
             game.mechanics = mechanics
             
+            
             game_xml.xml = str(xml)
         
     else: # Create new Game
         game = models.Game(key_name=mid,
+                           bgg_id=bgg_id,
+                           bgg_img_url=image_url,
                            name=name,
                            description=description,
                            year_published = year_published,
@@ -361,12 +367,15 @@ def getBGGGame(bgg_id, mid):
     game_xml.put() # Save GameXML
     return game
 
-def buildDataList(list):
-    data_list = []
-    for d in data_list:
-        data_list.append(d.text)
+def buildDataList(xml_element):
+    """Returns a list of parsed xml subelements.
+    """
+    data = []
+    for x in xml_element:
+        logging.info('########### buildDataList:: '+ x.text +' ###########')
+        data.append(x.text)
     
-    return data_list
+    return data
 
 def strToInt(s):
     """ Returns an integer formatted from a string.  Or 0, if string cannot be
