@@ -12,30 +12,29 @@ class User(db.Model):
     # TODO: provide a common way to define places for Users of FB, Twitter . . .
     #current_location = db.ReferenceProperty(Location, required=False)
 
-class Game(db.Model):
+class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
     bgg_url = db.LinkProperty(required=False)
-    bgg_id = db.IntegerProperty(required=False)
-    mid = db.StringProperty(required=False)
+    bgg_id = db.IntegerProperty(required=False) # BoardGameGeek id
+    mid = db.StringProperty(required=False) # Freebase mid
     description = db.TextProperty(required=False)
     year_published = db.IntegerProperty(required=False)
     min_players = db.IntegerProperty(required=False)
     max_players = db.IntegerProperty(required=False)
     playing_time = db.IntegerProperty(required=False)
     age = db.IntegerProperty(required=False)
-    publishers = db.StringListProperty(required=False) 
-    designers = db.StringListProperty(required=False) 
-    artists = db.StringListProperty(required=False) 
-    expansions = db.StringListProperty(required=False) 
-    mechanics = db.StringListProperty(required=False) 
-    awards = db.StringListProperty(required=False) 
-    categories = db.StringListProperty(required=False)    
-    totalRating = db.IntegerProperty(required=False)
+    publishers = db.StringListProperty(required=True, default=None) 
+    designers = db.StringListProperty(required=True, default=None) 
+    artists = db.StringListProperty(required=True, default=None) 
+    expansions = db.StringListProperty(required=True, default=None) 
+    mechanics = db.StringListProperty(required=True, default=None) 
+    awards = db.StringListProperty(required=True, default=None) 
+    categories = db.StringListProperty(required=True, default=None)    
+    totalRating = db.IntegerProperty(required=False, default=None)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
 
-class GameXML(db.Model):
-    bgg_id = db.IntegerProperty(required=True)
+class GameXML(db.Model): # bgg_id is key_name
     xml = db.TextProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
 

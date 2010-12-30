@@ -3,26 +3,26 @@
 	{% block title %}SuperMeeple - {{ game.name }}{% endblock %}
 	
 		{% block main %}
-			<h1>{{ game.name }}</h1>
+			<h1>{{ fb_game.name }}</h1>
 		  <div id="game-detail">	
 			  {% if game.designer %}
     		<dl>
     			<dt>Designed by</dt>
-					{% for d in game.designer %}
+					{% for d in fb_game.designer %}
 					<dd>{{ d }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
-				{% if game.introduced %}
+				{% if fb_game.introduced %}
     		<dl>
     			<dt>Introduced</dt>
-					<dd>{{ game.introduced }}</dd>
+					<dd>{{ fb_game.introduced }}</dd>
     		</dl>
 				{% endif %}
-				{% if game.play_time_minutes and game.maximum_playing_time_minutes %}
+				{% if fb_game.play_time_minutes and fb_game.maximum_playing_time_minutes %}
     		<dl>
     			<dt>Playing time</dt>
-					<dd>{{ game.playing_time_minutes|floatformat }} - {{ game.maximum_playing_time_minutes|floatformat }} minutes</dd>
+					<dd>{{ fb_game.playing_time_minutes|floatformat }} - {{ fb_game.maximum_playing_time_minutes|floatformat }} minutes</dd>
     		</dl>
 				{% endif %}
      		{% if playerMinMax %}
@@ -31,30 +31,30 @@
 					<dd>{{ playerMinMax.low_value }} - {{ playerMinMax.high_value }}</dd>
     		</dl>
 				{% endif %}
-				{% if game.minimum_age_years %}
+				{% if fb_game.minimum_age_years %}
  	   		<dl>
 	    			<dt>Suggested age</dt>
-						<dd>{{ game.minimum_age_years|floatformat }} years and up</dd>
+						<dd>{{ fb_game.minimum_age_years|floatformat }} years and up</dd>
     		</dl>
 				{% endif %}
-				{% if game.origin %}
+				{% if fb_game.origin %}
     		<dl>
     			<dt>Origin</dt>
-					<dd>{{ game.origin }}</dd>
+					<dd>{{ fb_game.origin }}</dd>
     		</dl>
 				{% endif %}
-				{% if game.publisher %}
+				{% if fb_game.publisher %}
   			<dl>
     			<dt>Published by</dt>
-    			{% for p in game.publisher %}
+    			{% for p in fb_game.publisher %}
     				<dd>{{ p }}</dd>
     			{% endfor %}		
   		  </dl>	
 				{% endif %}
-				{% if game.expansions %}
+				{% if fb_game.expansions %}
   			<dl>
     			<dt>Expansions</dt>
-    			{% for e in game.expansions %}
+    			{% for e in fb_game.expansions %}
     				<dd>{{ e }}</dd>
     			{% endfor %}		
   		  </dl>
@@ -62,15 +62,15 @@
 				{% if derivative %}
   			<dl>
     			<dt>Derivative games</dt>
-    			{% for d in game.derivative_games %}
+    			{% for d in fb_game.derivative_games %}
     				<dd>{{ d }}</dd>
     			{% endfor %}		
   		  </dl>
 				{% endif %}
-				{% if game.genre %}
+				{% if fb_game.genre %}
   			<dl>
     			<dt>Genres</dt>
-    			{% for g in game.genre %}
+    			{% for g in fb_game.genre %}
     				<dd>{{ g }}</dd>
     			{% endfor %}		
   		  </dl>
@@ -81,14 +81,20 @@
 					<dd><a href="{{ weblink.url|cut:"/{name}" }}">{{ weblink.description }}</a></dd>
     		</dl>
 				{% endif %}
-				{% if expansions %}
+				{% if bgg_game.expansions %}
   			<dl>
     			<dt>Expansions</dt>
     			{% for e in expansions %}
-    				<dd>{{ e.text }}</dd>
+    				<dd>{{ e }}</dd>
     			{% endfor %}		
   		  </dl>
 				{% endif %}
+				{% if bgg_game.description %}
+  			<dl>
+    			<dt>Description</dt>
+    			<dd>{{ bgg_game.description }}</dd>
+  		  </dl>
+				{% endif %}				
 			</div><!-- /game-detail -->		    			
 		{% endblock %}		
 		

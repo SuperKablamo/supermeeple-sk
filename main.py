@@ -16,7 +16,6 @@ import logging
 import facebook
 import models
 import datetime
-import BeautifulSoup
 import urllib2
 
 from urlparse import urlparse
@@ -88,6 +87,10 @@ class MainHandler(BaseHandler):
             },
             "limit": 1
           },
+          "key" : {
+            "namespace" : "/user/pak21/boardgamegeek/boardgame",
+            "value" : None
+          },
           "sort": "-!/award/award_honor/honored_for.year.value"
         }]
         result = freebase.mqlread(query)
@@ -103,10 +106,12 @@ class MainHandler(BaseHandler):
             name = r.name
             year = r["!/award/award_honor/honored_for"].year.value
             mid = r.mid
+            bgg_id = r.key.value
             game = {}
             game["name"] = name
             game["year"] = year
             game["mid"] = mid
+            game["bgg_id"] = bgg_id
             games.append(game)
             
         template_values = {
@@ -119,36 +124,35 @@ class MainHandler(BaseHandler):
 class GameProfile(BaseHandler):
     """Returns a Game data
     
-    GET - uses a guid to look up a Game on Freebase.  The datastore is 
+    GET - uses an mid to look up a Game on Freebase.  The datastore is 
     updated with Game data and the data is passed to a template.
     
     POST - uses gameID and gameName to look up a Game on Freebase.  The
     datastore is updated with Game data and the data is passed to a template.
     """
     # Direct linking to Game Profile
-    def get(self, mid=None):
+    def get(self, mid=None, bgg_id=None):
         logging.info('########### GameProfile::get ###########')
         logging.info('########### uri = ' + self.request.url + ' ###########')
         logging.info('########### mid = ' + mid + ' ###########')
 
-        gameResult = getGame(mid)
+        fb_game = getFBGame(mid)
+        bgg_game = getBGGGame(mid=mid, bgg_id=bgg_id)
         user = self.current_user
         # Can't access properties with special charactes in Django, so create
         # a dictionary.
-        playerMinMax = gameResult["/games/game/number_of_players"]
-        weblink = gameResult["/common/topic/weblink"]
-
-        expansions = getBGGGame(gameResult.key.value)
+        playerMinMax = fb_game["/games/game/number_of_players"]
+        weblink = fb_game["/common/topic/weblink"]
 
         # Create/Update Game data
-        game = models.Game.get_by_key_name(gameResult.mid)
+        game = models.Game.get_by_key_name(fb_game.mid)
         if not game:
-            game = models.Game(key_name=gameResult.mid, name=gameResult.name)
+            game = models.Game(key_name=fb_game.mid, name=fb_game.name)
             logging.info('## CREATING NEW ENTITY: KEY: ' + str(game.key()) + 
                          ' | NAME: ' + game.name)
                               
         else:
-            game.name = gameResult.name            
+            game.name = fb_game.name            
             logging.info('## UPDATING ENTITY: KEY: ' + str(game.key()) + 
                          ' | NAME: ' + game.name)
         
@@ -156,8 +160,8 @@ class GameProfile(BaseHandler):
         checkin = getCheckin(game, user) 
                                                   
         template_values = {
-            'expansions': expansions,
-            'game': gameResult,
+            'bgg_game': bgg_game,
+            'fb_game': fb_game,
             'playerMinMax': playerMinMax,
             'weblink': weblink,
             'checkin': checkin,
@@ -301,19 +305,22 @@ def getBGGGame(bgg_id, mid):
     # Parse data
     name = xml.findtext(".//name")
     description = xml.findtext(".//description")
-    year_published = xml.findtext(".//yearpublished")
-    min_players = xml.findtext(".//minplayers")
-    max_players = xml.findtext(".//maxplayers")
-    playing_time = xml.findtext(".//playingtime")
-    age = xml.findtext(".//age")
+    year_published = strToInt(xml.findtext(".//yearpublished"))
+    min_players = strToInt(xml.findtext(".//minplayers"))
+    max_players = strToInt(xml.findtext(".//maxplayers"))
+    playing_time = strToInt(xml.findtext(".//playingtime"))
+    age = strToInt(xml.findtext(".//age"))
     publishers = buildDataList(xml.findall(".//boardgamepublisher"))
     artists = buildDataList(xml.findall(".//boardgameartist"))
     designers = buildDataList(xml.findall(".//boardgamedesigner"))    
     expansions = buildDataList(xml.findall(".//boardgameexpansion"))
     categories = buildDataList(xml.findall(".//boardgamecategory"))
     mechanics = buildDataList(xml.findall(".//boardgamemechanic"))
+
+    
     # Create/Update Game
     game = models.Game.get_by_key_name(mid)
+    game_xml = models.GameXML.get_by_key_name(bgg_id)
     if game: # Update Game
         time = datetime.datetime.now() - datetime.timedelta(0, UPDATE_FREQUENCY)
         # Only update if the last update is older than the allowed time
@@ -330,34 +337,49 @@ def getBGGGame(bgg_id, mid):
             game.expansions = expansions
             game.categories = categories
             game.mechanics = mechanics
+            
+            game_xml.xml = str(xml)
         
     else: # Create new Game
         game = models.Game(key_name=mid,
-                           name=game.name,
-                           description=game.description,
-                           year_published = year_published
-                           min_players = min_players
-                           playing_time = playing_time
-                           age = age
-                           publishers = publishers
-                           artists = artists
-                           designers = designers  
-                           expansions = expansions
-                           categories = categories
+                           name=name,
+                           description=description,
+                           year_published = year_published,
+                           min_players = min_players,
+                           playing_time = playing_time,
+                           age = age,
+                           publishers = publishers,
+                           artists = artists,
+                           designers = designers,
+                           expansions = expansions,
+                           categories = categories,
                            mechanics = mechanics)
+        
+        game_xml = models.GameXML(key_name=bgg_id, xml=str(xml))                   
     
     game.put() # Save Game
+    game_xml.put() # Save GameXML
     return game
 
 def buildDataList(list):
-    data_list
-    for l in list:
-        data_list.append(l.text)
+    data_list = []
+    for d in data_list:
+        data_list.append(d.text)
     
     return data_list
 
-def getGame(mid):
-    """Returns a Freebase emql result for Game data.    
+def strToInt(s):
+    """ Returns an integer formatted from a string.  Or 0, if string cannot be
+    formatted.
+    """
+    try:
+        i = int(s)
+    except ValueError:
+        i = 0    
+    return i    
+
+def getFBGame(mid):
+    """Returns a JSON result for Freebase Game data.    
     """
     query = {
       "mid":           mid,
@@ -409,7 +431,7 @@ def getCheckin(game, user):
 application = webapp.WSGIApplication(
                                      [('/', MainHandler),
                                      ('/game-profile', GameProfile),
-                                     (r'/game-profile(/m/.*)', GameProfile),
+                                     (r'/game-profile(/m/.*)(/.*)', GameProfile),
                                      ('/game-checkin', GameCheckin),
                                      ('/game-checkin-test', GameCheckinTest)],
                                      debug=True)
