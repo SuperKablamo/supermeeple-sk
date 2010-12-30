@@ -14,13 +14,30 @@ class User(db.Model):
 
 class Game(db.Model):
     name = db.StringProperty(required=True)
-    bggURL = db.LinkProperty(required=False)
-    bggID = db.IntegerProperty(required=False)
+    bgg_url = db.LinkProperty(required=False)
+    bgg_id = db.IntegerProperty(required=False)
+    mid = db.StringProperty(required=False)
+    description = db.TextProperty(required=False)
+    year_published = db.IntegerProperty(required=False)
+    min_players = db.IntegerProperty(required=False)
+    max_players = db.IntegerProperty(required=False)
+    playing_time = db.IntegerProperty(required=False)
+    age = db.IntegerProperty(required=False)
+    publishers = db.StringListProperty(required=False) 
+    designers = db.StringListProperty(required=False) 
+    artists = db.StringListProperty(required=False) 
+    expansions = db.StringListProperty(required=False) 
+    mechanics = db.StringListProperty(required=False) 
+    awards = db.StringListProperty(required=False) 
+    categories = db.StringListProperty(required=False)    
     totalRating = db.IntegerProperty(required=False)
+    created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
 
-class GameData(db.Model):
-    data = db.StringProperty(required=True)
+class GameXML(db.Model):
+    bgg_id = db.IntegerProperty(required=True)
+    xml = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
 
 class GameSession(db.Model):
     game = db.ReferenceProperty(Game)

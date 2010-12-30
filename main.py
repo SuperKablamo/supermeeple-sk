@@ -6,6 +6,8 @@ FACEBOOK_APP_ID = "149881721731503"
 FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
 DEBUG = True
 CHECKIN_FREQUENCY = 600 # Checkin frequency in seconds
+UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
+BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
 
 import os
 import cgi
@@ -14,14 +16,18 @@ import logging
 import facebook
 import models
 import datetime
+import BeautifulSoup
+import urllib2
 
+from urlparse import urlparse
+from xml.etree import ElementTree 
 from django.utils import simplejson
+from google.appengine.api import urlfetch
 from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
-from urlparse import urlparse
 
 class BaseHandler(webapp.RequestHandler):
     """Provides access to the active Facebook user in self.current_user
@@ -132,6 +138,8 @@ class GameProfile(BaseHandler):
         playerMinMax = gameResult["/games/game/number_of_players"]
         weblink = gameResult["/common/topic/weblink"]
 
+        expansions = getBGGGame(gameResult.key.value)
+
         # Create/Update Game data
         game = models.Game.get_by_key_name(gameResult.mid)
         if not game:
@@ -148,6 +156,7 @@ class GameProfile(BaseHandler):
         checkin = getCheckin(game, user) 
                                                   
         template_values = {
+            'expansions': expansions,
             'game': gameResult,
             'playerMinMax': playerMinMax,
             'weblink': weblink,
@@ -276,16 +285,76 @@ class GameCheckinTest(BaseHandler):
         message = "I'm playing " + game.name
         results = facebook.GraphAPI(user.access_token).put_wall_post(message)
         
-        
-        
         template_values = {
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
-        }
-        
-
+        }  
 
 ######################## METHODS #############################################
+
+def getBGGGame(bgg_id, mid):
+    logging.info('########### getBGGGame:: BUILDING BGGGAME ###########')
+    # Use BGG XML API to get Game data
+    game_url = BGG_XML_URI + bgg_id
+    result = urllib2.urlopen(game_url).read()
+    xml = ElementTree.fromstring(result)
+    # Parse data
+    name = xml.findtext(".//name")
+    description = xml.findtext(".//description")
+    year_published = xml.findtext(".//yearpublished")
+    min_players = xml.findtext(".//minplayers")
+    max_players = xml.findtext(".//maxplayers")
+    playing_time = xml.findtext(".//playingtime")
+    age = xml.findtext(".//age")
+    publishers = buildDataList(xml.findall(".//boardgamepublisher"))
+    artists = buildDataList(xml.findall(".//boardgameartist"))
+    designers = buildDataList(xml.findall(".//boardgamedesigner"))    
+    expansions = buildDataList(xml.findall(".//boardgameexpansion"))
+    categories = buildDataList(xml.findall(".//boardgamecategory"))
+    mechanics = buildDataList(xml.findall(".//boardgamemechanic"))
+    # Create/Update Game
+    game = models.Game.get_by_key_name(mid)
+    if game: # Update Game
+        time = datetime.datetime.now() - datetime.timedelta(0, UPDATE_FREQUENCY)
+        # Only update if the last update is older than the allowed time
+        if game.updated < time:
+            game.name = name
+            game.description = description
+            game.year_published = year_published
+            game.min_players = min_players
+            game.playing_time = playing_time
+            game.age = age
+            game.publishers = publishers
+            game.artists = artists
+            game.designers = designers  
+            game.expansions = expansions
+            game.categories = categories
+            game.mechanics = mechanics
+        
+    else: # Create new Game
+        game = models.Game(key_name=mid,
+                           name=game.name,
+                           description=game.description,
+                           year_published = year_published
+                           min_players = min_players
+                           playing_time = playing_time
+                           age = age
+                           publishers = publishers
+                           artists = artists
+                           designers = designers  
+                           expansions = expansions
+                           categories = categories
+                           mechanics = mechanics)
+    
+    game.put() # Save Game
+    return game
+
+def buildDataList(list):
+    data_list
+    for l in list:
+        data_list.append(l.text)
+    
+    return data_list
 
 def getGame(mid):
     """Returns a Freebase emql result for Game data.    

@@ -81,6 +81,14 @@
 					<dd><a href="{{ weblink.url|cut:"/{name}" }}">{{ weblink.description }}</a></dd>
     		</dl>
 				{% endif %}
+				{% if expansions %}
+  			<dl>
+    			<dt>Expansions</dt>
+    			{% for e in expansions %}
+    				<dd>{{ e.text }}</dd>
+    			{% endfor %}		
+  		  </dl>
+				{% endif %}
 			</div><!-- /game-detail -->		    			
 		{% endblock %}		
 		
