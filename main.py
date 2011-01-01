@@ -20,6 +20,7 @@ import datetime
 import urllib2
 from utils import strToInt
 from utils import buildDataList
+from utils import findPrimaryName
 
 from urlparse import urlparse
 from xml.etree import ElementTree 
@@ -141,10 +142,10 @@ class GameProfile(BaseHandler):
         logging.info('########### mid = ' + mid + ' ###########')
         logging.info('########### bgg_id = ' + bgg_id + ' ###########')
         user = self.current_user
-        bgg_game = getBGGGame(mid=mid, bgg_id=bgg_id)
-        checkin = getCheckin(bgg_game, user) 
+        game = getBGGGame(mid=mid, bgg_id=bgg_id)
+        checkin = getCheckin(game, user) 
         template_values = {
-            'bgg_game': bgg_game,
+            'game': game,
             'checkin': checkin,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -163,10 +164,10 @@ class GameProfile(BaseHandler):
         game_ids = getBGGIDFromFB(game_id)
         
         if game_ids["bgg_id"] is not None: 
-            bgg_game = getBGGGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
-            checkin = getCheckin(bgg_game, user)                
+            game = getBGGGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
+            checkin = getCheckin(game, user)                
             template_values = {
-                'bgg_game': bgg_game,
+                'game': game,
                 'checkin': checkin,
                 'current_user': user,
                 'facebook_app_id': FACEBOOK_APP_ID
@@ -178,20 +179,30 @@ class GameProfile(BaseHandler):
             bgg_id = getBGGIDFromBGG(game_name)
             if bgg_id is not None:
                 logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########')
-                bgg_game = getBGGGame(mid=game_ids["mid"], bgg_id=bgg_id)
-                checkin = getCheckin(bgg_game, user)                
+                game = getBGGGame(mid=game_ids["mid"], bgg_id=bgg_id)
+                checkin = getCheckin(game, user)                
                 template_values = {
-                    'bgg_game': bgg_game,
+                    'game': game,
                     'checkin': checkin,
                     'current_user': user,
                     'facebook_app_id': FACEBOOK_APP_ID
                 }  
                 self.generate('base_game.html', template_values)                
-            else:            
-                ############################################
-                #TODO: create error page or empty game page#
-                ############################################
-                return None
+            else:  # Return an empty Game.          
+                game = models.Game(key_name="0",
+                                   bgg_id="0",
+                                   bgg_img_url=image_url,
+                                   name=game_name,
+                                   description="Data for this game was not found on Board Game Geek.")
+                checkin = getCheckin(game, user)                
+                template_values = {
+                    'game': game,
+                    'checkin': None,
+                    'current_user': user,
+                    'facebook_app_id': FACEBOOK_APP_ID
+                }  
+                self.generate('base_game.html', template_values)                                   
+             
 
 class GameCheckin(BaseHandler):
     # Checkin to Game
@@ -230,7 +241,7 @@ def getBGGGame(bgg_id, mid):
     result = urllib2.urlopen(game_url).read()
     xml = ElementTree.fromstring(result)
     # Parse data
-    name = xml.findtext(".//name")
+    name = findPrimaryName(xml)
     description = xml.findtext(".//description")
     year_published = strToInt(xml.findtext(".//yearpublished"))
     min_players = strToInt(xml.findtext(".//minplayers"))
@@ -243,11 +254,14 @@ def getBGGGame(bgg_id, mid):
     expansions = buildDataList(xml.findall(".//boardgameexpansion"))
     categories = buildDataList(xml.findall(".//boardgamecategory"))
     mechanics = buildDataList(xml.findall(".//boardgamemechanic"))
+    subdomains = buildDataList(xml.findall(".//boardgamesubdomain"))
     image_url = xml.findtext(".//image")
     
     # Create/Update Game
     game = models.Game.get_by_key_name(mid)
     game_xml = models.GameXML.get_by_key_name(bgg_id)
+    decoded_result = result.decode("utf-8")
+    xml_text = db.Text(decoded_result)
     if game: # Update Game
         time = datetime.datetime.now() - datetime.timedelta(0, UPDATE_FREQUENCY)
         # Only update if the last update is older than the allowed time
@@ -266,7 +280,8 @@ def getBGGGame(bgg_id, mid):
             game.expansions = expansions
             game.categories = categories
             game.mechanics = mechanics
-            game_xml.xml = str(xml)
+            game.subdomains = subdomains
+            game_xml.xml = xml_text
     else: # Create new Game
         game = models.Game(key_name=mid,
                            bgg_id=bgg_id,
@@ -282,8 +297,9 @@ def getBGGGame(bgg_id, mid):
                            designers = designers,
                            expansions = expansions,
                            categories = categories,
-                           mechanics = mechanics)
-        game_xml = models.GameXML(key_name=bgg_id, xml=str(xml))                   
+                           mechanics = mechanics,
+                           subdomains = subdomains)
+        game_xml = models.GameXML(key_name=bgg_id, xml=xml_text)                   
     game.put() # Save Game
     game_xml.put() # Save GameXML
     return game

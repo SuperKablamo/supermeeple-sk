@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-	{% block title %}{{ bgg_game.name }} - Board Game - SuperMeeple{% endblock %}
+	{% block title %}{{ game.name }} - Board Game - SuperMeeple{% endblock %}
 	
 		{% block main %}
 			<h1 id="game-title">
-				<span class="name">{{ bgg_game.name }}</span>
-				<span class="year">({{ bgg_game.year_published}})</span>
+				<span class="name">{{ game.name }}</span>
+				<span class="year">({{ game.year_published}})</span>
 			</h1>
 		  <div id="game-detail">	
-				{% if bgg_game.description %}
+				{% if game.description %}
   			<h2>Overview</h2>
 				<div id="description">
-					{{ bgg_game.description }}
+					{{ game.description }}
 				</div>
 				<div id="more-less-container">
 					<a href="#" id="more-less">show more >></a>
@@ -32,83 +32,92 @@
 				</script>
 				{% endif %}
 
-			  {% if bgg_game.designers %}
+			  {% if game.designers %}
     		<dl>
     			<dt>Designed by</dt>
-					{% for x in bgg_game.designers %}
+					{% for x in game.designers %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.artists %}
+			  {% if game.artists %}
     		<dl>
     			<dt>Art by</dt>
-					{% for x in bgg_game.artists %}
+					{% for x in game.artists %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.publishers %}
+			  {% if game.publishers %}
     		<dl>
     			<dt>Published by</dt>
-					{% for x in bgg_game.publishers %}
+					{% for x in game.publishers %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.year_published %}
+			  {% if game.year_published %}
     		<dl>
     			<dt>Introduced</dt>
-					<dd>{{ bgg_game.year_published }}</dd>
+					<dd>{{ game.year_published }}</dd>
     		</dl>
  				{% endif %}
 
-     		{% if bgg_game.min_players and bgg_game.max_players %}
+     		{% if game.min_players and game.max_players %}
     		<dl>
     			<dt># of players</dt>
-					<dd>{{ bgg_game.min_players }} - {{ bgg_game.max_players }}</dd>
+					<dd>{{ game.min_players }} - {{ game.max_players }}</dd>
     		</dl>
 				{% endif %}
 
-			  {% if bgg_game.playing_time %}
+			  {% if game.playing_time %}
     		<dl>
     			<dt>Playing time</dt>
-					<dd>{{ bgg_game.playing_time }}</dd>
+					<dd>{{ game.playing_time }}</dd>
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.age %}
+			  {% if game.age %}
     		<dl>
     			<dt>Ages</dt>
-					<dd>{{ bgg_game.age }} and up</dd>
+					<dd>{{ game.age }} and up</dd>
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.categories %}
+			  {% if game.categories %}
     		<dl>
     			<dt>Tags</dt>
-					{% for x in bgg_game.categories %}
+					{% for x in game.categories %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.mechanics %}
+			  {% if game.subdomains %}
+    		<dl>
+    			<dt>Categories</dt>
+					{% for x in game.subdomains %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.mechanics %}
     		<dl>
     			<dt>Mechanics</dt>
-					{% for x in bgg_game.mechanics %}
+					{% for x in game.mechanics %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
  				{% endif %}
 
-			  {% if bgg_game.expansions %}
+			  {% if game.expansions %}
     		<dl>
     			<dt>Expansions</dt>
-					{% for x in bgg_game.expansions %}
+					{% for x in game.expansions %}
 					<dd>{{ x }}</dd>
 					{% endfor %}
     		</dl>
@@ -116,7 +125,7 @@
 
     		<dl>
     			<dt>Weblinks</dt>
-					<dd><a href="http://boardgamegeek.com/boardgame/{{bgg_game.bgg_id}}">Board Game Geek</a></dd>
+					<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
     		</dl>
 						
 			</div><!-- /game-detail -->		    			
@@ -135,9 +144,9 @@
      	</div>
 		</div>
 			<div class="block">
-				{% if bgg_game.bgg_img_url %}
+				{% if game.bgg_img_url %}
   			<div id="game-image">
-					<img src="{{ bgg_game.bgg_img_url }}"/>
+					<img src="{{ game.bgg_img_url }}"/>
 				</div>
 				{% endif %}	
 			</div>
@@ -146,7 +155,7 @@
 				<div id="checkin-form">  
 			  	<form name="input" action="">  
 			   		<fieldset>  
-							<input type="hidden" name="mid" id="mid" value="{{bgg_game.key.name}}"/>  
+							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>  
 			       	<input type="submit" name="submit" class="button" id="checkin-button" value="Checkin" />  
 			     	</fieldset>  
 			   	</form>  
