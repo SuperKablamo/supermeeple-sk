@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-	{% block title %}SuperMeeple - {{ game.name }}{% endblock %}
+	{% block title %}{{ bgg_game.name }} - Board Game - SuperMeeple{% endblock %}
 	
 		{% block main %}
 			<h1 id="game-title">
-				<span class="name">{{ fb_game.name }}</span>
+				<span class="name">{{ bgg_game.name }}</span>
 				<span class="year">({{ bgg_game.year_published}})</span>
 			</h1>
 		  <div id="game-detail">	
@@ -123,6 +123,17 @@
 		{% endblock %}		
 		
 		{% block sidebar %}	
+		<div class="block">			
+    	<div id="search">
+     		<form name="input" action="/game-profile" method="post">
+         	<input class="search-box" type="text" id="game-search"/>
+         	<input type="hidden" name="game_id" id="game-id" />
+         	<input type="hidden" name="game_name" id="game-name" />
+         	<input class="button" value="Go" type="submit"/>
+       	</form>
+				<p>search for more games</p>
+     	</div>
+		</div>
 			<div class="block">
 				{% if bgg_game.bgg_img_url %}
   			<div id="game-image">
@@ -130,24 +141,12 @@
 				</div>
 				{% endif %}	
 			</div>
-			<div class="block">			
-	    	<div id="search">
-	     		<form name="input" action="/game-profile" method="post">
-	         	<input class="search-box" type="text" id="game-search"/>
-	         	<input type="hidden" name="game_id" id="game-id" />
-	         	<input type="hidden" name="game_name" id="game-name" />
-	         	<input class="button" value="Go" type="submit"/>
-	       	</form>
-					<p>search for more games</p>
-	     	</div>
-			</div>	
-<!--
 			<div class="block">
 				{% if not checkin %}
 				<div id="checkin-form">  
 			  	<form name="input" action="">  
 			   		<fieldset>  
-							<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>  
+							<input type="hidden" name="mid" id="mid" value="{{bgg_game.key.name}}"/>  
 			       	<input type="submit" name="submit" class="button" id="checkin-button" value="Checkin" />  
 			     	</fieldset>  
 			   	</form>  
@@ -157,6 +156,6 @@
 					<h2>You are checked in!</h2>
 				</div>
 				{% endif %}
-			</div>-->
+			</div>
 		{% endblock %}
 		

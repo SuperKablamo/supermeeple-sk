@@ -8,6 +8,7 @@ DEBUG = False
 CHECKIN_FREQUENCY = 600 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
 BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
+BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
 
 import os
 import cgi
@@ -17,6 +18,8 @@ import facebook
 import models
 import datetime
 import urllib2
+from utils import strToInt
+from utils import buildDataList
 
 from urlparse import urlparse
 from xml.etree import ElementTree 
@@ -69,7 +72,7 @@ class BaseHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values, debug=DEBUG))
 
 class MainHandler(BaseHandler):
-    """Return content for index.html.    
+    """Return content for index.html.      
     """
     def get(self):
         logging.info('########### MainHandler:: get() ###########')
@@ -125,8 +128,9 @@ class MainHandler(BaseHandler):
 class GameProfile(BaseHandler):
     """Returns a Game data
     
-    GET - uses an mid to look up a Game on Freebase.  The datastore is 
-    updated with Game data and the data is passed to a template.
+    GET - uses FB and BGG ids to build Game data for display. FB and BGG are
+    queried for data, persisted to the Datastore (if new or updated), and the
+    data is passed to HTML for display.
     
     POST - uses gameID and gameName to look up a Game on Freebase.  The
     datastore is updated with Game data and the data is passed to a template.
@@ -134,35 +138,13 @@ class GameProfile(BaseHandler):
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
         logging.info('########### GameProfile::get ###########')
-        logging.info('########### uri = ' + self.request.url + ' ###########')
         logging.info('########### mid = ' + mid + ' ###########')
-
-        fb_game = getFBGame(mid)
-        bgg_game = getBGGGame(mid=mid, bgg_id=bgg_id)
+        logging.info('########### bgg_id = ' + bgg_id + ' ###########')
         user = self.current_user
-        # Can't access properties with special charactes in Django, so create
-        # a dictionary.
-        playerMinMax = fb_game["/games/game/number_of_players"]
-        weblink = fb_game["/common/topic/weblink"]
-
-        # Create/Update Game data
-        game = models.Game.get_by_key_name(fb_game.mid)
-        if not game:
-            game = models.Game(key_name=fb_game.mid, name=fb_game.name)
-            logging.info('## CREATING NEW ENTITY: KEY: ' + str(game.key()) + 
-                         ' | NAME: ' + game.name)
-                              
-        else:
-            game.name = fb_game.name            
-            logging.info('## UPDATING ENTITY: KEY: ' + str(game.key()) + 
-                         ' | NAME: ' + game.name)
-        
-        game.put()
-        checkin = getCheckin(game, user) 
-                                                  
+        bgg_game = getBGGGame(mid=mid, bgg_id=bgg_id)
+        checkin = getCheckin(bgg_game, user) 
         template_values = {
             'bgg_game': bgg_game,
-            'fb_game': fb_game,
             'checkin': checkin,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -175,24 +157,43 @@ class GameProfile(BaseHandler):
         user = self.current_user
         # Store POST variables
         game_id = self.request.get('game_id')
-        logging.info('game_id = ' + str(game_id))
+
+        logging.info('########### game_id = ' + game_id + ' ###########')
         # Get bgg_id and mid
         game_ids = getBGGIDFromFB(game_id)
-        bgg_game = getBGGGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
-        fb_game = getFBGame(mid=game_ids["mid"])  
-        game = models.Game.get_by_key_name(fb_game.mid)     
-        checkin = getCheckin(game, user)                
-        template_values = {
-            'bgg_game': bgg_game,
-            'fb_game': fb_game,
-            'checkin': checkin,
-            'current_user': user,
-            'facebook_app_id': FACEBOOK_APP_ID
-        }  
-        self.generate('base_game.html', template_values) 
+        
+        if game_ids["bgg_id"] is not None: 
+            bgg_game = getBGGGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
+            checkin = getCheckin(bgg_game, user)                
+            template_values = {
+                'bgg_game': bgg_game,
+                'checkin': checkin,
+                'current_user': user,
+                'facebook_app_id': FACEBOOK_APP_ID
+            }  
+            self.generate('base_game.html', template_values)            
+        else:  # The FB data does not have a BGG id.  
+            logging.info('########### NO BGG ID :( ###########')
+            game_name = self.request.get('game_name')
+            bgg_id = getBGGIDFromBGG(game_name)
+            if bgg_id is not None:
+                logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########')
+                bgg_game = getBGGGame(mid=game_ids["mid"], bgg_id=bgg_id)
+                checkin = getCheckin(bgg_game, user)                
+                template_values = {
+                    'bgg_game': bgg_game,
+                    'checkin': checkin,
+                    'current_user': user,
+                    'facebook_app_id': FACEBOOK_APP_ID
+                }  
+                self.generate('base_game.html', template_values)                
+            else:            
+                ############################################
+                #TODO: create error page or empty game page#
+                ############################################
+                return None
 
 class GameCheckin(BaseHandler):
-    
     # Checkin to Game
     def post(self):
         logging.info('########### GameCheckin::post ###########')
@@ -200,31 +201,6 @@ class GameCheckin(BaseHandler):
         mid = self.request.get('mid')
         game = models.Game.get_by_key_name(mid)
         logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
-
-        gameCheckin = models.GameCheckin(user=user, game=game)
-                                         
-        gameCheckin.put()   
-        q = models.GameCheckin.all()
-        q = q.filter("game", game)
-        checkin = q.fetch(1)    
-        logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
-                                              
-                              
-        template_values = {
-            'current_user': user,
-            'facebook_app_id': FACEBOOK_APP_ID
-        }
-        self.generate('base_game.html', template_values) 
-
-class GameCheckinTest(BaseHandler):
-    # Checkin to Game
-    def post(self):
-        logging.info('########### GameCheckin::post ###########')
-        user = self.current_user
-        mid = self.request.get('mid')
-        game = models.Game.get_by_key_name(mid)
-        logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
-
         # Check user into game
         gameCheckin = models.GameCheckin(user=user, game=game)
         gameCheckin.put()   
@@ -232,26 +208,23 @@ class GameCheckinTest(BaseHandler):
         q = q.filter("game", game)
         checkin = q.fetch(1)    
         logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
-
         # Announce checkin on Facebook Wall
-        logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
-        message = "I'm playing " + game.name
-        results = facebook.GraphAPI(user.access_token).put_wall_post(message)
-        
+        #### logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
+        #### message = "I'm playing " + game.name
+        #### results = facebook.GraphAPI(user.access_token).put_wall_post(message)
         template_values = {
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
 
 ######################## METHODS #############################################
-
 def getBGGGame(bgg_id, mid):
     """Returns a BGGGame model that has been either created or update to the
     datastore.
     """
     logging.info('########### getBGGGame:: BUILDING BGGGAME ###########')
-    logging.info('########### bgg_id = ' + bgg_id + ' ###########')
-    logging.info('########### mid = ' + mid + ' ###########')
+    #logging.info('########### bgg_id = ' + bgg_id + ' ###########')
+    #logging.info('########### mid = ' + mid + ' ###########')
     # Use BGG XML API to get Game data
     game_url = BGG_XML_URI + bgg_id
     result = urllib2.urlopen(game_url).read()
@@ -315,24 +288,6 @@ def getBGGGame(bgg_id, mid):
     game_xml.put() # Save GameXML
     return game
 
-def buildDataList(xml_element):
-    """Returns a list of parsed xml subelements.
-    """
-    data = []
-    for x in xml_element:
-        data.append(x.text)
-    return data
-
-def strToInt(s):
-    """ Returns an integer formatted from a string.  Or 0, if string cannot be
-    formatted.
-    """
-    try:
-        i = int(s)
-    except ValueError:
-        i = 0    
-    return i    
-
 def getFBGame(mid):
     """Returns a JSON result for Freebase Game data.    
     """
@@ -371,26 +326,44 @@ def getFBGame(mid):
 def getBGGIDFromFB(game_id):
     """Returns the Board Game Geek Game ID and Freebase MID from Freebase.    
     """
+    # This query will return None if there is no BGG key/id.
     query = {
       "id":            str(game_id),
       "mid":           None,
       "key" : {
         "namespace" : "/user/pak21/boardgamegeek/boardgame",
-        "value" : None
+        "value" : None,
+        "optional": True
       }
     }  
     result = freebase.mqlread(query, extended=True)
-    game_ids = {"bgg_id":result.key.value, "mid":result.mid}    
-    return game_ids
-
-def getCheckin(game, user):
+    if result.key is not None: # The FB game entry has a BGG id
+        game_ids = {"bgg_id":result.key.value, "mid":result.mid}    
+        return game_ids
+    else:
+        game_ids = {"bgg_id":None, "mid":result.mid}
+        return game_ids   
+        
+def getBGGIDFromBGG(game_name):
+    """Returns the Board Game Geek Game ID from Board Game Geek.    
+    """
+    logging.info('########### getBGGIDFromBGG:: finding bgg_id ###########')
+    logging.info('########### game_name = ' + game_name + ' ###########')   
+    game_url = BGG_XML_SEARCH + urllib2.quote(game_name)
+    logging.info('########### game_url = ' + game_url + ' ###########') 
+    result = urllib2.urlopen(game_url).read()
+    xml = ElementTree.fromstring(result)
+    bgg_id = xml.find("./boardgame").attrib['objectid']
+    return bgg_id
+    
+def getCheckin(bgg_game, user):
     """Returns a checkin for the user and game.  Checkins that are not older
     than the CHECKIN_FREQUENCY are not returned, indicating that the user
     cannot checkin again.    
     """
     time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
     q = models.GameCheckin.all()
-    q.filter("game", game)
+    q.filter("game", bgg_game)
     q.filter("user", user)
     q.filter("created >", time)
     q.order("-created")
@@ -402,8 +375,7 @@ application = webapp.WSGIApplication(
                                      [('/', MainHandler),
                                      ('/game-profile', GameProfile),
                                      (r'/game-profile(/m/.*)/(.*)', GameProfile),
-                                     ('/game-checkin', GameCheckin),
-                                     ('/game-checkin-test', GameCheckinTest)],
+                                     ('/game-checkin', GameCheckin)],
                                      debug=True)
 
 def main():

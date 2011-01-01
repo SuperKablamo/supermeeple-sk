@@ -54,14 +54,14 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 #more-less-container { text-align: right; } 
 
 /*SIDEBAR*/
-#sidebar { margin: 4px 14px 4px 14px; width: 300px; float: left; }
+#sidebar { margin: 42px 14px 4px 14px; width: 300px; float: left; }
 #sidebar .block { padding-bottom: 12px; }
-#search { }
+#search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }
 #checkmark { float: left; }
 
 /*FOOTER*/
-#footer {  }
+#footer { height: 40px;  }
 #freebase-tag, #gae-tag { background-color: #222222;  padding: 10px 8px; position: absolute;  bottom: 0; }
 #freebase-tag { right: 56px; }
 #gae-tag { right: 228px; }

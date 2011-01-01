@@ -14,17 +14,17 @@
     $("#game-name").val(data.name);
     });
   });
-  </script><!--
+  </script>
 	<script type="text/javascript">
   	$(function() {  
       $('.error').hide();  
-      $(".button").click(function() { 
+      $("#checkin-button").click(function() { 
 	      var mid = $("input#mid").val();
 	      var dataString = 'mid='+ mid;  
 				//alert (dataString);return false;  
 				$.ajax({  
 					type: "POST",  
-				  url: "/game-checkin-test",  
+				  url: "/game-checkin",  
 				  data: dataString,  
 				  success: function() {  
 				  	$('#checkin-form').html("<div id='message'></div>");  
@@ -34,7 +34,7 @@
 				return false;
     	});  
    	});
-	</script>-->
+	</script>
   </head> 
   <body>
   <div id="container">
