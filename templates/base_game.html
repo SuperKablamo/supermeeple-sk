@@ -3,6 +3,7 @@
 	{% block title %}{{ game.name }} - Board Game - SuperMeeple{% endblock %}
 	
 		{% block main %}
+		<div id="mainbar">
 			<h1 id="game-title">
 				<span class="name">{{ game.name }}</span>
 				<span class="year">({{ game.year_published}})</span>
@@ -128,21 +129,23 @@
 					<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
     		</dl>
 						
-			</div><!-- /game-detail -->		    			
+			</div><!-- /game-detail -->		 
+		</div><!-- /main -->	   			
 		{% endblock %}		
 		
 		{% block sidebar %}	
-		<div class="block">			
-    	<div id="search">
-     		<form name="input" action="/game-profile" method="post">
-         	<input class="search-box" type="text" id="game-search"/>
-         	<input type="hidden" name="game_id" id="game-id" />
-         	<input type="hidden" name="game_name" id="game-name" />
-         	<input class="button" value="Go" type="submit"/>
-       	</form>
-				<p>search for more games</p>
-     	</div>
-		</div>
+		<div id="sidebar">
+			<div class="block">			
+    		<div id="search">
+     			<form name="input" action="/game-profile" method="post">
+         		<input class="search-box" type="text" id="game-search"/>
+         		<input type="hidden" name="game_id" id="game-id" />
+         		<input type="hidden" name="game_name" id="game-name" />
+         		<input class="button" value="Go" type="submit"/>
+       		</form>
+					<p>search for more games</p>
+     		</div>
+			</div>
 			<div class="block">
 				{% if game.bgg_img_url %}
   			<div id="game-image">
@@ -166,5 +169,6 @@
 				</div>
 				{% endif %}
 			</div>
+		</div><!-- /sidebar -->	
 		{% endblock %}
 		

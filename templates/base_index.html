@@ -3,17 +3,37 @@
 	{% block title %}SuperMeeple - Board Game Database, Tools and Apps{% endblock %}
 	
 		{% block main %}
+		<div id="main1">
       <table id="game-list">
-        <caption>Spiel Des Jahres Winners</caption>
-        {% for g in games %}
+        <caption>Meeples' Choice Awards</caption>
+        {% for m in meeples %}
   			<tr>
 					<td>
-						<span><a href="game-profile{{ g.mid }}/{{ g.bgg_id }}">{{ g.name }}</a></span>
+						<span><a href="game-profile{{ m.mid }}/{{ m.bgg_id }}">{{ m.name }}</a></span>
 					</td>
 					<td>
-						<div class="year">{{ g.year }}</div>
+						<div class="year">{{ m.year }}</div>
 					</td>
 	      </tr>
 				{% endfor %}
     	</table>
+		</div>	
+    {% endblock %}
+
+		{% block main2 %}
+		<div id="main2">
+      <table id="game-list">
+        <caption>Spiel Des Jahres Winners</caption>
+        {% for s in spiels %}
+  			<tr>
+					<td>
+						<span><a href="game-profile{{ s.mid }}/{{ s.bgg_id }}">{{ s.name }}</a></span>
+					</td>
+					<td>
+						<div class="year">{{ s.year }}</div>
+					</td>
+	      </tr>
+				{% endfor %}
+    	</table>
+		</div>	
     {% endblock %}

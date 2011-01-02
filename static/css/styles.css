@@ -22,14 +22,14 @@ h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
 #game-title span.name {   }
 #game-title span.year { font-size: 0.8em; color: #999; }
-#freebase-tag .logo { color: #999999; }
-#gae-tag .logo { color: #3885C7;  }
+/*freebase-tag .logo { color: #3885C7; }
+gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
 
 /*LAYOUT*/
 body { background-color: #333; }
 #container { width: 800px;  height: 100%; margin: 0; }
-#content { width: 100%; margin: 0; }
+#content { width: 100%; margin: 0; clear: both; min-height: 800px; }
 
 /*HEADER*/
 #header { height: 60px; margin: 4px 0 0 0; clear: both; }
@@ -39,9 +39,14 @@ body { background-color: #333; }
 #fb-profile { float: left; padding-right: 12px; }
 #fb-profile img { border: 3px solid #222; }
 
+/*TWO-COLUMN*/
+#main1, #main2 { margin: 4px 4px 4px 14px; width: 220px; }
+#main1 { float: left; clear: both;}
+#main2 { float: left; }
+
 /*MAINBAR*/
 #mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }
-table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; }
+table#game-list { border-collapse: collapse; width: 200px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
 #game-detail { margin: 12px 0; }
@@ -61,8 +66,8 @@ table#game-list { border-collapse: collapse; width: 300px; padding-right: 40px; 
 #checkmark { float: left; }
 
 /*FOOTER*/
-#footer { height: 40px;  }
-#freebase-tag, #gae-tag { background-color: #222222;  padding: 10px 8px; position: absolute;  bottom: 0; }
-#freebase-tag { right: 56px; }
-#gae-tag { right: 228px; }
-#plus { padding: 10px 8px; position: absolute; bottom: 0; right: 196px; }
+#footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}
+#freebase-tag, #gae-tag { background-color: #222;  padding: 10px 8px; float: right; }
+#freebase-tag {  }
+#gae-tag {  }
+#plus { padding: 10px 8px; float: right; }

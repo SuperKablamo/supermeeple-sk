@@ -78,7 +78,7 @@ class MainHandler(BaseHandler):
     def get(self):
         logging.info('########### MainHandler:: get() ###########')
         # Get the Spiel Des Jahres award winners.
-        query = [{
+        query_spiel = [{
           "type": "/games/game",
           "mid": None,
           "name": None,
@@ -98,16 +98,37 @@ class MainHandler(BaseHandler):
           },
           "sort": "-!/award/award_honor/honored_for.year.value"
         }]
-        result = freebase.mqlread(query)
-        logging.info(result)
+        query_meeple = [{
+          "type": "/games/game",
+          "mid": None,
+          "name": None,
+          "!/award/award_honor/honored_for": {
+            "award": {
+              "id": "/en/meeples_choice_award"
+            },
+            "year": {
+              "value": None,
+              "limit": 1
+            },
+            "limit": 1
+          },
+          "key" : {
+            "namespace" : "/user/pak21/boardgamegeek/boardgame",
+            "value" : None
+          },
+          "sort": "-!/award/award_honor/honored_for.year.value",
+          "limit": 20
+        }]        
+        result_spiels = freebase.mqlread(query_spiel)
+        result_meeples = freebase.mqlread(query_meeple)
 
         # Properties with special characters, like 
         # "!/award/award_honor/honored_for" cannot be accessed from a Django
         # template, so rebuild the result into a array of key-value pair 
         # dictionaries.
-        games = []
-        count = 0
-        for r in result:
+        spiel_games = []
+        spiel_count = 0
+        for r in result_spiels:
             name = r.name
             year = r["!/award/award_honor/honored_for"].year.value
             mid = r.mid
@@ -117,10 +138,25 @@ class MainHandler(BaseHandler):
             game["year"] = year
             game["mid"] = mid
             game["bgg_id"] = bgg_id
-            games.append(game)
+            spiel_games.append(game)
             
+        meeple_games = []
+        meeple_count = 0
+        for r in result_meeples:
+            name = r.name
+            year = r["!/award/award_honor/honored_for"].year.value
+            mid = r.mid
+            bgg_id = r.key.value
+            game = {}
+            game["name"] = name
+            game["year"] = year
+            game["mid"] = mid
+            game["bgg_id"] = bgg_id
+            meeple_games.append(game)            
+        
         template_values = {
-            'games': games,
+            'spiels': spiel_games,
+            'meeples': meeple_games,
             'current_user': self.current_user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  

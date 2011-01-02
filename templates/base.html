@@ -56,25 +56,27 @@
 			</div>
     </div><!-- /header -->
      <div id="content"> 
-    	<div id="mainbar">
     	{% block main %}
     	{% endblock %} 
-    	</div><!-- /mainbar -->
-			<div id="sidebar">
-				{% block sidebar %}
-				{% endblock %}	
-			</div><!-- /sidebar -->	
+
+			{% block sidebar%}
+			{% endblock %}
+
+			{% block main2 %}
+			{% endblock %}	
 		</div><!-- /content -->
- 		<div id="footer">
-	    <div id="freebase-tag">
-				<a href="http://freebase.com">powered by <span class="logo">freebase</span></a>
+	 	<div id="footer">
+		  <!--<div id="copyright"><p>Design by SuperKablamo</p></div>-->
+		  <div id="freebase-tag">
+				data by <a href="http://freebase.com"><span class="logo">Freebase</span></a> and <a href="http://boardgamegeek.com"><span class="logo">Board Game Geek</span></a>
 			</div>
 			<div id="plus">+</div>
-	    <div id="gae-tag">
-				<a href="http://code.google.com/appengine/">powered by <span class="logo">Google App Engine</span></a>
+		  <div id="gae-tag">
+				powered by <a href="http://code.google.com/appengine/"><span class="logo">Google App Engine</span></a>
 			</div>
-	  </div><!-- /footer -->
-  </div><!-- /container -->
+		</div><!-- /footer -->
+	</div><!-- /container -->
+
   <!-- Facebook Single Sign-on -->
   <div id="fb-root"></div>
   <script>
