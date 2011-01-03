@@ -73,90 +73,86 @@ class BaseHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, template_values, debug=DEBUG))
 
 class MainHandler(BaseHandler):
-    """Return content for index.html.      
+    """Return content for index.html.     
     """
     def get(self):
         logging.info('########### MainHandler:: get() ###########')
-        # Get the Spiel Des Jahres award winners.
-        query_spiel = [{
-          "type": "/games/game",
-          "mid": None,
-          "name": None,
-          "!/award/award_honor/honored_for": {
-            "award": {
-              "id": "/en/spiel_des_jahres"
-            },
-            "year": {
-              "value": None,
-              "limit": 1
-            },
-            "limit": 1
-          },
-          "key" : {
-            "namespace" : "/user/pak21/boardgamegeek/boardgame",
-            "value" : None
-          },
-          "sort": "-!/award/award_honor/honored_for.year.value"
-        }]
-        query_meeple = [{
-          "type": "/games/game",
-          "mid": None,
-          "name": None,
-          "!/award/award_honor/honored_for": {
-            "award": {
-              "id": "/en/meeples_choice_award"
-            },
-            "year": {
-              "value": None,
-              "limit": 1
-            },
-            "limit": 1
-          },
-          "key" : {
-            "namespace" : "/user/pak21/boardgamegeek/boardgame",
-            "value" : None
-          },
-          "sort": "-!/award/award_honor/honored_for.year.value",
-          "limit": 20
-        }]        
-        result_spiels = freebase.mqlread(query_spiel)
-        result_meeples = freebase.mqlread(query_meeple)
-
-        # Properties with special characters, like 
-        # "!/award/award_honor/honored_for" cannot be accessed from a Django
-        # template, so rebuild the result into a array of key-value pair 
-        # dictionaries.
-        spiel_games = []
-        spiel_count = 0
-        for r in result_spiels:
-            name = r.name
-            year = r["!/award/award_honor/honored_for"].year.value
-            mid = r.mid
-            bgg_id = r.key.value
-            game = {}
-            game["name"] = name
-            game["year"] = year
-            game["mid"] = mid
-            game["bgg_id"] = bgg_id
-            spiel_games.append(game)
-            
-        meeple_games = []
-        meeple_count = 0
-        for r in result_meeples:
-            name = r.name
-            year = r["!/award/award_honor/honored_for"].year.value
-            mid = r.mid
-            bgg_id = r.key.value
-            game = {}
-            game["name"] = name
-            game["year"] = year
-            game["mid"] = mid
-            game["bgg_id"] = bgg_id
-            meeple_games.append(game)            
+        spiel_id = "/en/spiel_des_jahres"
+        meeples_id = "/en/meeples_choice_award"
+        spiel_game_award = models.GameAward.get_by_key_name(spiel_id)
+        meeples_game_award = models.GameAward.get_by_key_name(meeples_id)
+        #TODO: need to query ALL winners
+        #spiel_winners = models.FBMQL.get_by_key_name(spiel_id)
+        #meeples_winners = models.FBMQL.get_by_key_name(meeples_id)   
         
+        # Freebases queries for award winners only occurs once - the first
+        # time index.html is requested. To updated the results in index.html,
+        # delete the appropriate entries in models.FBMQL.  This will force 
+        # the query to be run again and refresh the results.  
+        #if spiel_winners is None: # If there is no data for Spiel, get it...
+        
+        
+        if spiel_game_award is None:
+            query_spiel = [{
+                "type": "/games/game",
+                "mid": None,
+                "name": None,
+                "!/award/award_honor/honored_for": {
+                    "award": {
+                        "id": spiel_id
+                        },
+                    "year": {
+                        "value": None,
+                        "limit": 1
+                        },
+                    "limit": 1
+                    },
+                "key" : {
+                    "namespace" : "/user/pak21/boardgamegeek/boardgame",
+                    "value" : None
+                    },
+                "sort": "-!/award/award_honor/honored_for.year.value",
+                "limit": 20
+                }] 
+            result = freebase.mqlread(query_spiel) 
+            json_dump = simplejson.dumps(result)
+            json_dump_text = db.Text(json_dump)
+            spiel_game_award = models.GameAward(key_name=spiel_id, json_dump=json_dump_text)
+            spiel_game_award.put()
+
+        if meeples_game_award is None:
+            query_meeples = [{
+                "type": "/games/game",
+                "mid": None,
+                "name": None,
+                "!/award/award_honor/honored_for": {
+                    "award": {
+                        "id": meeples_id
+                        },
+                    "year": {
+                        "value": None,
+                        "limit": 1
+                        },
+                    "limit": 1
+                    },
+                "key" : {
+                    "namespace" : "/user/pak21/boardgamegeek/boardgame",
+                    "value" : None
+                    },
+                "sort": "-!/award/award_honor/honored_for.year.value",
+                "limit": 20
+                }] 
+            result = freebase.mqlread(query_meeples) 
+            json_dump = simplejson.dumps(result)
+            json_dump_text = db.Text(json_dump)
+            meeples_game_award = models.GameAward(key_name=meeples_id, json_dump=json_dump_text)
+            meeples_game_award.put()
+   
+        spiels = parseGameAwards(spiel_game_award) 
+        meeples = parseGameAwards(meeples_game_award)        
         template_values = {
-            'spiels': spiel_games,
-            'meeples': meeple_games,
+            'spiels': spiels,
+            'meeples': meeples,
             'current_user': self.current_user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -422,6 +418,25 @@ def getCheckin(bgg_game, user):
     checkin = q.get()
     return checkin
     
+def parseGameAwards(game_award):
+    """Returns a template iteratible list of game award winners.  
+    """
+    json_game_award = simplejson.loads(game_award.json_dump)
+    games = []
+    count = 0
+    for r in json_game_award:
+        name = r['name']
+        year = r["!/award/award_honor/honored_for"]["year"]["value"]
+        mid = r["mid"]
+        bgg_id = r["key"]["value"]
+        game = {}
+        game["name"] = name
+        game["year"] = year
+        game["mid"] = mid
+        game["bgg_id"] = bgg_id
+        games.append(game)
+    return games                             
+
 ##############################################################################
 application = webapp.WSGIApplication(
                                      [('/', MainHandler),

@@ -9,7 +9,7 @@ class User(db.Model):
     name = db.StringProperty(required=True)
     profile_url = db.StringProperty(required=True)
     access_token = db.StringProperty(required=True)
-    # TODO: provide a common way to define places for Users of FB, Twitter . . .
+    #TODO: provide a common way to define places for Users of FB, Twitter . . .
     #current_location = db.ReferenceProperty(Location, required=False)
 
 class Game(db.Model): # mid is key_name
@@ -62,7 +62,11 @@ class GameRating(db.Model):
     rating = db.IntegerProperty(required=True) 
     created = db.DateTimeProperty(required=True, auto_now=True)
   
-  
-   
-   
+#class FBMQL(db.Model): # FB id is key_name 
+#    json_result = db.ListProperty(required=True)
+#    created = db.DateTimeProperty(auto_now_add=True)
+#    updated = db.DateTimeProperty(required=True, auto_now=True)
+
+class GameAward(db.Model): # award id is key_name
+    json_dump = db.TextProperty(required=True)
     
