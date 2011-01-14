@@ -16,6 +16,7 @@ a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
+.checkin h3 { font-weight: normal; font-size: 1.6em; }
 #search p { font-size:.8em; text-transform: uppercase; }
 #game-list caption { color: #999; font-size: 1.2em; text-align: left; }
 #game-list .year { text-align: right; } 
@@ -40,13 +41,15 @@ body { background-color: #333; }
 #fb-profile img { border: 3px solid #222; }
 
 /*TWO-COLUMN*/
-#main1, #main2 { margin: 4px 4px 4px 14px; width: 220px; }
-#main1 { float: left; clear: both;}
+#main1 { margin: 4px 4px 4px 14px; width: 260px; }
+#main2, #main3 { margin: 4px 4px 4px 14px; width: 200px; }
+#main1 { float: left; }
 #main2 { float: left; }
+#main3 { float: left; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }
-table#game-list { border-collapse: collapse; width: 200px; padding-right: 40px; }
+table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
 #game-detail { margin: 12px 0; }
@@ -54,9 +57,21 @@ table#game-list { border-collapse: collapse; width: 200px; padding-right: 40px; 
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
 #game-image { padding-top: 10px; }
-#game-image img { max-width: 200px; border: 3px solid #222; }
+#game-image img, #profile-image img, .checkin .game-image img { border: 3px solid #222; }
+#game-image img { max-width: 200px; }
+#profile-image img, .checkin .game-image img { max-width: 50px; }
 #description { height: 10em; overflow: hidden; }
 #more-less-container { text-align: right; } 
+
+#user-profile { height: 60px; padding-bottom: 12px; }
+#profile-image, .checkin .game-image { float: left; }
+#profile-name, .checkin .game-name, .checkin .game-badges { margin: 12px 0 0 16px; float: left; }
+
+#checkin-list { width: 100%; }
+.checkin { margin: 0 0 16px 0; clear: both; overflow: hidden; }
+.game-name p { padding: 4px 0 0 4px; }
+
+
 
 /*SIDEBAR*/
 #sidebar { margin: 42px 14px 4px 14px; width: 300px; float: left; }

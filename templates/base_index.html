@@ -1,33 +1,43 @@
 {% extends "base.html" %}
 
-	{% block title %}SuperMeeple - Board Game Database, Tools and Apps{% endblock %}
-	
-		{% block main %}
-		<div id="main1">
-      <table id="game-list">
-        <caption>Meeples' Choice Awards</caption>
-        {% for m in meeples %}
-  			<tr>
-					<td>
-						<span><a href="game-profile{{ m.mid }}/{{ m.bgg_id }}">{{ m.name }}</a></span>
-					</td>
-					<td>
-						<div class="year">{{ m.year }}</div>
-					</td>
-	      </tr>
-				{% endfor %}
-    	</table>
-		</div>	
-    {% endblock %}
+	{% block title %}Board Game Database, Tools and Apps - SuperMeeple{% endblock %}
 
-		{% block main2 %}
-		<div id="main2">
+	{% block main %}
+	<div id="mainbar">
+		<div id="checkin-list">
+			<h2>Game Checkins</h2>
+			{% for c in checkins %}
+			<div class="checkin">
+  			<div class="game-image">
+					{% if c.game.bgg_img_url %}
+					<img src="{{c.game.bgg_img_url}}"/>
+					{% else %}
+					<img src="/static/images/game-img-blank.jpg"/>
+					{% endif %}
+				</div>
+				<div class="game-name">
+					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
+					<p>{{c.created|timesince}} ago </p>
+					<h4><span class="description">Players:</span> {{c.user.name}}</h4> 
+				</div>	
+				<div class="game-badges">
+					<p></p>
+				</div>				
+			</div>
+			{% endfor %}
+		</div><!-- /checkin-list -->
+	</div><!-- /mainbar -->	
+  {% endblock %}
+	
+	{% block sidebar %}
+	<div id="sidebar">
+		<div class="block">
       <table id="game-list">
         <caption>Spiel Des Jahres Winners</caption>
         {% for s in spiels %}
   			<tr>
 					<td>
-						<span><a href="game-profile{{ s.mid }}/{{ s.bgg_id }}">{{ s.name }}</a></span>
+						<span><a href="game{{ s.mid }}/{{ s.bgg_id }}">{{ s.name }}</a></span>
 					</td>
 					<td>
 						<div class="year">{{ s.year }}</div>
@@ -35,5 +45,21 @@
 	      </tr>
 				{% endfor %}
     	</table>
-		</div>	
-    {% endblock %}
+		</div><!-- /block -->		
+		<div class="block">
+    	<table id="game-list">
+    		<caption>Meeples' Choice Awards</caption>
+      	{% for m in meeples %}
+  			<tr>
+					<td>
+						<span><a href="game{{ m.mid }}/{{ m.bgg_id }}">{{ m.name }}</a></span>
+					</td>
+					<td>
+						<div class="year">{{ m.year }}</div>
+					</td>
+	     	</tr>
+				{% endfor %}
+    	</table>
+		</div><!-- /block -->	
+	</div><!-- /sidebar -->
+  {% endblock %}

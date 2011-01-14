@@ -43,27 +43,32 @@
          <a href="/">SuperMeeple</a>
     	</div>
 			<div id="fb-login">
-	    	{% if current_user %}
-	      <div id="fb-profile">
-					<a href="{{ current_user.profile_url }}">
-						<img src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square"/>
-					</a>
+    		{% if current_user %}
+      	<div id="fb-profile">
+					<p>Hello, <a href="/user/{{current_user.fb_id}}">{{current_user.name}}</a></p>
 				</div>
-	    	{% endif %}
+    		{% endif %}
 				<div id="fb-button">
 					<fb:login-button autologoutlink="true" perms="publish_checkins,publish_stream"></fb:login-button>
 				</div>
 			</div>
     </div><!-- /header -->
-     <div id="content"> 
+    <div id="content"> 
     	{% block main %}
     	{% endblock %} 
 
-			{% block sidebar%}
+			{% block main1 %}
 			{% endblock %}
 
 			{% block main2 %}
-			{% endblock %}	
+			{% endblock %}
+			
+			{% block main3 %}
+			{% endblock %}
+			
+			{% block sidebar%}
+			{% endblock %}
+
 		</div><!-- /content -->
 	 	<div id="footer">
 		  <!--<div id="copyright"><p>Design by SuperKablamo</p></div>-->

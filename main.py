@@ -33,6 +33,7 @@ from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
+############################# REQUEST HANDLERS ###############################    
 class BaseHandler(webapp.RequestHandler):
     """Provides access to the active Facebook user in self.current_user
 
@@ -43,7 +44,7 @@ class BaseHandler(webapp.RequestHandler):
     """
     @property
     def current_user(self):
-        logging.info('########### BaseHandler:: current_user ###########')
+        logging.info('############# BaseHandler:: current_user #############')
         if not hasattr(self, "_current_user"):
             self._current_user = None
             cookie = facebook.get_user_from_cookie(
@@ -52,15 +53,10 @@ class BaseHandler(webapp.RequestHandler):
                 # Store a local instance of the user data so we don't need
                 # a round-trip to Facebook on every request
                 user = models.User.get_by_key_name(cookie["uid"])
-                if not user:
-                    graph = facebook.GraphAPI(cookie["access_token"])
-                    profile = graph.get_object("me")
-                    user = models.User(key_name=str(profile["id"]),
-                                       id=str(profile["id"]),
-                                       name=profile["name"],
-                                       profile_url=profile["link"],
-                                       access_token=cookie["access_token"])
-                    user.put()
+                if not user: # Build a User
+                    user = getUser(
+                            facebook.GraphAPI(cookie["access_token"]),
+                            cookie)
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
                     user.put()
@@ -68,30 +64,27 @@ class BaseHandler(webapp.RequestHandler):
         return self._current_user
 
     def generate(self, template_name, template_values):
+        template.register_template_library('templatefilters')
         directory = os.path.dirname(__file__)
-        path = os.path.join(directory, os.path.join('templates', template_name))
-        self.response.out.write(template.render(path, template_values, debug=DEBUG))
+        path = os.path.join(directory, 
+                            os.path.join('templates', template_name))
 
+        self.response.out.write(template.render(path, 
+                                                template_values, 
+                                                debug=DEBUG))
 class MainHandler(BaseHandler):
     """Return content for index.html.     
     """
     def get(self):
-        logging.info('########### MainHandler:: get() ###########')
+        logging.info('################# MainHandler:: get() ################')
         spiel_id = "/en/spiel_des_jahres"
         meeples_id = "/en/meeples_choice_award"
         spiel_game_award = models.GameAward.get_by_key_name(spiel_id)
         meeples_game_award = models.GameAward.get_by_key_name(meeples_id)
-        #TODO: need to query ALL winners
-        #spiel_winners = models.FBMQL.get_by_key_name(spiel_id)
-        #meeples_winners = models.FBMQL.get_by_key_name(meeples_id)   
-        
         # Freebases queries for award winners only occurs once - the first
         # time index.html is requested. To updated the results in index.html,
         # delete the appropriate entries in models.FBMQL.  This will force 
         # the query to be run again and refresh the results.  
-        #if spiel_winners is None: # If there is no data for Spiel, get it...
-        
-        
         if spiel_game_award is None:
             query_spiel = [{
                 "type": "/games/game",
@@ -117,7 +110,8 @@ class MainHandler(BaseHandler):
             result = freebase.mqlread(query_spiel) 
             json_dump = simplejson.dumps(result)
             json_dump_text = db.Text(json_dump)
-            spiel_game_award = models.GameAward(key_name=spiel_id, json_dump=json_dump_text)
+            spiel_game_award = models.GameAward(key_name=spiel_id, 
+                                                json_dump=json_dump_text)
             spiel_game_award.put()
 
         if meeples_game_award is None:
@@ -145,12 +139,15 @@ class MainHandler(BaseHandler):
             result = freebase.mqlread(query_meeples) 
             json_dump = simplejson.dumps(result)
             json_dump_text = db.Text(json_dump)
-            meeples_game_award = models.GameAward(key_name=meeples_id, json_dump=json_dump_text)
+            meeples_game_award = models.GameAward(key_name=meeples_id, 
+                                                  json_dump=json_dump_text)
             meeples_game_award.put()
    
         spiels = parseGameAwards(spiel_game_award) 
-        meeples = parseGameAwards(meeples_game_award)        
+        meeples = parseGameAwards(meeples_game_award) 
+        checkins = getCheckins()       
         template_values = {
+            'checkins': checkins,
             'spiels': spiels,
             'meeples': meeples,
             'current_user': self.current_user,
@@ -170,9 +167,9 @@ class GameProfile(BaseHandler):
     """
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
-        logging.info('########### GameProfile::get ###########')
-        logging.info('########### mid = ' + mid + ' ###########')
-        logging.info('########### bgg_id = ' + bgg_id + ' ###########')
+        logging.info('################# GameProfile::get ###################')
+        #logging.info('########### mid = ' + mid + ' ###########')
+        #logging.info('########### bgg_id = ' + bgg_id + ' ###########')
         user = self.current_user
         game = getBGGGame(mid=mid, bgg_id=bgg_id)
         checkin = getCheckin(game, user) 
@@ -186,12 +183,10 @@ class GameProfile(BaseHandler):
           
     # Game search POST
     def post(self):
-        logging.info('########### GameProfile::post ###########')
+        logging.info('################### GameProfile::post ################')
         user = self.current_user
         # Store POST variables
         game_id = self.request.get('game_id')
-
-        logging.info('########### game_id = ' + game_id + ' ###########')
         # Get bgg_id and mid
         game_ids = getBGGIDFromFB(game_id)
         
@@ -235,11 +230,26 @@ class GameProfile(BaseHandler):
                 }  
                 self.generate('base_game.html', template_values)                                   
              
+class UserProfile(BaseHandler):
+    """Returns content for User Profile pages.
+    """
+    def get(self, user_fb_id=None):
+        logging.info('################# UserProfile::get ###################')
+        user = self.current_user # this is the logged in User
+        profile_user = getUser(user_fb_id)
+        checkins = getUserCheckins(user_fb_id)
+        template_values = {
+            'checkins': checkins,
+            'profile_user': profile_user,
+            'current_user': user,
+            'facebook_app_id': FACEBOOK_APP_ID
+        }  
+        self.generate('base_user.html', template_values)
 
 class GameCheckin(BaseHandler):
     # Checkin to Game
     def post(self):
-        logging.info('########### GameCheckin::post ###########')
+        logging.info('################### GameCheckin::post ################')
         user = self.current_user
         mid = self.request.get('mid')
         game = models.Game.get_by_key_name(mid)
@@ -261,6 +271,29 @@ class GameCheckin(BaseHandler):
         }  
 
 ######################## METHODS #############################################
+def getUser(graph, cookie):
+    """Returns a User model, built from the Facebook Graph API data.  
+    """
+    # Build User from Facebook Graph API ...
+    profile = graph.get_object("me")
+    try: # If the user has no location set, make the default "Earth"
+        loc_id = fb_location_id=profile["location"]["id"]
+        loc_name = fb_location_name=profile["location"]["name"]
+    except KeyError:
+        loc_id = "000000000000001"
+        loc_name = "Earth"    
+    user = models.User(key_name=str(profile["id"]),
+                       fb_id=str(profile["id"]),
+                       name=profile["name"],
+                       fb_profile_url=profile["link"],
+                       fb_location_id=profile["location"]["id"],
+                       fb_location_name=profile["location"]["name"],
+                       access_token=cookie["access_token"])
+                       
+    user.put() 
+    return user
+
+
 def getBGGGame(bgg_id, mid):
     """Returns a BGGGame model that has been either created or update to the
     datastore.
@@ -316,6 +349,7 @@ def getBGGGame(bgg_id, mid):
             game_xml.xml = xml_text
     else: # Create new Game
         game = models.Game(key_name=mid,
+                           mid=mid,
                            bgg_id=bgg_id,
                            bgg_img_url=image_url,
                            name=name,
@@ -395,7 +429,7 @@ def getBGGIDFromFB(game_id):
 def getBGGIDFromBGG(game_name):
     """Returns the Board Game Geek Game ID from Board Game Geek.    
     """
-    logging.info('########### getBGGIDFromBGG:: finding bgg_id ###########')
+    logging.info('############ getBGGIDFromBGG:: finding bgg_id ############')
     logging.info('########### game_name = ' + game_name + ' ###########')   
     game_url = BGG_XML_SEARCH + urllib2.quote(game_name)
     logging.info('########### game_url = ' + game_url + ' ###########') 
@@ -403,6 +437,10 @@ def getBGGIDFromBGG(game_name):
     xml = ElementTree.fromstring(result)
     bgg_id = xml.find("./boardgame").attrib['objectid']
     return bgg_id
+
+def createCheckin(bgg_game, user):
+    
+    return checkin
     
 def getCheckin(bgg_game, user):
     """Returns a checkin for the user and game.  Checkins that are not older
@@ -417,6 +455,17 @@ def getCheckin(bgg_game, user):
     q.order("-created")
     checkin = q.get()
     return checkin
+
+def getCheckins():
+    """Returns latest Checkins.
+    """
+    logging.info('##################### getCheckins ########################')    
+    q = models.GameCheckin.all()
+    q.order("-created")
+    checkins = q.fetch(14)  
+    return checkins    
+    
+
     
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
@@ -437,12 +486,33 @@ def parseGameAwards(game_award):
         games.append(game)
     return games                             
 
+def getUser(fb_id=None):
+    """Returns a User for the given fb_id.
+    """
+    user = models.User.get_by_key_name(fb_id)
+    return user
+
+def getUserCheckins(fb_id=None):
+    """Returns Checkins for a User given that User's fb_id.
+    """
+    logging.info('##################### getUserCheckins ####################')    
+    key = db.Key.from_path('User', fb_id)
+    logging.info('################# key = '+str(key)+' ####################')       
+    q = models.GameCheckin.all()
+    q.filter('user =', key)
+    q.order("-created")
+    checkins = q.fetch(10)  
+    return checkins
+
+
+    
 ##############################################################################
 application = webapp.WSGIApplication(
-                                     [('/', MainHandler),
-                                     ('/game-profile', GameProfile),
-                                     (r'/game-profile(/m/.*)/(.*)', GameProfile),
-                                     ('/game-checkin', GameCheckin)],
+                                     [('/game', GameProfile),
+                                     (r'/game(/m/.*)/(.*)', GameProfile),
+                                     (r'/user/(.*)', UserProfile),
+                                     ('/game-checkin', GameCheckin),
+                                     (r'/.*', MainHandler)],
                                      debug=True)
 
 def main():
