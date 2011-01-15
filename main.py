@@ -174,9 +174,11 @@ class GameProfile(BaseHandler):
         user = self.current_user
         game = getBGGGame(mid=mid, bgg_id=bgg_id)
         checkin = getCheckin(game, user) 
+        checkins = getGameCheckins(mid)
         template_values = {
             'game': game,
             'checkin': checkin,
+            'checkins': checkins,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -439,9 +441,9 @@ def createCheckin(game, user):
     return checkin
     
 def getCheckin(bgg_game, user):
-    """Returns a checkin for the user and game.  Checkins that are not older
-    than the CHECKIN_FREQUENCY are not returned, indicating that the user
-    cannot checkin again.    
+    """Returns a single checkin for the user and game.  Checkins that are not 
+    older than the CHECKIN_FREQUENCY are not returned, indicating that the 
+    user cannot checkin again.    
     """
     time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
     q = models.GameCheckin.all()
@@ -458,13 +460,42 @@ def getCheckins():
     logging.info('##################### getCheckins ########################')    
     q = models.GameCheckin.all()
     q.order("-created")
-    checkins = q.fetch(14)  
-    return utils.prefetch_refprops(checkins, models.GameCheckin.player, models.GameCheckin.game)
+    checkins = q.fetch(10) 
+    deref_checkins = utils.prefetch_refprops(checkins, 
+                                             models.GameCheckin.player, 
+                                             models.GameCheckin.game)
+    return deref_checkins                                         
     
-    
+def getUserCheckins(fb_id=None):
+    """Returns Checkins for a User given that User's fb_id.
+    """
+    logging.info('##################### getUserCheckins ####################')    
+    key = db.Key.from_path('User', fb_id)
+    q = models.GameCheckin.all()
+    q.filter('player =', key)
+    q.order("-created")
+    checkins = q.fetch(10)  
+    deref_checkins = utils.prefetch_refprops(checkins, 
+                                             models.GameCheckin.game)
+    return deref_checkins    
+
+def getGameCheckins(mid=None):
+    """Returns Checkins for a Game given that Game's mid.
+    """
+    logging.info('##################### getGameCheckins ####################')    
+    key = db.Key.from_path('Game', mid)
+    q = models.GameCheckin.all()
+    q.filter('game =', key)
+    q.order("-created")
+    checkins = q.fetch(10)  
+    deref_checkins = utils.prefetch_refprops(checkins, 
+                                             models.GameCheckin.player)
+    return deref_checkins    
+
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
     """
+    logging.info('##################### parseGameAwards ####################')       
     json_game_award = simplejson.loads(game_award.json_dump)
     games = []
     count = 0
@@ -479,25 +510,15 @@ def parseGameAwards(game_award):
         game["mid"] = mid
         game["bgg_id"] = bgg_id
         games.append(game)
-    return games                             
+    return games
 
 def getUser(fb_id=None):
     """Returns a User for the given fb_id.
     """
+    logging.info('##################### getUser ############################')        
     user = models.User.get_by_key_name(fb_id)
     return user
 
-def getUserCheckins(fb_id=None):
-    """Returns Checkins for a User given that User's fb_id.
-    """
-    logging.info('##################### getUserCheckins ####################')    
-    key = db.Key.from_path('User', fb_id)
-    logging.info('################# key = '+str(key)+' ####################')       
-    q = models.GameCheckin.all()
-    q.filter('user =', key)
-    q.order("-created")
-    checkins = q.fetch(10)  
-    return checkins
     
 ##############################################################################
 application = webapp.WSGIApplication([('/game', GameProfile),

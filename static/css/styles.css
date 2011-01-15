@@ -15,6 +15,7 @@ a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none
 #container { text-align: left; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
+h1#error { font-size: 40px; color: red; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 .checkin h3 { font-weight: normal; font-size: 1.6em; }
 .checkin h4 { font-weight: normal; font-size: 1em;}
@@ -41,12 +42,15 @@ body { background-color: #333; }
 #fb-profile { float: left; padding-right: 12px; }
 #fb-profile img { border: 3px solid #222; }
 
-/*TWO-COLUMN*/
+/*MULTI-COLUMN*/
 #main1 { margin: 4px 4px 4px 14px; width: 260px; }
 #main2, #main3 { margin: 4px 4px 4px 14px; width: 200px; }
 #main1 { float: left; }
 #main2 { float: left; }
 #main3 { float: left; }
+
+/*FULLBAR*/
+#fullbar { width: 600px; float: left; padding-right: 28px; min-height: 600px; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }

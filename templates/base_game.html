@@ -145,7 +145,7 @@
        		</form>
 					<p>search for more games</p>
      		</div>
-			</div>
+			</div><!-- /block -->
 			<div class="block">
 				{% if game.bgg_img_url %}
   			<div id="game-image">
@@ -159,7 +159,7 @@
 			  	<form name="input" action="">  
 			   		<fieldset>  
 							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>  
-			       	<input type="submit" name="submit" class="button" id="checkin-button" value="Checkin" />  
+			       	<input type="image" src="/static/images/check-in-button.png" name="submit" class="button" id="checkin-button" value="Checkin" />  
 			     	</fieldset>  
 			   	</form>  
 			  </div>			
@@ -168,7 +168,18 @@
 					<h2>You are checked in!</h2>
 				</div>
 				{% endif %}
-			</div>
+			</div><!-- /block -->
+			<div class="block">
+				<div class="checkin-list">
+					<h2>Checkins</h2>
+					{% for c in checkins %}
+					<div class="checkin">
+						<p>{{c.created|timesince}} ago </p>
+						<p>Player: <a href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></p>
+					</div>
+					{% endfor %}
+				</div>	
+			</div>	
 		</div><!-- /sidebar -->	
 		{% endblock %}
 		

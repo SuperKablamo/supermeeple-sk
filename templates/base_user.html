@@ -22,9 +22,9 @@
 			<div class="checkin">
   			<div class="game-image">
 					{% if c.game.bgg_img_url %}
-					<img src="{{c.game.bgg_img_url}}"/>
+					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_img_url}}"/></a>
 					{% else %}
-					<img src="/static/images/game-img-blank.jpg"/>
+					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="Game image missing for {{c.game.name}}" alt="Game image missing for {{c.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
 					{% endif %}
 				</div>
 				<div class="game-name">
