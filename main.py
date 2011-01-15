@@ -18,6 +18,7 @@ import facebook
 import models
 import datetime
 import urllib2
+import utils
 from utils import strToInt
 from utils import buildDataList
 from utils import findPrimaryName
@@ -253,14 +254,8 @@ class GameCheckin(BaseHandler):
         user = self.current_user
         mid = self.request.get('mid')
         game = models.Game.get_by_key_name(mid)
-        logging.info('########### GameCheckin:: game: ' + game.name +  '###########')
         # Check user into game
-        gameCheckin = models.GameCheckin(user=user, game=game)
-        gameCheckin.put()   
-        q = models.GameCheckin.all()
-        q = q.filter("game", game)
-        checkin = q.fetch(1)    
-        logging.info('########### GameCheckin:: checkin: ' + str(checkin) +  '###########')
+        checkin = createCheckin(user=user, game=game)
         # Announce checkin on Facebook Wall
         #### logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
         #### message = "I'm playing " + game.name
@@ -438,8 +433,9 @@ def getBGGIDFromBGG(game_name):
     bgg_id = xml.find("./boardgame").attrib['objectid']
     return bgg_id
 
-def createCheckin(bgg_game, user):
-    
+def createCheckin(game, user):
+    checkin = models.GameCheckin(player=user, game=game)
+    checkin.put()   
     return checkin
     
 def getCheckin(bgg_game, user):
@@ -463,9 +459,8 @@ def getCheckins():
     q = models.GameCheckin.all()
     q.order("-created")
     checkins = q.fetch(14)  
-    return checkins    
+    return utils.prefetch_refprops(checkins, models.GameCheckin.player, models.GameCheckin.game)
     
-
     
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
@@ -503,12 +498,9 @@ def getUserCheckins(fb_id=None):
     q.order("-created")
     checkins = q.fetch(10)  
     return checkins
-
-
     
 ##############################################################################
-application = webapp.WSGIApplication(
-                                     [('/game', GameProfile),
+application = webapp.WSGIApplication([('/game', GameProfile),
                                      (r'/game(/m/.*)/(.*)', GameProfile),
                                      (r'/user/(.*)', UserProfile),
                                      ('/game-checkin', GameCheckin),

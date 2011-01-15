@@ -10,15 +10,15 @@
 			<div class="checkin">
   			<div class="game-image">
 					{% if c.game.bgg_img_url %}
-					<img src="{{c.game.bgg_img_url}}"/>
+					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_img_url}}"/></a>
 					{% else %}
-					<img src="/static/images/game-img-blank.jpg"/>
+					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="Game image missing for {{c.game.name}}" alt="Game image missing for {{c.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
 					{% endif %}
 				</div>
 				<div class="game-name">
 					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
 					<p>{{c.created|timesince}} ago </p>
-					<h4><span class="description">Players:</span> {{c.user.name}}</h4> 
+					<h4><span class="description">Player:</span> <a href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></h4> 
 				</div>	
 				<div class="game-badges">
 					<p></p>
@@ -31,9 +31,20 @@
 	
 	{% block sidebar %}
 	<div id="sidebar">
+		<div class="block">			
+  		<div id="search">
+   			<form name="input" action="/game-profile" method="post">
+       		<input class="search-box" type="text" id="game-search"/>
+       		<input type="hidden" name="game_id" id="game-id" />
+       		<input type="hidden" name="game_name" id="game-name" />
+       		<input class="button" value="Go" type="submit"/>
+     		</form>
+				<p>search for more games</p>
+   		</div>
+		</div><!-- /block -->		
 		<div class="block">
       <table id="game-list">
-        <caption>Spiel Des Jahres Winners</caption>
+        <caption><h2>Spiel Des Jahres Winners</h2></caption>
         {% for s in spiels %}
   			<tr>
 					<td>
@@ -48,7 +59,7 @@
 		</div><!-- /block -->		
 		<div class="block">
     	<table id="game-list">
-    		<caption>Meeples' Choice Awards</caption>
+    		<caption><h2>Meeples' Choice Awards</h2></caption>
       	{% for m in meeples %}
   			<tr>
 					<td>

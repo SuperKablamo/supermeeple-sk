@@ -15,10 +15,11 @@ a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none
 #container { text-align: left; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
-h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
+h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 .checkin h3 { font-weight: normal; font-size: 1.6em; }
+.checkin h4 { font-weight: normal; font-size: 1em;}
 #search p { font-size:.8em; text-transform: uppercase; }
-#game-list caption { color: #999; font-size: 1.2em; text-align: left; }
+#game-list caption { color: #999; text-align: left; }
 #game-list .year { text-align: right; } 
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
 #game-title span.name {   }
@@ -59,7 +60,8 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #game-image { padding-top: 10px; }
 #game-image img, #profile-image img, .checkin .game-image img { border: 3px solid #222; }
 #game-image img { max-width: 200px; }
-#profile-image img, .checkin .game-image img { max-width: 50px; }
+#profile-image img { max-width: 50px; }
+.checkin .game-image img { max-width: 80px; }
 #description { height: 10em; overflow: hidden; }
 #more-less-container { text-align: right; } 
 
@@ -68,8 +70,8 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #profile-name, .checkin .game-name, .checkin .game-badges { margin: 12px 0 0 16px; float: left; }
 
 #checkin-list { width: 100%; }
-.checkin { margin: 0 0 16px 0; clear: both; overflow: hidden; }
-.game-name p { padding: 4px 0 0 4px; }
+.checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
+.checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
 
 
 
