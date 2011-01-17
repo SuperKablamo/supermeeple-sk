@@ -12,6 +12,13 @@ def in_list(value, arg):
   {% endif %}
   """
   return value in arg
+
+def checkedin(value, arg):
+    time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
+    if value > time:
+        return True
+    else: return False
   
 register = template.create_template_register()  
 ifinlist = register.filter(in_list)
+ifcheckedin = register.filter(checkedin)

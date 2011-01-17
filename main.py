@@ -2,14 +2,7 @@
 # Copyright 2010 SuperKablamo, LLC
 #
 
-FACEBOOK_APP_ID = "149881721731503"
-FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
-DEBUG = False
-CHECKIN_FREQUENCY = 600 # Checkin frequency in seconds
-UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
-BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
-BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
-
+############################# IMPORTS ######################################## 
 import os
 import cgi
 import freebase
@@ -23,6 +16,7 @@ from utils import strToInt
 from utils import buildDataList
 from utils import findPrimaryName
 
+from settings import *
 from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
@@ -146,9 +140,9 @@ class MainHandler(BaseHandler):
    
         spiels = parseGameAwards(spiel_game_award) 
         meeples = parseGameAwards(meeples_game_award) 
-        checkins = getCheckins()       
+        #checkins = getCheckins()       
         template_values = {
-            'checkins': checkins,
+            #'checkins': checkins,
             'spiels': spiels,
             'meeples': meeples,
             'current_user': self.current_user,
@@ -172,13 +166,15 @@ class GameProfile(BaseHandler):
         #logging.info('########### mid = ' + mid + ' ###########')
         #logging.info('########### bgg_id = ' + bgg_id + ' ###########')
         user = self.current_user
-        game = getBGGGame(mid=mid, bgg_id=bgg_id)
-        checkin = getCheckin(game, user) 
-        checkins = getGameCheckins(mid)
+        game = getGame(mid=mid, bgg_id=bgg_id)
+        #checkin = getCheckin(game, user) 
+        #checkins = getGameCheckins(mid)
+        host = self.request.host        
         template_values = {
+            'host': host,
             'game': game,
-            'checkin': checkin,
-            'checkins': checkins,
+            #'checkin': checkin,
+            #'checkins': checkins,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -249,15 +245,15 @@ class UserProfile(BaseHandler):
         }  
         self.generate('base_user.html', template_values)
 
-class GameCheckin(BaseHandler):
+class Checkin(BaseHandler):
     # Checkin to Game
     def post(self):
-        logging.info('################### GameCheckin::post ################')
+        logging.info('################### Checkin::post ################')
         user = self.current_user
         mid = self.request.get('mid')
-        game = models.Game.get_by_key_name(mid)
+        game_key = db.Key.from_path('Game', mid)
         # Check user into game
-        checkin = createCheckin(user=user, game=game)
+        checkin = createCheckin(user, game_key)
         # Announce checkin on Facebook Wall
         #### logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
         #### message = "I'm playing " + game.name
@@ -291,7 +287,7 @@ def getUser(graph, cookie):
     return user
 
 
-def getBGGGame(bgg_id, mid):
+def getGame(bgg_id, mid):
     """Returns a BGGGame model that has been either created or update to the
     datastore.
     """
@@ -435,9 +431,18 @@ def getBGGIDFromBGG(game_name):
     bgg_id = xml.find("./boardgame").attrib['objectid']
     return bgg_id
 
-def createCheckin(game, user):
-    checkin = models.GameCheckin(player=user, game=game)
+def createCheckin(user, game_key):
+    players = [user.key()] # A new Checkin has only one User
+
+    json_dict = {'player_name' : user.name, 'player_fb_id': user.fb_id}
+    json = simplejson.dumps(json_dict)    
+    checkin = models.Checkin(players=players, game=game_key, json=db.Text(json))    
+    #user.last_checkin_game = []
     checkin.put()   
+    #badges = awardCheckinBadges(user, game_key, first)    
+    
+    
+    
     return checkin
     
 def getCheckin(bgg_game, user):
@@ -446,7 +451,7 @@ def getCheckin(bgg_game, user):
     user cannot checkin again.    
     """
     time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
-    q = models.GameCheckin.all()
+    q = models.Checkin.all()
     q.filter("game", bgg_game)
     q.filter("user", user)
     q.filter("created >", time)
@@ -458,12 +463,12 @@ def getCheckins():
     """Returns latest Checkins.
     """
     logging.info('##################### getCheckins ########################')    
-    q = models.GameCheckin.all()
+    q = models.Checkin.all()
     q.order("-created")
     checkins = q.fetch(10) 
     deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.GameCheckin.player, 
-                                             models.GameCheckin.game)
+                                             models.Checkin.player, 
+                                             models.Checkin.game)
     return deref_checkins                                         
     
 def getUserCheckins(fb_id=None):
@@ -471,12 +476,12 @@ def getUserCheckins(fb_id=None):
     """
     logging.info('##################### getUserCheckins ####################')    
     key = db.Key.from_path('User', fb_id)
-    q = models.GameCheckin.all()
+    q = models.Checkin.all()
     q.filter('player =', key)
     q.order("-created")
     checkins = q.fetch(10)  
     deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.GameCheckin.game)
+                                             models.Checkin.game)
     return deref_checkins    
 
 def getGameCheckins(mid=None):
@@ -484,12 +489,12 @@ def getGameCheckins(mid=None):
     """
     logging.info('##################### getGameCheckins ####################')    
     key = db.Key.from_path('Game', mid)
-    q = models.GameCheckin.all()
+    q = models.Checkin.all()
     q.filter('game =', key)
     q.order("-created")
     checkins = q.fetch(10)  
     deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.GameCheckin.player)
+                                             models.Checkin.player)
     return deref_checkins    
 
 def parseGameAwards(game_award):
@@ -519,12 +524,49 @@ def getUser(fb_id=None):
     user = models.User.get_by_key_name(fb_id)
     return user
 
+def awardCheckinBadges():
+    """Returns any badges earned by a User.  Checks Checkins for badge
+    triggers.  If any triggers are met, the Badges are awarded/saved.
+    """
+    keys = []
+    # Award Badge for number of checkins
+    checkin_count = user.checkin_count
+    if checkin_count == 2:
+        keys.append(BADGE_KEY_CHECKIN_A)   
+    elif checking_count == 11:    
+        keys.append(BADGE_KEY_CHECKIN_B)   
+    elif checking_count == 21:    
+        keys.append(BADGE_KEY_CHECKIN_C)   
+    elif checking_count == 51:    
+        keys.append(BADGE_KEY_CHECKIN_D)   
+    elif checking_count == 101:    
+        keys.append(BADGE_KEY_CHECKIN_E)   
+    elif checking_count == 151:
+        keys.append(BADGE_KEY_CHECKIN_F)   
+    elif checking_count == 201:
+        keys.append(BADGE_KEY_CHECKIN_G)   
+    # Award Badge for being first checkin to Game
+    key = db.Key.from_path('Game', game.mid)
+    q = models.Checkin.all()
+    q.filter('game =', key)
+    game_checking = q.get()
+    if game_checkin is not None:
+            
+
+    # If checkins equal badge, add badge
+    
+    # is if first checkin to game?
+    
+    #
+    
+        return badges
+
     
 ##############################################################################
 application = webapp.WSGIApplication([('/game', GameProfile),
                                      (r'/game(/m/.*)/(.*)', GameProfile),
                                      (r'/user/(.*)', UserProfile),
-                                     ('/game-checkin', GameCheckin),
+                                     ('/game-checkin', Checkin),
                                      (r'/.*', MainHandler)],
                                      debug=True)
 

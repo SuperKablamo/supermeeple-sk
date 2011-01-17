@@ -10,8 +10,8 @@ del { text-decoration: line-through; }
 table { border-collapse: collapse; border-spacing: 0; }
 
 /*TEXT STYLES*/
-body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: .8em; color: #eee;}
-a { color: #FF9933; cursor: pointer; outline: medium none; text-decoration: none; }
+body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: .8em; color: #eee; }
+a { color: #FF8003; cursor: pointer; outline: medium none; text-decoration: none; }
 #container { text-align: left; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
@@ -53,11 +53,14 @@ body { background-color: #333; }
 #fullbar { width: 600px; float: left; padding-right: 28px; min-height: 600px; }
 
 /*MAINBAR*/
-#mainbar { margin: 4px 56px 4px 14px; width: 400px; float: left; clear: both; }
+#mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }
+#game-header-wrap { margin: 0 0 12px 0; overflow: hidden; }
+#game-header { float: left; }
+#facebook-like { float: right; margin-top: 2px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
-#game-detail { margin: 12px 0; }
+#game-detail { margin: 12px 0; clear: both; }
 #game-detail dl { margin: 6px 0; }
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
@@ -80,7 +83,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 
 
 /*SIDEBAR*/
-#sidebar { margin: 42px 14px 4px 14px; width: 300px; float: left; }
+#sidebar { margin: 42px 0px 4px 10px; width: 300px; float: left; }
 #sidebar .block { padding-bottom: 12px; }
 #search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }

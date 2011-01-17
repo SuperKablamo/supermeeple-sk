@@ -4,11 +4,19 @@
 	
 		{% block main %}
 		<div id="mainbar">
-			<h1 id="game-title">
-				<span class="name">{{ game.name }}</span>
-				<span class="year">({{ game.year_published}})</span>
-			</h1>
-		  <div id="game-detail">	
+			<div id="game-header-wrap">
+				<div id="game-header">
+					<h1 id="game-title">
+						<span class="name">{{ game.name }}</span>
+						<span class="year">({{ game.year_published}})</span>
+					</h1>
+				</div>
+				<div id="facebook-like">
+					<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+					<fb:like href="http://{{host}}/game{{game.mid}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+				</div>
+		  </div>
+			<div id="game-detail">	
 				{% if game.description %}
   			<h2>Overview</h2>
 				<div id="description">
@@ -123,12 +131,10 @@
 					{% endfor %}
     		</dl>
  				{% endif %}
-
     		<dl>
     			<dt>Weblinks</dt>
 					<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
     		</dl>
-						
 			</div><!-- /game-detail -->		 
 		</div><!-- /main -->	   			
 		{% endblock %}		
@@ -155,24 +161,24 @@
 			</div>
 			<div class="block">
 				{% if not checkin %}
-				<div id="checkin-form">  
-			  	<form name="input" action="">  
-			   		<fieldset>  
-							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>  
-			       	<input type="image" src="/static/images/check-in-button.png" name="submit" class="button" id="checkin-button" value="Checkin" />  
-			     	</fieldset>  
-			   	</form>  
-			  </div>			
+				<div id="checkin-form">
+					<form name="input" action="">
+						<fieldset>
+							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>
+							<input type="image" src="/static/images/check-in-button.png" name="submit" class="button" id="checkin-button" value="Checkin" />
+						</fieldset>
+					</form>
+				</div>
 				{% else %}
 				<div id="checkin">
 					<h2>You are checked in!</h2>
 				</div>
 				{% endif %}
-			</div><!-- /block -->
+			</div><!-- /block -->			
 			<div class="block">
 				<div class="checkin-list">
 					<h2>Checkins</h2>
-					{% for c in checkins %}
+					{% for c in game.checkins %}
 					<div class="checkin">
 						<p>{{c.created|timesince}} ago </p>
 						<p>Player: <a href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></p>
