@@ -178,10 +178,14 @@
 			<div class="block">
 				<div class="checkin-list">
 					<h2>Checkins</h2>
-					{% for c in game.checkins %}
+					{% for c in checkins %}
 					<div class="checkin">
 						<p>{{c.created|timesince}} ago </p>
-						<p>Player: <a href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></p>
+						<p>Players:
+							{% for p in c.players %}
+						  <a href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
+							{% endfor %}
+						</p>
 					</div>
 					{% endfor %}
 				</div>	

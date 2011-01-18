@@ -11,7 +11,8 @@ class User(db.Model):
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     access_token = db.StringProperty(required=True)
-    badges = db.StringListProperty(db.Key, required=True, default=None)    
+    badges = db.StringListProperty(db.Key, required=True, default=None)   
+    last_checkin = db.ReferenceProperty()
     @property
     def checkins(self):
         return Checkin.all().filter('players', self.key())
@@ -53,7 +54,10 @@ class Checkin(db.Model):
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now=True)
-    json = db.TextProperty(required=False)
+    
+    # {players:[{'name':name,'fb_id':fb_id},{'name':name,'fb_id':fb_id}],
+    # badges:[{'name':name,'id':id},{'name':name,'id':id}]}
+    json = db.TextProperty(required=False)    
   
 class GameAward(db.Model): # award id is key_name
     json_dump = db.TextProperty(required=True)

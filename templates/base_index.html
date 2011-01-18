@@ -10,15 +10,19 @@
 			<div class="checkin">
   			<div class="game-image">
 					{% if c.game.bgg_img_url %}
-					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_img_url}}"/></a>
+					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_img_url}}"/></a>
 					{% else %}
-					<a href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="Game image missing for {{c.game.name}}" alt="Game image missing for {{c.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
+					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id}}"><img title="Game image missing for {{c.game.name}}" alt="Game image missing for {{c.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
 					{% endif %}
 				</div>
 				<div class="game-name">
-					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
+					<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
 					<p>{{c.created|timesince}} ago </p>
-					<h4><span class="description">Player:</span> <a href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></h4> 
+					<h4><span class="description">Players:</span> 
+						{% for p in c.players %}
+					  <a title="{{c.game.name}} player" href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
+						{% endfor %}
+					</h4>					
 				</div>	
 				<div class="game-badges">
 					<p></p>
@@ -48,7 +52,7 @@
         {% for s in spiels %}
   			<tr>
 					<td>
-						<span><a href="game{{ s.mid }}/{{ s.bgg_id }}">{{ s.name }}</a></span>
+						<span><a title="{{s.name}}" href="game{{ s.mid }}/{{ s.bgg_id }}">{{ s.name }}</a></span>
 					</td>
 					<td>
 						<div class="year">{{ s.year }}</div>
@@ -63,7 +67,7 @@
       	{% for m in meeples %}
   			<tr>
 					<td>
-						<span><a href="game{{ m.mid }}/{{ m.bgg_id }}">{{ m.name }}</a></span>
+						<span><a title="{{s.name}}" href="game{{ m.mid }}/{{ m.bgg_id }}">{{ m.name }}</a></span>
 					</td>
 					<td>
 						<div class="year">{{ m.year }}</div>

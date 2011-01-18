@@ -140,9 +140,9 @@ class MainHandler(BaseHandler):
    
         spiels = parseGameAwards(spiel_game_award) 
         meeples = parseGameAwards(meeples_game_award) 
-        #checkins = getCheckins()       
+        checkins = getLatestCheckins()       
         template_values = {
-            #'checkins': checkins,
+            'checkins': checkins,
             'spiels': spiels,
             'meeples': meeples,
             'current_user': self.current_user,
@@ -168,13 +168,13 @@ class GameProfile(BaseHandler):
         user = self.current_user
         game = getGame(mid=mid, bgg_id=bgg_id)
         #checkin = getCheckin(game, user) 
-        #checkins = getGameCheckins(mid)
+        checkins = getGameCheckins(game)
         host = self.request.host        
         template_values = {
             'host': host,
             'game': game,
             #'checkin': checkin,
-            #'checkins': checkins,
+            'checkins': checkins,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -433,16 +433,22 @@ def getBGGIDFromBGG(game_name):
 
 def createCheckin(user, game_key):
     players = [user.key()] # A new Checkin has only one User
-
-    json_dict = {'player_name' : user.name, 'player_fb_id': user.fb_id}
+    # Create initial json data:
+    # {'players': 
+    #     [{'name': name, 'fb_id': fb_id}, {'name': name, 'fb_id': fb_id}],
+    # 'badges': 
+    #     [{'name': name, 'id': id}, {'name': name, 'id': id}]
+    # }
+    player = {'name' : user.name, 'fb_id': user.fb_id}
+    player_data = [player]
+    badges = []
+    json_dict = {'players': player_data, 'badges': badges}
     json = simplejson.dumps(json_dict)    
-    checkin = models.Checkin(players=players, game=game_key, json=db.Text(json))    
-    #user.last_checkin_game = []
+    checkin = models.Checkin(players=players, 
+                             game=game_key, 
+                             json=db.Text(json))    
     checkin.put()   
     #badges = awardCheckinBadges(user, game_key, first)    
-    
-    
-    
     return checkin
     
 def getCheckin(bgg_game, user):
@@ -484,18 +490,55 @@ def getUserCheckins(fb_id=None):
                                              models.Checkin.game)
     return deref_checkins    
 
-def getGameCheckins(mid=None):
-    """Returns Checkins for a Game given that Game's mid.
+def getGameCheckins(game):
+    """Returns Checkins for a Game.
     """
     logging.info('##################### getGameCheckins ####################')    
-    key = db.Key.from_path('Game', mid)
+    # Create Checkins json data:
+    # [{'players': 
+    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
+    #   'badges': 
+    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #   'time': '3 minutes ago'
+    #  }]
+    checkins = []
+    for c in game.checkins:
+        checkin = simplejson.loads(c.json)
+        checkin["created"] = c.created
+        checkins.append(checkin)
+        logging.info('############### checkin ='+str(checkin)+' ####################')
+    return checkins   
+
+def getLatestCheckins():
+    """Returns last 14 Checkins.
+    """
+    logging.info('##################### getLatestCheckins ##################')    
+    # Create Checkins json data:
+    # [{'players': 
+    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
+    #   'badges': 
+    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #   'created': '3 minutes ago',
+    #   'game': 
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
+    #  }]
     q = models.Checkin.all()
-    q.filter('game =', key)
     q.order("-created")
-    checkins = q.fetch(10)  
-    deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.Checkin.player)
-    return deref_checkins    
+    q_checkins = q.fetch(14)  
+    deref_checkins = utils.prefetch_refprops(q_checkins, 
+                                             models.Checkin.game)    
+    checkins = []
+    for c in deref_checkins:
+        checkin = simplejson.loads(c.json)
+        checkin["created"] = c.created
+        game = {"name": c.game.name, 
+                "mid": c.game.mid, 
+                "bgg_id": c.game.bgg_id, 
+                "bgg_img_url": c.game.bgg_img_url}
+        checkin["game"] = game
+        checkins.append(checkin)
+        logging.info('############### checkin ='+str(checkin)+' ####################')
+    return checkins
 
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
