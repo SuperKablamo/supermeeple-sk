@@ -12,7 +12,7 @@ class User(db.Model):
     fb_location_name = db.StringProperty(required=False)
     access_token = db.StringProperty(required=True)
     badges = db.StringListProperty(db.Key, required=True, default=None)   
-    last_checkin = db.ReferenceProperty()
+    last_checkin_time = db.DateTimeProperty(required=False)
     @property
     def checkins(self):
         logging.info("################# User:: def checkins(self) ###########")
@@ -21,14 +21,13 @@ class User(db.Model):
         checkins = q.fetch(14)        
         return checkins
         
-
-
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
     bgg_id = db.StringProperty(required=False) # BoardGameGeek id
     mid = db.StringProperty(required=False) # Freebase mid
     bgg_url = db.LinkProperty(required=False)
     bgg_img_url = db.LinkProperty(required=False)
+    bgg_thumbnail_url = db.LinkProperty(required=False)
     description = db.TextProperty(required=False)
     year_published = db.IntegerProperty(required=False)
     min_players = db.IntegerProperty(required=False)
@@ -49,6 +48,7 @@ class Game(db.Model): # mid is key_name
     updated = db.DateTimeProperty(required=True, auto_now=True)
 
 class GameXML(db.Model): # bgg_id is key_name
+    # BGG Game XML example: http://www.boardgamegeek.com/xmlapi/boardgame/13
     xml = db.TextProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
 

@@ -24,7 +24,10 @@
 	      var mid = $("input#mid").val();
 		    var message = $("textarea#message").val();
 			  var facebook = $("input#facebook").val();
-	      var dataString = 'mid='+mid+'&message='+message+'&facebook='+facebook;  
+			  var name = $("input#name").val();
+			  var bgg_id = $("input#bgg-id").val();
+			  var thumbnail = $("input#thumbnail").val();
+	      var dataString = 'mid='+mid+'&message='+message+'&facebook='+facebook+'&name='+name+'&bgg_id='+bgg_id+'&thumbnail='+thumbnail;  
 				//alert (dataString);return false;  
 				$.ajax({  
 					type: "POST",  
@@ -32,7 +35,7 @@
 				  data: dataString,  
 				  success: function() {  
 				  	$('#checkin-form').html("<div id='message'></div>");  
-				    $('#message').html("<h2>You are checked in!</h2>");  
+				    $('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
 				  }  
 				});  
 				return false;
