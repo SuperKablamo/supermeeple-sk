@@ -30,6 +30,11 @@
 				<div class="game-name">
 					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
 					<p>{{c.created|timesince}} ago </p>
+					<p>Players:
+						{% for p in c.players %}
+					  <a href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
+						{% endfor %}
+					</p>				
 				</div>	
 				<div class="game-badges">
 					<p></p>
@@ -52,7 +57,23 @@
      		</form>
 				<p>search for more games</p>
    		</div>
-		</div>
+		</div><!-- /block  -->
+		<div class="block">			
+  		<div id="badges">
+				<h2>Badges</h2>
+				<p>This user doesn't have any Badges yet.</p>
+				<div class="tip">
+					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
+					<ul>
+						<li>Check in to games</li>
+						<li>Sharing check ins on Facebook</li>
+						<li>Adding players to your check ins</li>
+						<li>Scoring check ins</li>
+						<li>Being first and winning also helps</li>
+					</ul>	
+				</div>
+   		</div>
+		</div><!-- /block  -->		
 	</div><!-- /sidebar -->	
 	{% endblock %}
 

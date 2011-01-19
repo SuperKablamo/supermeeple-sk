@@ -29,6 +29,12 @@ indexes:
   - name: created
     direction: desc
 
+- kind: Checkin
+  properties:
+  - name: players
+  - name: created
+    direction: desc
+
 - kind: GameCheckin
   properties:
   - name: game

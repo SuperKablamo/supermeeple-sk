@@ -143,7 +143,7 @@
 		<div id="sidebar">
 			<div class="block">			
     		<div id="search">
-     			<form name="input" action="/game-profile" method="post">
+     			<form name="input" action="/game" method="post">
          		<input class="search-box" type="text" id="game-search"/>
          		<input type="hidden" name="game_id" id="game-id" />
          		<input type="hidden" name="game_name" id="game-name" />
@@ -160,12 +160,17 @@
 				{% endif %}	
 			</div>
 			<div class="block">
+				<div class="tip">
+					<p>Playing {{game.name}}?  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
+				</div>
 				{% if not checkin %}
 				<div id="checkin-form">
 					<form name="input" action="">
 						<fieldset>
 							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>
-							<input type="image" src="/static/images/check-in-button.png" name="submit" class="button" id="checkin-button" value="Checkin" />
+							<textarea class="text-area" id="message" name="message" rows="3" cols="30">Joining a game of {{ game.name }}.</textarea><br/>
+							<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
+							<input type="image" src="/static/images/check-in-button-small.png" style="float:right" name="submit" class="button" id="checkin-button" value="Checkin" />
 						</fieldset>
 					</form>
 				</div>
@@ -178,16 +183,20 @@
 			<div class="block">
 				<div class="checkin-list">
 					<h2>Checkins</h2>
-					{% for c in checkins %}
+					{% if checkins %}
+						{% for c in checkins %}
 					<div class="checkin">
-						<p>{{c.created|timesince}} ago </p>
+						<p>{{c.created|timesince}} ago</p>
 						<p>Players:
 							{% for p in c.players %}
 						  <a href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
 							{% endfor %}
 						</p>
 					</div>
-					{% endfor %}
+						{% endfor %}
+					{% else %}
+					<p>No one has checked into {{game.name}} yet. Be the first!
+					{% endif %}	
 				</div>	
 			</div>	
 		</div><!-- /sidebar -->	

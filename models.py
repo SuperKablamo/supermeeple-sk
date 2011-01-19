@@ -1,5 +1,5 @@
 # Datastore
-
+import logging
 from google.appengine.ext import db
 
 class User(db.Model):
@@ -15,7 +15,13 @@ class User(db.Model):
     last_checkin = db.ReferenceProperty()
     @property
     def checkins(self):
-        return Checkin.all().filter('players', self.key())
+        logging.info("################# User:: def checkins(self) ###########")
+        q = Checkin.all().filter('players', self.key())
+        q.order("-created")
+        checkins = q.fetch(14)        
+        return checkins
+        
+
 
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)

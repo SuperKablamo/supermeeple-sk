@@ -25,6 +25,7 @@ h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
 #game-title span.name {   }
 #game-title span.year { font-size: 0.8em; color: #999; }
+.tip { color: #999; }
 /*freebase-tag .logo { color: #3885C7; }
 gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
@@ -80,14 +81,18 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 .checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
 
-
-
 /*SIDEBAR*/
 #sidebar { margin: 42px 0px 4px 10px; width: 300px; float: left; }
-#sidebar .block { padding-bottom: 12px; }
+#sidebar .block { padding-bottom: 12px; width: 256px; }
 #search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }
+#checkin-form { width: 256px; }
+#checkin-button { padding: 4px 0 10px 0; }
 #checkmark { float: left; }
+img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
+.tip { border: dotted 2px #222; padding: 6px; margin: 0 0 12px 0; }
+#badges p { padding: 0 0 12px 0; }
+#badges ul, #badges li { list-style: disc inside none; }
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}

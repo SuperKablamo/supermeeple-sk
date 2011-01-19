@@ -20,6 +20,7 @@ from settings import *
 from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
@@ -74,77 +75,101 @@ class MainHandler(BaseHandler):
         logging.info('################# MainHandler:: get() ################')
         spiel_id = "/en/spiel_des_jahres"
         meeples_id = "/en/meeples_choice_award"
-        spiel_game_award = models.GameAward.get_by_key_name(spiel_id)
-        meeples_game_award = models.GameAward.get_by_key_name(meeples_id)
+        spiels_cache = memcache.get(spiel_id)
+        meeples_cache = memcache.get(meeples_id)
         # Freebases queries for award winners only occurs once - the first
         # time index.html is requested. To updated the results in index.html,
         # delete the appropriate entries in models.FBMQL.  This will force 
-        # the query to be run again and refresh the results.  
-        if spiel_game_award is None:
-            query_spiel = [{
-                "type": "/games/game",
-                "mid": None,
-                "name": None,
-                "!/award/award_honor/honored_for": {
-                    "award": {
-                        "id": spiel_id
+        # the query to be run again and refresh the results.
+        if spiels_cache is None:
+            spiel_game_award = models.GameAward.get_by_key_name(spiel_id)
+            if spiel_game_award is None:
+                query_spiel = [{
+                    "type":"/games/game",
+                    "mid":None,
+                    "name":None,
+                    "!/award/award_honor/honored_for": {
+                        "award": {
+                            "id":spiel_id
                         },
-                    "year": {
-                        "value": None,
+                        "year": {
+                            "value":None,
+                            "limit":1
+                        },
+                        "limit":1
+                        },
+                        "key" : {
+                            "namespace":"/user/pak21/boardgamegeek/boardgame",
+                            "value": None
+                        },
+                        "sort":"-!/award/award_honor/honored_for.year.value",
+                        "limit":20
+                    }] 
+                result = freebase.mqlread(query_spiel) 
+                json_dump = simplejson.dumps(result)
+                json_dump_text = db.Text(json_dump)
+                spiel_game_award = models.GameAward(key_name=spiel_id, 
+                                                    json_dump=json_dump_text)
+                spiel_game_award.put()
+                spiels = parseGameAwards(spiel_game_award) 
+                success = memcache.set(key=spiel_id, 
+                                       value=spiels, 
+                                       time=2592000) # expiration 30 days
+                spiels_cache = spiels
+            else:    
+                spiels = parseGameAwards(spiel_game_award) 
+                success = memcache.set(key=spiel_id, 
+                                       value=spiels, 
+                                       time=2592000) # expiration 30 days
+                spiels_cache = spiels
+                
+        if meeples_cache is None:
+            meeples_game_award = models.GameAward.get_by_key_name(meeples_id)
+            if meeples_game_award is None:
+                query_meeples = [{
+                    "type": "/games/game",
+                    "mid": None,
+                    "name": None,
+                    "!/award/award_honor/honored_for": {
+                        "award": {
+                            "id": meeples_id
+                        },
+                        "year": {
+                            "value": None,
+                            "limit": 1
+                        },
                         "limit": 1
                         },
-                    "limit": 1
-                    },
-                "key" : {
-                    "namespace" : "/user/pak21/boardgamegeek/boardgame",
-                    "value" : None
-                    },
-                "sort": "-!/award/award_honor/honored_for.year.value",
-                "limit": 20
-                }] 
-            result = freebase.mqlread(query_spiel) 
-            json_dump = simplejson.dumps(result)
-            json_dump_text = db.Text(json_dump)
-            spiel_game_award = models.GameAward(key_name=spiel_id, 
-                                                json_dump=json_dump_text)
-            spiel_game_award.put()
-
-        if meeples_game_award is None:
-            query_meeples = [{
-                "type": "/games/game",
-                "mid": None,
-                "name": None,
-                "!/award/award_honor/honored_for": {
-                    "award": {
-                        "id": meeples_id
+                        "key" : {
+                            "namespace" : "/user/pak21/boardgamegeek/boardgame",
+                            "value" : None
                         },
-                    "year": {
-                        "value": None,
-                        "limit": 1
-                        },
-                    "limit": 1
-                    },
-                "key" : {
-                    "namespace" : "/user/pak21/boardgamegeek/boardgame",
-                    "value" : None
-                    },
-                "sort": "-!/award/award_honor/honored_for.year.value",
-                "limit": 20
-                }] 
-            result = freebase.mqlread(query_meeples) 
-            json_dump = simplejson.dumps(result)
-            json_dump_text = db.Text(json_dump)
-            meeples_game_award = models.GameAward(key_name=meeples_id, 
-                                                  json_dump=json_dump_text)
-            meeples_game_award.put()
-   
-        spiels = parseGameAwards(spiel_game_award) 
-        meeples = parseGameAwards(meeples_game_award) 
+                        "sort": "-!/award/award_honor/honored_for.year.value",
+                        "limit": 20
+                    }] 
+                result = freebase.mqlread(query_meeples) 
+                json_dump = simplejson.dumps(result)
+                json_dump_text = db.Text(json_dump)
+                meeples_game_award = models.GameAward(key_name=meeples_id, 
+                                                      json_dump=json_dump_text)
+                meeples_game_award.put()
+                meeples = parseGameAwards(meeples_game_award) 
+                success = memcache.set(key=meeples_id, 
+                                       value=meeples, 
+                                       time=2592000) # expiration 30 days
+                meeples_cache = meeples
+            else:
+                meeples = parseGameAwards(meeples_game_award) 
+                success = memcache.set(key=meeples_id, 
+                                       value=meeples, 
+                                       time=2592000) # expiration 30 days
+                meeples_cache = meeples                     
+                                       
         checkins = getLatestCheckins()       
         template_values = {
             'checkins': checkins,
-            'spiels': spiels,
-            'meeples': meeples,
+            'spiels': spiels_cache,
+            'meeples': meeples_cache,
             'current_user': self.current_user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -163,17 +188,13 @@ class GameProfile(BaseHandler):
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
         logging.info('################# GameProfile::get ###################')
-        #logging.info('########### mid = ' + mid + ' ###########')
-        #logging.info('########### bgg_id = ' + bgg_id + ' ###########')
         user = self.current_user
         game = getGame(mid=mid, bgg_id=bgg_id)
-        #checkin = getCheckin(game, user) 
         checkins = getGameCheckins(game)
-        host = self.request.host        
+        host = self.request.host # used for Facebook Like url      
         template_values = {
             'host': host,
             'game': game,
-            #'checkin': checkin,
             'checkins': checkins,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -190,7 +211,7 @@ class GameProfile(BaseHandler):
         game_ids = getBGGIDFromFB(game_id)
         
         if game_ids["bgg_id"] is not None: 
-            game = getBGGGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
+            game = getGame(mid=game_ids["mid"], bgg_id=game_ids["bgg_id"])
             checkin = getCheckin(game, user)                
             template_values = {
                 'game': game,
@@ -235,8 +256,8 @@ class UserProfile(BaseHandler):
     def get(self, user_fb_id=None):
         logging.info('################# UserProfile::get ###################')
         user = self.current_user # this is the logged in User
-        profile_user = getUser(user_fb_id)
-        checkins = getUserCheckins(user_fb_id)
+        profile_user = getFBUser(user_fb_id)
+        checkins = getUserCheckins(profile_user)
         template_values = {
             'checkins': checkins,
             'profile_user': profile_user,
@@ -248,16 +269,18 @@ class UserProfile(BaseHandler):
 class Checkin(BaseHandler):
     # Checkin to Game
     def post(self):
-        logging.info('################### Checkin::post ################')
+        logging.info('#################### Checkin::post ###################')
         user = self.current_user
         mid = self.request.get('mid')
+        message = self.request.get('message')
+        facebook = self.request.get('facebook')
         game_key = db.Key.from_path('Game', mid)
         # Check user into game
-        checkin = createCheckin(user, game_key)
-        # Announce checkin on Facebook Wall
-        #### logging.info('########### user.access_token = ' + user.access_token  + ' ###########')
-        #### message = "I'm playing " + game.name
-        #### results = facebook.GraphAPI(user.access_token).put_wall_post(message)
+        checkin = createCheckin(user, game_key, facebook)
+        if facebook.upper() == 'TRUE':# Announce checkin on Facebook Wall
+            logging.info('#### posting to Facebook '+user.access_token+'####')
+            results = facebook.GraphAPI(
+                user.access_token).put_wall_post(message)
         template_values = {
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -288,80 +311,106 @@ def getUser(graph, cookie):
 
 
 def getGame(bgg_id, mid):
-    """Returns a BGGGame model that has been either created or update to the
-    datastore.
+    """Returns a Game.  Looks for one in memcache, if not then creates one
+    using the BGG XML API.
     """
-    logging.info('########### getBGGGame:: BUILDING BGGGAME ###########')
-    #logging.info('########### bgg_id = ' + bgg_id + ' ###########')
-    #logging.info('########### mid = ' + mid + ' ###########')
-    # Use BGG XML API to get Game data
+    logging.info('########### getGame:: ####################################')
+    game_cache = memcache.get(mid)
     game_url = BGG_XML_URI + bgg_id
-    result = urllib2.urlopen(game_url).read()
+    if game_cache is None:
+        game = models.Game.get_by_key_name(mid)
+        game_xml = models.GameXML.get_by_key_name(bgg_id)
+        if game is None:
+            # Use BGG XML API to get Game data
+            game_data = parseBGGXML(game_url)
+            # Build Game from BGG data
+            game = models.Game(key_name=mid,
+                               mid=mid,
+                               bgg_id=bgg_id,
+                               bgg_img_url=game_data['image_url'],
+                               name=game_data['name'],
+                               description=game_data['description'],
+                               year_published = game_data['year_published'],
+                               min_players = game_data['min_players'],
+                               playing_time = game_data['playing_time'],
+                               age = game_data['age'],
+                               publishers = game_data['publishers'],
+                               artists = game_data['artists'],
+                               designers = game_data['designers'],
+                               expansions = game_data['expansions'],
+                               categories = game_data['categories'],
+                               mechanics = game_data['mechanics'],
+                               subdomains = game_data['subdomains'])
+            if game_xml is None:
+                game_xml = models.GameXML(key_name=bgg_id, 
+                                          xml=game_data['xml_text'])  
+            else:
+                game_xml.xml = game_data['xml_text']                 
+            game.put() # Save Game
+            game_xml.put() # Save GameXML       
+            success = memcache.set(key=mid, 
+                                   value=game, 
+                                   time=432000) # expiration 5 days
+            game_cache = game                                        
+        else:
+            # Use BGG XML API to get Game data
+            game_data = parseBGGXML(game_url)
+            # Build Game from BGG data            
+            game.name = game_data['name']
+            game.bgg_id = bgg_id
+            game.bgg_img_url = game_data['image_url']
+            game.description = game_data['description']
+            game.year_published = game_data['year_published']
+            game.min_players = game_data['min_players']
+            game.playing_time = game_data['playing_time']
+            game.age = game_data['age']
+            game.publishers = game_data['publishers']
+            game.artists = game_data['artists']
+            game.designers = game_data['designers']  
+            game.expansions = game_data['expansions']
+            game.categories = game_data['categories']
+            game.mechanics = game_data['mechanics']
+            game.subdomains = game_data['subdomains']
+            game_xml.xml = game_data['xml_text']
+            game.put() # Save Game
+            game_xml.put() # Save GameXML
+            success = memcache.set(key=mid, 
+                                   value=game, 
+                                   time=432000) # expiration 5 days
+            game_cache = game        
+    return game_cache
+
+def parseBGGXML(bgg_game_url):
+    """Returns a dictionary of game data retrieved from BGGs XML API.
+    """
+    result = urllib2.urlopen(bgg_game_url).read()
     xml = ElementTree.fromstring(result)
-    # Parse data
-    name = findPrimaryName(xml)
-    description = xml.findtext(".//description")
-    year_published = strToInt(xml.findtext(".//yearpublished"))
-    min_players = strToInt(xml.findtext(".//minplayers"))
-    max_players = strToInt(xml.findtext(".//maxplayers"))
-    playing_time = strToInt(xml.findtext(".//playingtime"))
-    age = strToInt(xml.findtext(".//age"))
-    publishers = buildDataList(xml.findall(".//boardgamepublisher"))
-    artists = buildDataList(xml.findall(".//boardgameartist"))
-    designers = buildDataList(xml.findall(".//boardgamedesigner"))    
-    expansions = buildDataList(xml.findall(".//boardgameexpansion"))
-    categories = buildDataList(xml.findall(".//boardgamecategory"))
-    mechanics = buildDataList(xml.findall(".//boardgamemechanic"))
-    subdomains = buildDataList(xml.findall(".//boardgamesubdomain"))
-    image_url = xml.findtext(".//image")
-    
-    # Create/Update Game
-    game = models.Game.get_by_key_name(mid)
-    game_xml = models.GameXML.get_by_key_name(bgg_id)
     decoded_result = result.decode("utf-8")
     xml_text = db.Text(decoded_result)
-    if game: # Update Game
-        time = datetime.datetime.now() - datetime.timedelta(0, UPDATE_FREQUENCY)
-        # Only update if the last update is older than the allowed time
-        if game.updated < time:
-            game.name = name
-            game.bgg_id = bgg_id
-            game.bgg_img_url = image_url
-            game.description = description
-            game.year_published = year_published
-            game.min_players = min_players
-            game.playing_time = playing_time
-            game.age = age
-            game.publishers = publishers
-            game.artists = artists
-            game.designers = designers  
-            game.expansions = expansions
-            game.categories = categories
-            game.mechanics = mechanics
-            game.subdomains = subdomains
-            game_xml.xml = xml_text
-    else: # Create new Game
-        game = models.Game(key_name=mid,
-                           mid=mid,
-                           bgg_id=bgg_id,
-                           bgg_img_url=image_url,
-                           name=name,
-                           description=description,
-                           year_published = year_published,
-                           min_players = min_players,
-                           playing_time = playing_time,
-                           age = age,
-                           publishers = publishers,
-                           artists = artists,
-                           designers = designers,
-                           expansions = expansions,
-                           categories = categories,
-                           mechanics = mechanics,
-                           subdomains = subdomains)
-        game_xml = models.GameXML(key_name=bgg_id, xml=xml_text)                   
-    game.put() # Save Game
-    game_xml.put() # Save GameXML
-    return game
+    bgg_data = {'name': findPrimaryName(xml),
+                'description': xml.findtext(".//description"),
+                'year_published': strToInt(xml.findtext(".//yearpublished")),
+                'min_players': strToInt(xml.findtext(".//minplayers")),
+                'max_players': strToInt(xml.findtext(".//maxplayers")),
+                'playing_time': strToInt(xml.findtext(".//playingtime")),
+                'age': strToInt(xml.findtext(".//age")),
+                'publishers': 
+                    buildDataList(xml.findall(".//boardgamepublisher")),
+                'artists': buildDataList(xml.findall(".//boardgameartist")),
+                'designers': 
+                    buildDataList(xml.findall(".//boardgamedesigner")),  
+                'expansions': 
+                    buildDataList(xml.findall(".//boardgameexpansion")),
+                'categories': 
+                    buildDataList(xml.findall(".//boardgamecategory")),
+                'mechanics': 
+                    buildDataList(xml.findall(".//boardgamemechanic")),
+                'subdomains': 
+                    buildDataList(xml.findall(".//boardgamesubdomain")),
+                'image_url': xml.findtext(".//image"),
+                'xml_text': xml_text}
+    
+    return bgg_data
 
 def getFBGame(mid):
     """Returns a JSON result for Freebase Game data.    
@@ -431,7 +480,7 @@ def getBGGIDFromBGG(game_name):
     bgg_id = xml.find("./boardgame").attrib['objectid']
     return bgg_id
 
-def createCheckin(user, game_key):
+def createCheckin(user, game_key, facebook=False):
     players = [user.key()] # A new Checkin has only one User
     # Create initial json data:
     # {'players': 
@@ -465,55 +514,59 @@ def getCheckin(bgg_game, user):
     checkin = q.get()
     return checkin
 
-def getCheckins():
-    """Returns latest Checkins.
+def getUserCheckins(user):
+    """Returns Checkins for a User.
     """
-    logging.info('##################### getCheckins ########################')    
-    q = models.Checkin.all()
-    q.order("-created")
-    checkins = q.fetch(10) 
-    deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.Checkin.player, 
-                                             models.Checkin.game)
-    return deref_checkins                                         
-    
-def getUserCheckins(fb_id=None):
-    """Returns Checkins for a User given that User's fb_id.
-    """
-    logging.info('##################### getUserCheckins ####################')    
-    key = db.Key.from_path('User', fb_id)
-    q = models.Checkin.all()
-    q.filter('player =', key)
-    q.order("-created")
-    checkins = q.fetch(10)  
-    deref_checkins = utils.prefetch_refprops(checkins, 
-                                             models.Checkin.game)
-    return deref_checkins    
+    # Data format:
+    # [{'players': 
+    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
+    #   'badges': 
+    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #   'created': '3 minutes ago',
+    #   'game': 
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
+    #  }]    
+    q_checkins = user.checkins
+    deref_checkins = utils.prefetch_refprops(q_checkins, 
+                                             models.Checkin.game)    
+    checkins = []
+    for c in deref_checkins:
+        checkin = simplejson.loads(c.json)
+        checkin["created"] = c.created
+        game = {"name": c.game.name, 
+                "mid": c.game.mid, 
+                "bgg_id": c.game.bgg_id, 
+                "bgg_img_url": c.game.bgg_img_url}
+        checkin["game"] = game
+        checkins.append(checkin)
+        logging.info('############# checkin ='+str(checkin)+' ##############')
+    return checkins
 
 def getGameCheckins(game):
     """Returns Checkins for a Game.
     """
     logging.info('##################### getGameCheckins ####################')    
-    # Create Checkins json data:
+    # Data format:
     # [{'players': 
     #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
     #   'badges': 
     #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
     #   'time': '3 minutes ago'
     #  }]
-    checkins = []
-    for c in game.checkins:
+    ref_checkins = game.checkins.order("-created") 
+    checkins = [] 
+    for c in ref_checkins:
         checkin = simplejson.loads(c.json)
         checkin["created"] = c.created
         checkins.append(checkin)
-        logging.info('############### checkin ='+str(checkin)+' ####################')
+        logging.info('############### checkin ='+str(checkin)+' ############')
     return checkins   
 
 def getLatestCheckins():
-    """Returns last 14 Checkins.
+    """Returns lastest Checkins.
     """
     logging.info('##################### getLatestCheckins ##################')    
-    # Create Checkins json data:
+    # Data format:
     # [{'players': 
     #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
     #   'badges': 
@@ -537,7 +590,7 @@ def getLatestCheckins():
                 "bgg_img_url": c.game.bgg_img_url}
         checkin["game"] = game
         checkins.append(checkin)
-        logging.info('############### checkin ='+str(checkin)+' ####################')
+        logging.info('############# checkin ='+str(checkin)+' ##############')
     return checkins
 
 def parseGameAwards(game_award):
@@ -560,7 +613,7 @@ def parseGameAwards(game_award):
         games.append(game)
     return games
 
-def getUser(fb_id=None):
+def getFBUser(fb_id=None):
     """Returns a User for the given fb_id.
     """
     logging.info('##################### getUser ############################')        
