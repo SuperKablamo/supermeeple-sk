@@ -13,7 +13,7 @@
 				</div>
 				<div id="facebook-like">
 					<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
-					<fb:like href="http://{{host}}/game{{game.mid}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+					<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
 				</div>
 		  </div>
 			<div id="game-detail">	
@@ -155,7 +155,7 @@
 			<div class="block">
 				{% if game.bgg_img_url %}
   			<div id="game-image">
-					<img src="{{ game.bgg_img_url }}"/>
+					<img alt="{{ game.name }}" title="{{ game.name }}" src="{{ game.bgg_img_url }}"/>
 				</div>
 				{% endif %}	
 			</div>
@@ -163,6 +163,7 @@
 				<div class="tip">
 					<p>Playing {{game.name}}?  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
 				</div>
+				{% if current_user %}
 				{% if checked_in %}
 				<div id="checkin">
 					<h2>You are checked into a game</h2>
@@ -183,6 +184,7 @@
 					</form>
 				</div>
 				{% endif %}
+				{% endif %}
 			</div><!-- /block -->			
 			<div class="block">
 				<div class="checkin-list">
@@ -191,11 +193,9 @@
 						{% for c in checkins %}
 					<div class="checkin">
 						<p>{{c.created|timesince}} ago</p>
-						<p>Players:
-							{% for p in c.players %}
-						  <a href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
-							{% endfor %}
-						</p>
+						<div class="player">
+					  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+						</div>
 					</div>
 						{% endfor %}
 					{% else %}

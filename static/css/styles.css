@@ -55,8 +55,8 @@ body { background-color: #333; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }
-#game-header-wrap { margin: 0 0 12px 0; overflow: hidden; }
-#game-header { float: left; }
+#game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
+#game-header { float: left; margin: 0 0 10px 0; }
 #facebook-like { float: right; margin-top: 2px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
@@ -89,11 +89,12 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #checkin-form { width: 256px; }
 #checkin-button { padding: 4px 0 10px 0; }
 #checkmark { float: left; }
-img.join-button, img.facebook-icon h2 { padding: 0px 0 0 4px; vertical-align: text-bottom; }
+img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
 .tip { border: dotted 2px #222; padding: 6px; margin: 0 0 12px 0; }
 #badges p { padding: 0 0 12px 0; }
 #badges ul, #badges li { list-style: disc inside none; }
 h2 img.check-mark { vertical-align: text-bottom; padding: 0 4px 0 0; }
+.player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}

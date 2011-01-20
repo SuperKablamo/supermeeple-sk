@@ -37,6 +37,7 @@ import cgi
 import hashlib
 import time
 import urllib
+import logging
 
 # Find a JSON parser
 try:
@@ -168,10 +169,19 @@ class GraphAPI(object):
             else:
                 args["access_token"] = self.access_token
         post_data = None if post_args is None else urllib.urlencode(post_args)
-        file = urllib.urlopen("https://graph.facebook.com/" + path + "?" +
+        """ Trace statements and Exception handling added by 
+        will@superkablamo.com.  Attempt to handle and debug an error when 
+        posting data to Facebook.
+        """
+        try:
+            file = urllib.urlopen("https://graph.facebook.com/" + path + "?" +
                               urllib.urlencode(args), post_data)
+        except Exception:
+            logging.error('************* DownloadError *********************')
         try:
             response = _parse_json(file.read())
+            logging.info('************* GraphAPI.request:: _parse_json *****')
+            logging.info('************* response = '+str(response)+' *******')
         finally:
             file.close()
         if response.get("error"):

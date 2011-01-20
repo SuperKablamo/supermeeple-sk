@@ -18,11 +18,9 @@
 				<div class="game-name">
 					<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
 					<p>{{c.created|timesince}} ago </p>
-					<h4><span class="description">Players:</span> 
-						{% for p in c.players %}
-					  <a title="{{c.game.name}} player" href="/user/{{p.fb_id}}">{{p.name}}</a>{% if not forloop.last %}, {% endif %}
-						{% endfor %}
-					</h4>					
+					<div class="player">
+				  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+					</div>
 				</div>	
 				<div class="game-badges">
 					<p></p>

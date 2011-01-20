@@ -70,6 +70,16 @@ class BaseHandler(webapp.RequestHandler):
                                                 template_values, 
                                                 debug=DEBUG))
                                                 
+class Admin(BaseHandler):
+    def get(self, pswd=None):
+        if pswd == "backyardchicken":
+            template_values = {
+                'current_user': self.current_user,
+                'facebook_app_id': FACEBOOK_APP_ID
+            }  
+            self.generate('base_admin.html', template_values)
+        else: self.redirect(500)  
+
 class MainHandler(BaseHandler):
     """Return content for index.html.     
     """
@@ -250,21 +260,19 @@ class Checkin(BaseHandler):
         thumbnail = self.request.get('thumbnail')
         game_key = db.Key.from_path('Game', mid)
         # Check user into game
-        checkin = createCheckin(user, game_key, facebook)
+        badges = createCheckin(user, game_key, facebook)
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
             logging.info('#### posting to Facebook '+user.access_token+'####')
             attachment = {}
-            url = self.request.url + mid + '/' + bgg_id
+            url = 'http://www.supermeeple.com' + mid + '/' + bgg_id
             attachment['caption'] = "supermeeple.com"
             attachment['link'] = url #url
             attachment['name'] = name
             attachment['picture'] = thumbnail
             results = facebook.GraphAPI(
                user.access_token).put_wall_post(message, attachment)
-        template_values = {
-            'current_user': user,
-            'facebook_app_id': FACEBOOK_APP_ID
-        }  
+        self.response.headers.add_header("content-type", "application/json")       
+        return self.response.out.write(simplejson.dumps(badges))
 
 ######################## METHODS #############################################
 def getUser(graph, cookie):
@@ -473,31 +481,39 @@ def getBGGIDFromBGG(game_name):
 def createCheckin(user, game_key, facebook=False):
     players = [user.key()] # A new Checkin has only one User
     # Create initial json data:
-    # {'players': 
-    #     [{'name': name, 'fb_id': fb_id}, {'name': name, 'fb_id': fb_id}],
+    # {'player': 
+    #     {'name':name,'fb_id':fb_id},
     # 'badges': 
-    #     [{'name': name, 'id': id}, {'name': name, 'id': id}]
+    #     [{'name':name,'img_url':img_url,'key_name':key_name},
+    #      {'name':name,'img_url':img_url,'key_name':key_name}]
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
-    player_data = [player]
-    badges = []
-    json_dict = {'players': player_data, 'badges': badges}
-    json = simplejson.dumps(json_dict)    
-    checkin = models.Checkin(players=players, 
+    badge_entities = awardCheckinBadges(user, game_key)  
+    badges=[]
+    for b in badge_entities:
+        logging.info('################ badge = ' +str(b)+ '##############')
+        badge = {'name':b.name, 'img_url':b.img_url, 'key_name':b.key().name()}
+        badges.append(badge)      
+    json_dict = {'player': player, 'badges': badges}
+    json = simplejson.dumps(json_dict)  
+    checkin = models.Checkin(player=user, 
                              game=game_key, 
                              json=db.Text(json))    
     checkin.put()   
     user.last_checkin_time = datetime.datetime.now()
     user.put()
-    #badges = awardCheckinBadges(user, game_key, first)    
-    return checkin
+
+    return badges
     
 def isCheckedIn(user):
     """Returns True if the User is checked into a Game with the check in grace
     period.   
     """
     time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
-    last_time = user.last_checkin_time
+    try:
+        last_time = user.last_checkin_time
+    except AttributeError:
+        return False    
     if last_time is None:
         return False
     elif last_time > time:
@@ -507,8 +523,8 @@ def getUserCheckins(user):
     """Returns Checkins for a User.
     """
     # Data format:
-    # [{'players': 
-    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
+    # [{'player': 
+    #       {'name': name, 'fb_id': fb_id},
     #   'badges': 
     #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
     #   'created': '3 minutes ago',
@@ -609,11 +625,18 @@ def getFBUser(fb_id=None):
     user = models.User.get_by_key_name(fb_id)
     return user
 
-def awardCheckinBadges():
+def awardCheckinBadges(user, game_key):
     """Returns any badges earned by a User.  Checks Checkins for badge
     triggers.  If any triggers are met, the Badges are awarded/saved.
     """
+    createBadges()
     keys = []
+    # Is this the first checkin for this Game?
+    q = models.Checkin.all()
+    q.filter("game =", game_key)  
+    any_checkin = q.get()
+    if any_checkin is None: keys.append(BADGE_KEY_GAME_CHECKIN_FIRST)    
+    """
     # Award Badge for number of checkins
     checkin_count = user.checkin_count
     if checkin_count == 2:
@@ -630,21 +653,44 @@ def awardCheckinBadges():
         keys.append(BADGE_KEY_CHECKIN_F)   
     elif checking_count == 201:
         keys.append(BADGE_KEY_CHECKIN_G)   
-    # Award Badge for being first checkin to Game
-    key = db.Key.from_path('Game', game.mid)
-    q = models.Checkin.all()
-    q.filter('game =', key)
-    game_checking = q.get()
-    if game_checkin is not None:
-            
 
+    """
     # If checkins equal badge, add badge
     
     # is if first checkin to game?
     
     #
+    if not keys: return None
+    else:
+        user.badges.extend(keys)
+        user.put() 
+        return db.Model.get(keys)
+
+def createBadges():
     
-        return badges
+    host = "http://localhost:8080"
+    badgeA = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_A,
+                          name=BADGE_NAME_CHECKIN_COUNT_A,
+                          img_url=host + BADGE_IMG_CHECKIN_COUNT_A)
+
+    badgeB = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_B,
+                          name=BADGE_NAME_CHECKIN_COUNT_B,
+                          img_url=host + BADGE_IMG_CHECKIN_COUNT_B)
+
+    badgeC = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_C,
+                          name=BADGE_NAME_CHECKIN_COUNT_C,
+                          img_url=host + BADGE_IMG_CHECKIN_COUNT_C)
+
+    badgeFirst = models.Badge(key_name=BADGE_NAME_GAME_CHECKIN_FIRST,
+                              name=BADGE_NAME_GAME_CHECKIN_FIRST,
+                              img_url=host + BADGE_IMG_GAME_CHECKIN_FIRST)
+    
+    badgeA.put()                          
+    badgeB.put()                          
+    badgeC.put()                          
+    badgeFirst.put() 
+    return                         
+
 
     
 ##############################################################################
@@ -652,6 +698,7 @@ application = webapp.WSGIApplication([('/game', GameProfile),
                                      (r'/game(/m/.*)/(.*)', GameProfile),
                                      (r'/user/(.*)', UserProfile),
                                      ('/game-checkin', Checkin),
+                                     (r'/admin/(.*)', Admin),
                                      (r'/.*', MainHandler)],
                                      debug=True)
 

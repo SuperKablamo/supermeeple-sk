@@ -23,8 +23,8 @@
       $("#checkin-button").click(function() { 
 	      var mid = $("input#mid").val();
 		    var message = $("textarea#message").val();
-			  var facebook = $("input#facebook").val();
-			  var name = $("input#name").val();
+			  var facebook = $('input#facebook').is(':checked');
+				var name = $("input#name").val();
 			  var bgg_id = $("input#bgg-id").val();
 			  var thumbnail = $("input#thumbnail").val();
 	      var dataString = 'mid='+mid+'&message='+message+'&facebook='+facebook+'&name='+name+'&bgg_id='+bgg_id+'&thumbnail='+thumbnail;  
@@ -33,11 +33,14 @@
 					type: "POST",  
 				  url: "/game-checkin",  
 				  data: dataString,  
-				  success: function() {  
-				  	$('#checkin-form').html("<div id='message'></div>");  
+				  success: function(badges) {  
+				  	$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
 				    $('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
-				  }  
-				});  
+						$.each(badges, function(i,badge) {
+				  	  $('#badges').append("<p>New Badge!"  +badge.name +  "<p><img class='badge' src='"+badge.img_url+"'>");  
+				    });
+				  }
+				});
 				return false;
     	});  
    	});

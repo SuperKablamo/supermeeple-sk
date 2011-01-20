@@ -11,15 +11,8 @@ class User(db.Model):
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     access_token = db.StringProperty(required=True)
-    badges = db.StringListProperty(db.Key, required=True, default=None)   
+    badges = db.ListProperty(db.Key, required=True, default=None)   
     last_checkin_time = db.DateTimeProperty(required=False)
-    @property
-    def checkins(self):
-        logging.info("################# User:: def checkins(self) ###########")
-        q = Checkin.all().filter('players', self.key())
-        q.order("-created")
-        checkins = q.fetch(14)        
-        return checkins
         
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
@@ -54,15 +47,14 @@ class GameXML(db.Model): # bgg_id is key_name
 
 class Checkin(db.Model):
     game = db.ReferenceProperty(Game, required=True, collection_name="checkins")
-    players = db.ListProperty(db.Key, required=True, default=None)
+    player = db.ReferenceProperty(User, required=True, collection_name="checkins")
     badges = db.ListProperty(db.Key, required=True, default=None)
     winner = db.ReferenceProperty(User, required=False, collection_name="wins")
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now=True)
     
-    # {players:[{'name':name,'fb_id':fb_id},{'name':name,'fb_id':fb_id}],
-    # badges:[{'name':name,'id':id},{'name':name,'id':id}]}
+    # badges:[{'name':name,'img_url':img_url},{'name':name,'img_url':img_url}]}
     json = db.TextProperty(required=False)    
   
 class GameAward(db.Model): # award id is key_name
@@ -70,7 +62,7 @@ class GameAward(db.Model): # award id is key_name
 
 class Badge(db.Model):
     name = db.StringProperty(required=True)
-    img_url = db.LinkProperty(required=True, default='/foo.jpg')
+    img_url = db.LinkProperty(required=True, default='http://www.supermeeple.com/static/images/meeple.png')
     points = db.IntegerProperty(required=True, default=0)    
     @property
     def checkin_badges(self):
