@@ -26,6 +26,7 @@ h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 #game-title span.name {   }
 #game-title span.year { font-size: 0.8em; color: #999; }
 .tip { color: #999; }
+#badges span.badge-title { font-size: 1.2em; color: #fff; }
 /*freebase-tag .logo { color: #3885C7; }
 gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
@@ -51,7 +52,12 @@ body { background-color: #333; }
 #main3 { float: left; }
 
 /*FULLBAR*/
-#fullbar { width: 600px; float: left; padding-right: 28px; min-height: 600px; }
+#fullbar { width: 600px; float: left; padding: 0 0 0 28px; min-height: 600px; }
+.admin-block { border: dotted 2px #222; padding: 0 6px; }
+.admin-block h2 { padding: 12px 0; }
+.admin-block label { position: absolute; text-align:right; width:60px; }
+.admin-block input, .admin-block textarea, .admin-block select { margin: 0 0 12px 70px; }
+.admin-block .badge { padding: 4px 0 12px 0; border-top: dotted 2px #222; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }
@@ -93,8 +99,9 @@ img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-
 .tip { border: dotted 2px #222; padding: 6px; margin: 0 0 12px 0; }
 #badges p { padding: 0 0 12px 0; }
 #badges ul, #badges li { list-style: disc inside none; }
-h2 img.check-mark { vertical-align: text-bottom; padding: 0 4px 0 0; }
+h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 0 0; }
 .player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
+#badges, #message { width: 100%; padding: 0 0 10px 0; }
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}

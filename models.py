@@ -1,6 +1,7 @@
 # Datastore
 import logging
 from google.appengine.ext import db
+from google.appengine.ext import blobstore
 
 class User(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
@@ -13,6 +14,7 @@ class User(db.Model):
     access_token = db.StringProperty(required=True)
     badges = db.ListProperty(db.Key, required=True, default=None)   
     last_checkin_time = db.DateTimeProperty(required=False)
+    checkin_count = db.IntegerProperty(required=True, default=0)
         
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
@@ -62,8 +64,10 @@ class GameAward(db.Model): # award id is key_name
 
 class Badge(db.Model):
     name = db.StringProperty(required=True)
-    img_url = db.LinkProperty(required=True, default='http://www.supermeeple.com/static/images/meeple.png')
-    points = db.IntegerProperty(required=True, default=0)    
+    description = db.TextProperty(required=False)
+    points = db.IntegerProperty(required=True, default=0)   
+    image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
+    thumb = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False) 
     @property
     def checkin_badges(self):
         return Checkin.all().filter('badges', self.key())    

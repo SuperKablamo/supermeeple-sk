@@ -5,12 +5,45 @@
 	{% block main %}	
 	<!-- FULLBAR --> 
 	<div id="fullbar">
-		<h1 id="error">Game Over</h1>
-		<p>AKA error 404, Page Not Found.<p>
-		<p>Sorry to tell you that whatever you're trying to find is not available.  But rest assured it's probably only 49% your fault, which leaves the majority of the blame with us.  It's also 99% likely that the aforementioned "majority of the blame" should go to Will Merydith, who spends most of his time pretending to be a programmer.  It's a wonder this site works at all frankly.</p>
-		<br/>
-		<p>Try our home page:</p>
-		<p><a href="/">http://supermeeple.com</a></p>
+		<h1>Admin</h1>
+		<div class="admin-block">
+			<h2>Upload Badge Image</h2>
+			<form action="{{image_upload_url}}" method="POST" enctype="multipart/form-data">
+				<label>name</label>
+				<select name="key_name">
+					{% for b in badges %}
+						<option value="{{b.key.name}}">{{b.name}}</option>
+					{% endfor %}
+					<option>
+				</select>	<br/>
+				<label>image</label><input type="file" name="file" size="50"><br/> 
+				<input type="submit" name="submit" value="Submit">
+			</form>
+			<h2>Upload Badge Thumb</h2>
+			<form action="{{thumb_upload_url}}" method="POST" enctype="multipart/form-data">
+				<label>name</label>
+				<select name="key_name">
+					{% for b in badges %}
+						<option value="{{b.key.name}}">{{b.name}}</option>
+					{% endfor %}
+					<option>
+				</select>	<br/>
+				<label>thumb</label><input type="file" name="file" size="50"><br/> 
+				<input type="submit" name="submit" value="Submit">
+			</form>
+			<div id="badges-list">
+			{% for b in badges %}
+				<div class="badge">
+					<h3>Name: {{b.name}}</h3>
+					<p>Key Name: {{b.key_name }}</p>
+					<p>Description: {{b.description}}</p>
+					<p>Points: {{b.points}}</p>
+					<p>Image: <img src="/serve/{{b.image.key}}"/></p>
+					<p>Thumb: <img src="/serve/{{b.thumb.key}}"/></p>	
+				</div>			
+			{% endfor %}
+			</div>	
+		</div>	
                          
   </div><!-- /fullbar -->
 	{% endblock %}	
