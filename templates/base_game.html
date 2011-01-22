@@ -191,11 +191,16 @@
 					<h2>Recent checkins</h2>
 					{% if checkins %}
 						{% for c in checkins %}
-					<div class="checkin">
+					<div class="tiny-checkin">
 						<p>{{c.created|timesince}} ago</p>
 						<div class="player">
 					  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
 						</div>
+						<div class="game-badges">
+							{% for b in c.badges %}
+							<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.thumb}}" />
+						  {% endfor %}
+						</div>						
 					</div>
 						{% endfor %}
 					{% else %}

@@ -7,6 +7,10 @@
 	<div id="fullbar">
 		<h1>Admin</h1>
 		<div class="admin-block">
+			<h2>Create Badges</h2>
+			<form action="/admin/create-badges" method="POST">
+					<label>Badges</label><input type="submit" name="create" value="Submit">
+			</form>			
 			<h2>Upload Badge Image</h2>
 			<form action="{{image_upload_url}}" method="POST" enctype="multipart/form-data">
 				<label>name</label>

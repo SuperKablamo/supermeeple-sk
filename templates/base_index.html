@@ -23,7 +23,9 @@
 					</div>
 				</div>	
 				<div class="game-badges">
-					<p></p>
+					{% for b in c.badges %}
+					<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.thumb}}" />
+				  {% endfor %}
 				</div>				
 			</div>
 			{% endfor %}

@@ -81,10 +81,11 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 
 #user-profile { height: 60px; padding-bottom: 12px; }
 #profile-image, .checkin .game-image { float: left; }
-#profile-name, .checkin .game-name, .checkin .game-badges { margin: 12px 0 0 16px; float: left; }
+#profile-name, .checkin .game-name { margin: 12px 0 0 16px; float: left; }
+.checkin .game-badges { margin: 8px 0 0 0px; float: left; }
 
 #checkin-list { width: 100%; }
-.checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
+.checkin, .tiny-checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
 
 /*SIDEBAR*/
@@ -99,9 +100,11 @@ img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-
 .tip { border: dotted 2px #222; padding: 6px; margin: 0 0 12px 0; }
 #badges p { padding: 0 0 12px 0; }
 #badges ul, #badges li { list-style: disc inside none; }
-h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 0 0; }
+h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 .player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
 #badges, #message { width: 100%; padding: 0 0 10px 0; }
+.tiny-checkin .game-badges { margin: 0 0 0 16px; float: left; }
+.tiny-checkin .player { float: left; }
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}

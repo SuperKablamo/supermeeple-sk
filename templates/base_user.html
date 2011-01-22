@@ -32,8 +32,10 @@
 					<p>{{c.created|timesince}} ago </p>
 				</div>	
 				<div class="game-badges">
-					<p></p>
-				</div>				
+					{% for b in c.badges %}
+					<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.thumb}}" />
+				  {% endfor %}
+				</div>			
 			</div>
 			{% endfor %}
 		</div><!-- /checkin-list -->	
@@ -56,6 +58,11 @@
 		<div class="block">			
   		<div id="badges">
 				<h2>Badges</h2>
+				{% if badges %}
+					{% for b in badges %}
+					<img alt="{{b.image.name}}" title="{{b.image.name}}" "class="badge" title src="/serve/{{b.image.key}}" />
+					{% endfor %}
+   			{% else %}
 				<p>This user doesn't have any Badges yet.</p>
 				<div class="tip">
 					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
@@ -67,7 +74,8 @@
 						<li>Being first and winning also helps</li>
 					</ul>	
 				</div>
-   		</div>
+				{% endif %}
+			</div>
 		</div><!-- /block  -->		
 	</div><!-- /sidebar -->	
 	{% endblock %}

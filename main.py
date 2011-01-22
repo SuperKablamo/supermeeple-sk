@@ -90,7 +90,15 @@ class Admin(BaseHandler):
             }  
             self.generate('base_admin.html', template_values)
         else: self.redirect(500)  
-
+        
+    def post(self, method=None):
+        logging.info('################### Admin:: post() ###################')
+        logging.info('################### method =' +method+' ##############')
+        if method == "create-badges":
+            createBadges()
+        self.redirect('/admin/backyardchicken')  
+    
+    
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self, form=None):
         upload_files = self.get_uploads('file') 
@@ -271,7 +279,9 @@ class UserProfile(BaseHandler):
         user = self.current_user # this is the logged in User
         profile_user = getFBUser(user_fb_id)
         checkins = getUserCheckins(profile_user)
+        badges = db.get(profile_user.badges)
         template_values = {
+            'badges': badges,
             'checkins': checkins,
             'profile_user': profile_user,
             'current_user': user,
@@ -327,6 +337,13 @@ def getUser(graph, cookie):
                        fb_location_name=loc_name,
                        access_token=cookie["access_token"])
     user.put() 
+    return user
+
+def getFBUser(fb_id=None):
+    """Returns a User for the given fb_id.
+    """
+    logging.info('##################### getUser ############################')        
+    user = models.User.get_by_key_name(fb_id)
     return user
 
 def getGame(bgg_id, mid=None):
@@ -517,8 +534,8 @@ def createCheckin(user, game_key, facebook=False):
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
     # 'badges': 
-    #     [{'name':name,'img_url':img_url,'key_name':key_name},
-    #      {'name':name,'img_url':img_url,'key_name':key_name}]
+    #     [{'name':name,'image':img_key,'thumb':thumb_key,'key_name':key_name},
+    #      {'name':name,'image':img_key,'thumb':thumb_key,'key_name':key_name}]
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
@@ -527,11 +544,13 @@ def createCheckin(user, game_key, facebook=False):
     if badge_entities is not None:
         for b in badge_entities:
             logging.info('############### badge = ' +str(b)+ '##############')
-            image = '/serve/%s' % b.image
-            thumbnail = '/serve/%s' % b.thumbnail
+            logging.info('############### badge.name = ' +str(b.name)+ '##############')
+            logging.info('############### badge.image= ' +str(b.image.key())+ '##############')
+            image = '/serve/%s' % b.image.key()
+            thumb = '/serve/%s' % b.thumb.key()
             badge = {'name':b.name, 
                      'image': image,
-                     'thumbnail': thumbnail, 
+                     'thumb': thumb, 
                      'key_name':b.key().name()}
             badges.append(badge)      
     json_dict = {'player': player, 'badges': badges}
@@ -657,32 +676,26 @@ def parseGameAwards(game_award):
         games.append(game)
     return games
 
-def getFBUser(fb_id=None):
-    """Returns a User for the given fb_id.
-    """
-    logging.info('##################### getUser ############################')        
-    user = models.User.get_by_key_name(fb_id)
-    return user
-
 def awardCheckinBadges(user, game_key):
     """Returns any badges earned by a User.  Checks Checkins for badge
     triggers.  If any triggers are met, the Badges are awarded/saved.
     """
-    #createBadges()
     keys = []
     # Is this the first checkin for this Game?
     q = models.Checkin.all()
     q.filter("game =", game_key)  
     any_checkin = q.get()
-    if any_checkin is None: keys.append(BADGE_KEY_GAME_CHECKIN_FIRST)    
+    if any_checkin is None: 
+        keys.append(db.Key.from_path('Badge', BADGE_GAME_CHECKIN_FIRST))   
     # Award Badge for number of checkins
     checkin_count = user.checkin_count
     if checkin_count == 2:
-        keys.append(BADGE_KEY_CHECKIN_COUNT_A)   
+        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_A))   
     elif checkin_count == 11:    
-        keys.append(BADGE_KEY_CHECKIN_COUNT_B)   
+        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_B))  
     elif checkin_count == 21:    
-        keys.append(BADGE_KEY_CHECKIN_COUNT_C)   
+        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_C))  
+    """
     elif checkin_count == 51:    
         keys.append(BADGE_KEY_CHECKIN_COUNT_D)   
     elif checkin_count == 101:    
@@ -691,7 +704,7 @@ def awardCheckinBadges(user, game_key):
         keys.append(BADGE_KEY_CHECKIN_COUNT_F)   
     elif checkin_count == 201:
         keys.append(BADGE_KEY_CHECKIN_COUNT_G)   
-
+    """
     # If checkins equal badge, add badge
     
     # is if first checkin to game?
@@ -709,26 +722,23 @@ def getBadges():
     
 def createBadges():
     
-    host = "http://localhost:8080"
-    badgeA = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_A,
-                          name=BADGE_NAME_CHECKIN_COUNT_A)
+    badgeA = models.Badge(key_name=BADGE_CHECKIN_COUNT_A,
+                          name=BADGE_CHECKIN_COUNT_A)
 
-    badgeB = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_B,
-                          name=BADGE_NAME_CHECKIN_COUNT_B)
+    badgeB = models.Badge(key_name=BADGE_CHECKIN_COUNT_B,
+                          name=BADGE_CHECKIN_COUNT_B)
 
-    badgeC = models.Badge(key_name=BADGE_NAME_CHECKIN_COUNT_C,
-                          name=BADGE_NAME_CHECKIN_COUNT_C)
+    badgeC = models.Badge(key_name=BADGE_CHECKIN_COUNT_C,
+                          name=BADGE_CHECKIN_COUNT_C)
 
-    badgeFirst = models.Badge(key_name=BADGE_NAME_GAME_CHECKIN_FIRST,
-                              name=BADGE_NAME_GAME_CHECKIN_FIRST)
-    
+    badgeFirst = models.Badge(key_name=BADGE_GAME_CHECKIN_FIRST,
+                              name=BADGE_GAME_CHECKIN_FIRST)
+
     badgeA.put()                          
     badgeB.put()                          
     badgeC.put()                          
     badgeFirst.put() 
     return                         
-
-
 
 ##############################################################################
 ##############################################################################
