@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+	{% block title %}About - SuperMeeple{% endblock %}
+	
+	{% block main %}	
+	<!-- MAINBAR --> 
+	<div id="mainbar">
+		<div id="page">
+			<h1>About Us</h1>
+			<p>We're not really sure what SuperMeeple is yet to be honest.  We started building it to try out the Google App Engine framework and Freebase API, while also meeting our love for board games.</p>
+			<p>But now here we are, releasing what could hardly be called a beta, to see what other gamers and developers think.</p>		
+			<p>Got feeback or questions?  Post a comment below or send us an email at info@supermeeple.com</p>
+			<div id="comments">
+				<div id="fb-root"></div>
+				<script src="http://connect.facebook.net/en_US/all.js#appId=174331539272451&amp;amp;xfbml=1"></script>
+				<fb:comments xid="supermeeple-about" numposts="20" width="376" publish_feed="true"></fb:comments>		
+			</div><!-- /comments -->	
+    </div><!-- /page -->                       
+  </div><!-- /mainbar -->
+	{% endblock %}	
+	
+	{% block sidebar %}	
+	<div id="sidebar">
+		<div class="block">			
+  		<div id="search">
+   			<form name="input" action="/game" method="post">
+       		<input class="search-box" type="text" id="game-search"/>
+       		<input type="hidden" name="game_id" id="game-id" />
+       		<input type="hidden" name="game_name" id="game-name" />
+       		<input class="button" value="Go" type="submit"/>
+     		</form>
+				<p>search for more games</p>
+   		</div>
+		</div><!-- /block  -->
+	</div><!-- /sidebar -->	
+	{% endblock %}

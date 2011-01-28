@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 
 	{% block title %}{{ game.name }} - Board Game - SuperMeeple{% endblock %}
-	
+
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+  <meta property="og:title" content="{{game.name}}"/>
+  <meta property="og:type" content="game"/>
+  <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}"/>
+  <meta property="og:image" content="{{ game.bgg_img_url }}"/>
+  <meta property="og:site_name" content="SuperMeeple"/>	
+  <meta property="og:description"
+        content="{{ game.description|truncatewords_html:40 }}"/>{% endblock %}	
+
 		{% block main %}
 		<div id="mainbar">
 			<div id="game-header-wrap">

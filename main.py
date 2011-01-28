@@ -12,6 +12,7 @@ import logging
 import facebook
 import models
 import datetime
+import re
 import urllib2
 import utils
 from utils import strToInt
@@ -280,7 +281,9 @@ class UserProfile(BaseHandler):
         profile_user = getFBUser(user_fb_id)
         checkins = getUserCheckins(profile_user)
         badges = db.get(profile_user.badges)
+        host = self.request.host # used for Facebook Like url 
         template_values = {
+            'host': host,
             'badges': badges,
             'checkins': checkins,
             'profile_user': profile_user,
@@ -315,6 +318,32 @@ class Checkin(BaseHandler):
                user.access_token).put_wall_post(message, attachment)
         self.response.headers.add_header("content-type", "application/json")       
         return self.response.out.write(simplejson.dumps(badges))
+
+class Page(MainHandler):
+    """Returns content for meta pages.
+    """   
+    def get(self, page=None):
+        path = ""
+        if isFacebook(self.request.path):
+            path = "facebook/fb_"            
+        if page == "signup":
+            template = path+"base_signup.html"
+        elif page == "about":
+            template = path+"base_about.html"    
+        elif page == "contact":
+            template = path+"base_contact.html"
+        elif page == "rewards":
+            template = path+"base_rewards.html"                           
+        elif page == "terms":
+            template = path+"base_terms.html"        
+        else:
+            template = path+"base_404.html"   
+        logging.info("############### template ="+template+" ###############")    
+        self.generate(template, {
+                      'host': self.request.host_url, 
+                      'current_user':self.current_user,
+                      'facebook_app_id':FACEBOOK_APP_ID})        
+
 
 ######################## METHODS #############################################
 ##############################################################################
@@ -539,6 +568,8 @@ def createCheckin(user, game_key, facebook=False):
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
+    game = models.Game.get(game_key)
+    game.checkin_count += 1
     badge_entities = awardCheckinBadges(user, game_key)  
     badges=[]
     if badge_entities is not None:
@@ -561,6 +592,7 @@ def createCheckin(user, game_key, facebook=False):
     checkin.put()   
     user.last_checkin_time = datetime.datetime.now()
     user.put()
+    game.put()
     return badges
     
 def isCheckedIn(user):
@@ -740,17 +772,28 @@ def createBadges():
     badgeFirst.put() 
     return                         
 
+def isFacebook(path):
+    """Returns True if request is from a Facebook iFrame, otherwise False.
+    """
+    if re.search(r".facebook\.*", path): # match a Facebook apps uri
+        logging.info("############### facebook detected! ###############")
+        return True
+    else:
+        logging.info("############### facebook NOT detected! ###########")        
+        return False
+
 ##############################################################################
 ##############################################################################
-application = webapp.WSGIApplication([('/game', GameProfile),
-                                     (r'/game(/m/.*)/(.*)', GameProfile),
-                                     (r'/user/(.*)', UserProfile),
-                                     ('/game-checkin', Checkin),
-                                     (r'/admin/(.*)', Admin),
-                                     (r'/upload/(.*)', UploadHandler),
-                                     ('/serve/([^/]+)?', ServeHandler),
-                                     (r'/.*', MainHandler)],
-                                     debug=True)
+application = webapp.WSGIApplication([(r'/page/(.*)', Page),
+                                      ('/game', GameProfile),
+                                      (r'/game(/m/.*)/(.*)', GameProfile),
+                                      (r'/user/(.*)', UserProfile),
+                                      ('/game-checkin', Checkin),
+                                      (r'/admin/(.*)', Admin),
+                                      (r'/upload/(.*)', UploadHandler),
+                                      ('/serve/([^/]+)?', ServeHandler),
+                                      (r'/.*', MainHandler)],
+                                       debug=True)
 
 def main():
     run_wsgi_app(application)

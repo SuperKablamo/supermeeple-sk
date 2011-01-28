@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
-	{% block title %}{{ current_user.name }} - Game Geek - SuperMeeple{% endblock %}
+	{% block title %}{{ current_user.name }} - Board Game Geek - SuperMeeple{% endblock %}
+
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+  <meta property="og:title" content="{{ current_user.name }}"/>
+  <meta property="og:type" content="geek"/>
+  <meta property="og:url" content="http://{{host}}//user/{{profile_user.fb_id}}"/>
+  <meta property="og:image" content="http://graph.facebook.com/{{ profile_user.fb_id }}/picture?type=square"/>
+  <meta property="og:site_name" content="SuperMeeple"/>	
+	{% endblock %}
 	
 	{% block main %}
 	<div id="mainbar">
@@ -15,6 +23,10 @@
 					<span class="beans">{{beans}}</span>
 				</h1>
       </div>
+			<div id="facebook-like">
+				<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+				<fb:like href="http://{{host}}//user/{{profile_user.fb_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+			</div>
     </div><!-- /user-profile -->		
 		<div id="checkin-list">
 			<h2>Game Checkins</h2>
@@ -60,7 +72,7 @@
 				<h2>Badges</h2>
 				{% if badges %}
 					{% for b in badges %}
-					<img alt="{{b.image.name}}" title="{{b.image.name}}" "class="badge" title src="/serve/{{b.image.key}}" />
+					<img alt="{{b.image.name}}" title="{{b.image.name}}" class="badge" title src="/serve/{{b.image.key}}" />
 					{% endfor %}
    			{% else %}
 				<p>This user doesn't have any Badges yet.</p>
@@ -68,8 +80,7 @@
 					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
 					<ul>
 						<li>Check in to games</li>
-						<li>Sharing check ins on Facebook</li>
-						<li>Adding players to your check ins</li>
+						<li>Share check ins on Facebook</li>
 						<li>Scoring check ins</li>
 						<li>Being first and winning also helps</li>
 					</ul>	

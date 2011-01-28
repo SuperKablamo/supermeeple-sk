@@ -19,6 +19,7 @@ h1#error { font-size: 40px; color: red; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 .checkin h3 { font-weight: normal; font-size: 1.6em; }
 .checkin h4 { font-weight: normal; font-size: 1em;}
+#mainbar #page p { font-size: 1em; }
 #search p { font-size:.8em; text-transform: uppercase; }
 #game-list caption { color: #999; text-align: left; }
 #game-list .year { text-align: right; } 
@@ -61,9 +62,11 @@ body { background-color: #333; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }
+#mainbar #page p { padding: 8px 0; }
 #game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
 #game-header { float: left; margin: 0 0 10px 0; }
-#facebook-like { float: right; margin-top: 2px; }
+#game-header-wrap #facebook-like { float: right; margin-top: 2px; }
+#user-profile #facebook-like { float: right; margin-top: 14px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
@@ -72,7 +75,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
 #game-image { padding-top: 10px; }
-#game-image img, #profile-image img, .checkin .game-image img { border: 3px solid #222; }
+#game-image img, #profile-image img, .checkin .game-image img, #comments { border: 3px solid #222; }
 #game-image img { max-width: 200px; }
 #profile-image img { max-width: 50px; }
 .checkin .game-image img { max-width: 80px; }
@@ -82,11 +85,13 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #user-profile { height: 60px; padding-bottom: 12px; }
 #profile-image, .checkin .game-image { float: left; }
 #profile-name, .checkin .game-name { margin: 12px 0 0 16px; float: left; }
-.checkin .game-badges { margin: 8px 0 0 0px; float: left; }
+.checkin .game-badges { margin: 8px 0 0 12px; float: left; }
 
 #checkin-list { width: 100%; }
 .checkin, .tiny-checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
+
+#comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 
 /*SIDEBAR*/
 #sidebar { margin: 42px 0px 4px 10px; width: 300px; float: left; }
