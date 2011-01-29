@@ -113,6 +113,8 @@ h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}
+#bottom-nav { float: left; margin: 10px 0px 0px 24px; }
+#bottom-nav li { display: inline; color: #636363; font-size: 16px; padding-right: 16px; }
 #freebase-tag, #gae-tag { background-color: #222;  padding: 10px 8px; float: right; }
 #freebase-tag {  }
 #gae-tag {  }

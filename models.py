@@ -37,7 +37,6 @@ class Game(db.Model): # mid is key_name
     awards = db.StringListProperty(required=True, default=None) 
     categories = db.StringListProperty(required=True, default=None)  
     subdomains = db.StringListProperty(required=True, default=None)     
-    totalRating = db.IntegerProperty(required=False, default=0)
     checkin_count = db.IntegerProperty(required=True, default=0)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
@@ -86,4 +85,3 @@ class GameRating(db.Model):
     game = db.ReferenceProperty(Game, required=True)  
     rating = db.IntegerProperty(required=True) 
     created = db.DateTimeProperty(required=True, auto_now=True)
-    

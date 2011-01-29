@@ -97,8 +97,9 @@ class Admin(BaseHandler):
         logging.info('################### method =' +method+' ##############')
         if method == "create-badges":
             createBadges()
+        if method == "build-games":
+            buildGames()
         self.redirect('/admin/backyardchicken')  
-    
     
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self, form=None):
@@ -343,7 +344,6 @@ class Page(MainHandler):
                       'host': self.request.host_url, 
                       'current_user':self.current_user,
                       'facebook_app_id':FACEBOOK_APP_ID})        
-
 
 ######################## METHODS #############################################
 ##############################################################################
@@ -782,6 +782,69 @@ def isFacebook(path):
         logging.info("############### facebook NOT detected! ###########")        
         return False
 
+def loadCursors():
+
+    query = [{
+      "id":     None,
+      "type":   "/games/game",
+      "mid":    None,
+      "key": {
+        "namespace": "/user/pak21/boardgamegeek/boardgame",
+        "value":     None,
+        "optional":  False
+      },
+      "limit": 10
+    }]   
+    results = freebase.mqlread(query, extended=True)
+    for r in results:
+        mid = r.mid
+        bgg_id = r.key.value
+        logging.info("############### "+bgg_id + "###"+ mid +" ###########") 
+        game = getGame(bgg_id=bgg_id, mid=mid)
+        logging.info("############### "+str(game.name)+" ###########") 
+    """
+    query = {
+      "id":     None,
+      "type":   "/games/game",
+      "mid":    None,
+      "key": {
+        "namespace": "/user/pak21/boardgamegeek/boardgame",
+        "value":     None,
+        "optional":  False
+      }
+    }
+    results = freebase.mqlreaditer(query, extended=True)
+    for r in results:
+        logging.info("############### "+str(r)+" ###########") 
+    """ 
+
+def buildGames():
+    logging.info("############# meeple_tasks.py:: buildGames() #############")   
+    query = {
+        "type":   "/games/game",
+        "mid":    None,
+        "key": {
+            "namespace": "/user/pak21/boardgamegeek/boardgame",
+            "value":     None,
+            "optional":  False
+            }
+        }
+    results = freebase.mqlreaditer(query, extended=True)
+    for r in results:
+        logging.info("################ result:: "+str(r)+" #################")    
+        mid = r.mid
+        bgg_id = r.key.value
+        game = getGame(bgg_id=bgg_id, mid=mid)
+        """        
+        if method == "build-games":
+            
+            cursor = self.request.get('cursor')
+            q = taskqueue.Queue('slow')
+            t = taskqueue.add(url='/_ah/queue/build-games', 
+                              params={'cursor': cursor})
+            q.add(t)   
+        """    
+    return True       
 ##############################################################################
 ##############################################################################
 application = webapp.WSGIApplication([(r'/page/(.*)', Page),

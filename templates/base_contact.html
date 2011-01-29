@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+	{% block title %}Contact Us - SuperMeeple{% endblock %}
+	
+	{% block main %}	
+	<!-- MAINBAR --> 
+	<div id="mainbar">
+		<div id="page">
+			<h1>Contact Us</h1>
+			<p>You can get a hold of us by emailing info@supermeeple.com.</p>
+    </div><!-- /page -->                       
+  </div><!-- /mainbar -->
+	{% endblock %}	
+	
+	{% block sidebar %}	
+	<div id="sidebar">
+		<div class="block">			
+  		<div id="search">
+   			<form name="input" action="/game" method="post">
+       		<input class="search-box" type="text" id="game-search"/>
+       		<input type="hidden" name="game_id" id="game-id" />
+       		<input type="hidden" name="game_name" id="game-name" />
+       		<input class="button" value="Go" type="submit"/>
+     		</form>
+				<p>search for more games</p>
+   		</div>
+		</div><!-- /block  -->
+	</div><!-- /sidebar -->	
+	{% endblock %}

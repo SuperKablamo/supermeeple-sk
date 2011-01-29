@@ -13,8 +13,13 @@ handlers:
   
 - url: /js
   static_dir: javascript
+
+- url: /_ah/queue/.*
+  script: meeple_tasks.py
+  login: admin
   
 - url: /.*
   script: main.py  
+
 
   
