@@ -1,3 +1,4 @@
 queue:
-- name: slow
-  rate: 30/m    
+- name: default
+  rate: 20/m  
+  bucket_size: 5  

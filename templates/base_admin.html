@@ -7,13 +7,17 @@
 	<div id="fullbar">
 		<h1>Admin</h1>
 		<div class="admin-block">
-			<h2>Load Freebase Cursors</h2>
-			<form action="/admin/load-cursors" method="POST">
-					<label>Freebase Cursors</label><input type="submit" name="Load" value="Submit">
+			<h2>Seed Games</h2>
+			<form action="/admin/seed-games" method="POST">
+					<label>Seed</label><input type="submit" name="submit" value="Submit">
+			</form>			
+			<h2>Build Games</h2>
+			<form action="/admin/build-games" method="POST">
+					<label>Build</label><input type="submit" name="submit" value="Submit">
 			</form>			
 			<h2>Create Badges</h2>
 			<form action="/admin/create-badges" method="POST">
-					<label>Badges</label><input type="submit" name="create" value="Submit">
+					<label>Create</label><input type="submit" name="submit" value="Submit">
 			</form>			
 			<h2>Upload Badge Image</h2>
 			<form action="{{image_upload_url}}" method="POST" enctype="multipart/form-data">

@@ -7,66 +7,63 @@
 ############################################################################## 
 import freebase
 import logging
+import main
 import models
-import urllib2
 
-from settings import *
-from urlparse import urlparse
-from xml.etree import ElementTree 
-from django.utils import simplejson
-from google.appengine.api import urlfetch
-from google.appengine.ext import db
-from google.appengine.ext.webapp import util
+from google.appengine.api import taskqueue
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 ############################# REQUEST HANDLERS ############################### 
 ##############################################################################   
-class FreebaseCursor(db.Model):
-    cursor = db.StringProperty(required=True)
-    created = db.DateTimeProperty(required=True, auto_now=True)
 
 class GameBuilder(webapp.RequestHandler):
     def get(self):
         logging.info('################# GameBuilder:: get ##################')
 
-    def post(self, )
+    def post(self):
+        logging.info('################# GameBuilder:: post #################')
+        bgg_id = self.request.get('bgg_id')
+        mid = self.request.get('mid')
+        game = main.getGame(bgg_id=bgg_id, mid=mid)  
+
+class GameSeeder(webapp.RequestHandler):
+    def get(self):
+        logging.info('################# GameSeeder:: get ##################')
+
+    def post(self):
+        logging.info('################# GameSeeder:: post #################')
+        seedGames()
+  
+############################# METHODS ########################################
+##############################################################################
+def seedGames():    
+    logging.info("################## main.py:: seedGames() ################")   
+    query = {
+        "type":   "/games/game",
+        "mid":    None,
+        "key": {
+            "namespace": "/user/pak21/boardgamegeek/boardgame",
+            "value":     None,
+            "optional":  False
+            }
+        }
+    results = freebase.mqlreaditer(query, extended=True)
+    for r in results:
+        #logging.info("################ result:: "+str(r)+" #################")    
+        mid = r.mid
+        bgg_id = r.key.value
+        game_seed = models.GameSeed.get_by_key_name(mid)
+        if game_seed is None:
+            game_seed = models.GameSeed(key_name=mid, mid=mid, bgg_id=bgg_id)
+            game_seed.put()
+
+    return True  
     
-                                                
-class Admin(BaseHandler):
-    def get(self, pswd=None):
-        logging.info('################### Admin:: get() ####################')
-        logging.info('################### pswd =' +pswd+ ' #################')        
-        if pswd == "backyardchicken":
-            badges = getBadges()
-            image_upload_url = blobstore.create_upload_url('/upload/image')
-            thumb_upload_url = blobstore.create_upload_url('/upload/thumb')
-            template_values = {
-                'badges': badges,
-                'image_upload_url': image_upload_url,
-                'thumb_upload_url': thumb_upload_url,
-                'current_user': self.current_user,
-                'facebook_app_id': FACEBOOK_APP_ID
-            }  
-            self.generate('base_admin.html', template_values)
-        else: self.redirect(500)  
-        
-    def post(self, method=None):
-        logging.info('################### Admin:: post() ###################')
-        logging.info('################### method =' +method+' ##############')
-        if method == "create-badges":
-            createBadges()
-        elif method == "build-games":
-            taskqueue.add(url='/build-games')
-        self.redirect('/admin/backyardchicken')  
-    
-  
-  
-######################## METHODS #############################################
-##############################################################################
-  
 ##############################################################################
 ##############################################################################
-application = webapp.WSGIApplication([('/_ah/queue/build-games', GameBuilder)],
+application = webapp.WSGIApplication([('/_ah/queue/build-games', GameBuilder),
+                                      ('/_ah/queue/seed-games', GameSeeder)],
                                        debug=True)
 
 def main():

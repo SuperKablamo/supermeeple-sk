@@ -47,10 +47,10 @@ class GameXML(db.Model): # bgg_id is key_name
     created = db.DateTimeProperty(auto_now_add=True)
 
 class Checkin(db.Model):
-    game = db.ReferenceProperty(Game, required=True, collection_name="checkins")
-    player = db.ReferenceProperty(User, required=True, collection_name="checkins")
+    game = db.ReferenceProperty(Game, required=True, collection_name='checkins')
+    player = db.ReferenceProperty(User, required=True, collection_name='checkins')
     badges = db.ListProperty(db.Key, required=True, default=None)
-    winner = db.ReferenceProperty(User, required=False, collection_name="wins")
+    winner = db.ReferenceProperty(User, required=False, collection_name='wins')
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now=True)
@@ -63,7 +63,7 @@ class GameAward(db.Model): # award id is key_name
 
 class Badge(db.Model):
     name = db.StringProperty(required=True)
-    description = db.TextProperty(required=False)
+    description = db.TextProperty(required=True, default='description')
     points = db.IntegerProperty(required=True, default=0)   
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
     thumb = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False) 
@@ -85,3 +85,7 @@ class GameRating(db.Model):
     game = db.ReferenceProperty(Game, required=True)  
     rating = db.IntegerProperty(required=True) 
     created = db.DateTimeProperty(required=True, auto_now=True)
+    
+class GameSeed(db.Model): # mid is key_name
+    bgg_id = db.StringProperty(required=False) # BoardGameGeek id
+    mid = db.StringProperty(required=False) # Freebase mid

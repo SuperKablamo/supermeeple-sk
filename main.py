@@ -24,6 +24,7 @@ from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
 from google.appengine.api import memcache
+from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
@@ -97,6 +98,8 @@ class Admin(BaseHandler):
         logging.info('################### method =' +method+' ##############')
         if method == "create-badges":
             createBadges()
+        if method == "seed-games":
+            taskqueue.add(url='/_ah/queue/seed-games')           
         if method == "build-games":
             buildGames()
         self.redirect('/admin/backyardchicken')  
@@ -263,6 +266,7 @@ class GameProfile(BaseHandler):
         logging.info('################### GameProfile::post ################')
         user = self.current_user
         game_ids = getBGGIDFromFB(self.request.get('game_id'))
+        # TODO: if BGGID is not on Freebase, then get it from BGG.
         mid = game_ids["mid"]
         bgg_id = game_ids["bgg_id"]
         if mid:
@@ -380,6 +384,9 @@ def getGame(bgg_id, mid=None):
     using the BGG XML API.
     """
     logging.info('########### getGame:: ####################################')
+    ##########################################################################
+    # TODO: nested if statement is  . . . scary - could use a refactor!       #
+    ##########################################################################
     if mid is None:
         self.redirect(500)
     game_cache = memcache.get(mid)
@@ -389,12 +396,13 @@ def getGame(bgg_id, mid=None):
         if game is None: # Game has never been stored, so build and store it.
             if bgg_id == '0' or bgg_id is None: # Call BGG XML API for match
                 fb_game = getFBGame(mid)
-                bgg_id = getBGGIDFromBGG(fb_game.game_name)
+                bgg_id = getBGGIDFromBGG(fb_game.name)
                 if bgg_id is None:
                     self.redirect(500)
-                    
+            logging.info('########## Found BGG ID! = '+bgg_id+' ############')        
             game_xml = models.GameXML.get_by_key_name(bgg_id)
             # Use BGG XML API to get Game data
+            game_url = BGG_XML_URI + bgg_id # Remake url with new found bgg_id
             game_data = parseBGGXML(game_url)
             # Build Game from BGG data
             game = models.Game(key_name=mid,
@@ -519,7 +527,8 @@ def getFBGame(mid):
       },
       "key" : {
         "namespace" : "/user/pak21/boardgamegeek/boardgame",
-        "value" : None
+        "value" : None,
+        "optional": True
       }
     }       
     return freebase.mqlread(query, extended=True)   
@@ -539,10 +548,12 @@ def getBGGIDFromFB(game_id):
     }  
     result = freebase.mqlread(query, extended=True)
     if result.key is not None: # The FB game entry has a BGG id
-        game_ids = {"bgg_id":result.key.value, "mid":result.mid}    
+        game_ids = {"bgg_id":result.key.value, "mid":result.mid}  
+        logging.info('########## bgg_id = ' +game_ids["bgg_id"]+' ##########')  
         return game_ids
     else:
         game_ids = {"bgg_id":None, "mid":result.mid}
+        logging.info('#################### bgg_id = None ###################')         
         return game_ids   
         
 def getBGGIDFromBGG(game_name):
@@ -555,6 +566,7 @@ def getBGGIDFromBGG(game_name):
     result = urllib2.urlopen(game_url).read()
     xml = ElementTree.fromstring(result)
     bgg_id = xml.find("./boardgame").attrib['objectid']
+    logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
     return bgg_id
 
 def createCheckin(user, game_key, facebook=False):
@@ -713,35 +725,62 @@ def awardCheckinBadges(user, game_key):
     triggers.  If any triggers are met, the Badges are awarded/saved.
     """
     keys = []
-    # Is this the first checkin for this Game?
+    ######## AWARD 1ST CHECKIN ###############################################
     q = models.Checkin.all()
     q.filter("game =", game_key)  
     any_checkin = q.get()
     if any_checkin is None: 
-        keys.append(db.Key.from_path('Badge', BADGE_GAME_CHECKIN_FIRST))   
-    # Award Badge for number of checkins
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_1ST))   
+        
+    ######## AWARD CHECKIN LEVELS ############################################
     checkin_count = user.checkin_count
     if checkin_count == 2:
-        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_A))   
-    elif checkin_count == 11:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_B))  
-    elif checkin_count == 21:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHECKIN_COUNT_C))  
-    """
-    elif checkin_count == 51:    
-        keys.append(BADGE_KEY_CHECKIN_COUNT_D)   
-    elif checkin_count == 101:    
-        keys.append(BADGE_KEY_CHECKIN_COUNT_E)   
-    elif checkin_count == 151:
-        keys.append(BADGE_KEY_CHECKIN_COUNT_F)   
-    elif checkin_count == 201:
-        keys.append(BADGE_KEY_CHECKIN_COUNT_G)   
-    """
-    # If checkins equal badge, add badge
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_1))   
+    elif checkin_count == 8:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_2))  
+    elif checkin_count == 16:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_3)) 
+    elif checkin_count == 26:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_4))
+    elif checkin_count == 38:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_5))
+    elif checkin_count == 52:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_6))
+    elif checkin_count == 68:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_7))
+    elif checkin_count == 86:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_8))  
+    elif checkin_count == 106:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_9))
+    elif checkin_count == 128:    
+        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_10))                                                       
+
+    ######## AWARD CHARE LEVELS ##############################################
+    share_count = user.share_count
+    if share_count == 2:
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_1))   
+    elif share_count == 8:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_2))  
+    elif share_count == 16:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_3)) 
+    elif share_count == 26:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_4))
+    elif share_count == 38:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_5))
+    elif share_count == 52:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_6))
+    elif share_count == 68:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_7))
+    elif share_count == 86:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_8))  
+    elif share_count == 106:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_9))
+    elif share_count == 128:    
+        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_10))
+
+    ######## AWARD BADGES ############################################
+    # TODO: other badge awards go here . . .
     
-    # is if first checkin to game?
-    
-    #
     if not keys: return None
     else:
         user.badges.extend(keys)
@@ -753,24 +792,14 @@ def getBadges():
     return models.Badge.all().fetch(500)
     
 def createBadges():
+    updated = []    
+    for b in BADGES:
+        badge = models.Badge(key_name=b, name=b, description=b)
+        updated.append(badge)
     
-    badgeA = models.Badge(key_name=BADGE_CHECKIN_COUNT_A,
-                          name=BADGE_CHECKIN_COUNT_A)
-
-    badgeB = models.Badge(key_name=BADGE_CHECKIN_COUNT_B,
-                          name=BADGE_CHECKIN_COUNT_B)
-
-    badgeC = models.Badge(key_name=BADGE_CHECKIN_COUNT_C,
-                          name=BADGE_CHECKIN_COUNT_C)
-
-    badgeFirst = models.Badge(key_name=BADGE_GAME_CHECKIN_FIRST,
-                              name=BADGE_GAME_CHECKIN_FIRST)
-
-    badgeA.put()                          
-    badgeB.put()                          
-    badgeC.put()                          
-    badgeFirst.put() 
-    return                         
+    updated.append(badgeD)      
+    db.put(updated)
+    return None                      
 
 def isFacebook(path):
     """Returns True if request is from a Facebook iFrame, otherwise False.
@@ -819,7 +848,7 @@ def loadCursors():
     """ 
 
 def buildGames():
-    logging.info("############# meeple_tasks.py:: buildGames() #############")   
+    logging.info("################## main.py:: buildGames() ################")   
     query = {
         "type":   "/games/game",
         "mid":    None,
@@ -830,21 +859,43 @@ def buildGames():
             }
         }
     results = freebase.mqlreaditer(query, extended=True)
+    count = 0
     for r in results:
         logging.info("################ result:: "+str(r)+" #################")    
         mid = r.mid
         bgg_id = r.key.value
-        game = getGame(bgg_id=bgg_id, mid=mid)
-        """        
-        if method == "build-games":
-            
-            cursor = self.request.get('cursor')
-            q = taskqueue.Queue('slow')
-            t = taskqueue.add(url='/_ah/queue/build-games', 
-                              params={'cursor': cursor})
-            q.add(t)   
-        """    
-    return True       
+        taskqueue.add(url='/_ah/queue/build-games', 
+                      params={'bgg_id': bgg_id, 'mid': mid})
+        
+        count +=1
+        if count > 300: return True              
+  
+    return True  
+
+def seedGames():
+    
+    
+    logging.info("################## main.py:: seedGames() ################")   
+    query = {
+        "type":   "/games/game",
+        "mid":    None,
+        "key": {
+            "namespace": "/user/pak21/boardgamegeek/boardgame",
+            "value":     None,
+            "optional":  False
+            }
+        }
+    results = freebase.mqlreaditer(query, extended=True)
+    count = 0
+    for r in results:
+        logging.info("################ result:: "+str(r)+" #################")    
+        mid = r.mid
+        bgg_id = r.key.value
+        taskqueue.add(url='/_ah/queue/seed-games', 
+                      params={'bgg_id': bgg_id, 'mid': mid})
+        
+  
+    return True             
 ##############################################################################
 ##############################################################################
 application = webapp.WSGIApplication([(r'/page/(.*)', Page),
