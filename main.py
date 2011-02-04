@@ -314,18 +314,28 @@ class Checkin(BaseHandler):
         share = self.request.get('facebook')
         thumbnail = self.request.get('thumbnail')
         game_key = db.Key.from_path('Game', mid)
-        # Check user into game
-        badges = createCheckin(user, game_key, facebook)
+        game = models.Game.get(game_key)
+        # Check user into game ...
+        badges = createCheckin(user, game, share)
+        # Share checkin on Facebook if requested ...
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
             logging.info('#### posting to Facebook '+user.access_token+'####')
             attachment = {}
+            description = utils.smart_truncate(game.description, length=300)
             url = 'http://www.supermeeple.com' + mid + '/' + bgg_id
-            attachment['caption'] = "supermeeple.com"
-            attachment['link'] = url #url
+            caption = "SuperMeeple: Board Game Database, Tools and Apps"
+            attachment['caption'] = caption
             attachment['name'] = name
+            attachment['link'] = url #url
+            attachment['description'] = description   
             attachment['picture'] = thumbnail
+            action_link = 'http://www.supermeeple.com'+str(mid)+'/'+str(bgg_id)
+            action_name = "Check In!"
+            actions = {"name": action_name, "link": action_link}
+            attachment['actions'] = actions     
             results = facebook.GraphAPI(
                user.access_token).put_wall_post(message, attachment)
+               
         self.response.headers.add_header("content-type", "application/json")       
         return self.response.out.write(simplejson.dumps(badges))
 
@@ -579,7 +589,7 @@ def getBGGIDFromBGG(game_name):
     logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
     return bgg_id
 
-def createCheckin(user, game_key, facebook=False):
+def createCheckin(user, game, facebook=False):
     players = [user.key()] # A new Checkin has only one User
     # Create initial json data:
     # {'player': 
@@ -590,9 +600,8 @@ def createCheckin(user, game_key, facebook=False):
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
-    game = models.Game.get(game_key)
     game.checkin_count += 1
-    badge_entities = awardCheckinBadges(user, game_key)  
+    badge_entities = awardCheckinBadges(user, game.key())  
     badges=[]
     if badge_entities is not None:
         for b in badge_entities:
@@ -605,7 +614,7 @@ def createCheckin(user, game_key, facebook=False):
     json_dict = {'player': player, 'badges': badges}
     json = simplejson.dumps(json_dict)  
     checkin = models.Checkin(player=user, 
-                             game=game_key, 
+                             game=game.key(), 
                              json=db.Text(json))    
     
     # TODO: either batch put, and run in Transaction or Task.
@@ -705,7 +714,7 @@ def getLatestCheckins():
         game = {"name": c.game.name, 
                 "mid": c.game.mid, 
                 "bgg_id": c.game.bgg_id, 
-                "bgg_img_url": c.game.bgg_img_url}
+                "bgg_img_url": c.game.bgg_thumbnail_url}
         checkin["game"] = game
         checkins.append(checkin)
         logging.info('############# checkin ='+str(checkin)+' ##############')

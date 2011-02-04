@@ -36,18 +36,26 @@
 			  var thumbnail = $("input#thumbnail").val();
 	      var dataString = 'mid='+mid+'&message='+message+'&facebook='+facebook+'&name='+name+'&bgg_id='+bgg_id+'&thumbnail='+thumbnail;  
 				//alert (dataString);return false;  
-				$.ajax({  
+			 	$.ajax({  
 					type: "POST",  
 				  url: "/game-checkin",  
 				  data: dataString,  
+          beforeSend: function() {
+          	$('#spinner').addClass('loading');
+          	$('#checkin-form-inner').hide();
+          },
 				  success: function(badges) {  
 				  	$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
 				    $('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
 						$.each(badges, function(i,badge) {
 				  	  $('#badges').append("<h2>New Badge!</h2><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
 				    });
-				  }
+				  },
+          complete: function() {
+          	$('#spinner').removeClass('loading');
+					}				
 				});
+				
 				return false;
     	});  
    	});
@@ -118,7 +126,7 @@
     (function() {
       var e = document.createElement('script');
       e.type = 'text/javascript';
-      e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+      e.src = 'https://connect.facebook.net/en_US/all.js';
       e.async = true;
       document.getElementById('fb-root').appendChild(e);
     }());

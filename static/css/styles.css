@@ -120,3 +120,6 @@ h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6
 #freebase-tag {  }
 #gae-tag {  }
 #plus { padding: 10px 8px; float: right; }
+
+/*AJAX*/
+#spinner.loading { background-image: url("/static/images/ajax-loader.gif"); width: 128px; height: 16px; }

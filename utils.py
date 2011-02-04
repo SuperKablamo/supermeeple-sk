@@ -51,3 +51,9 @@ def prefetch_refprops(entities, *props):
     for (entity, prop), ref_key in zip(fields, ref_keys):
         prop.__set__(entity, ref_entities[ref_key])
     return entities  
+
+def smart_truncate(content, length=100, suffix='...'):
+    if len(content) <= length:
+        return content
+    else:
+        return ' '.join(content[:length+1].split(' ')[0:-1]) + suffix 
