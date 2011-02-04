@@ -23,6 +23,7 @@ from settings import *
 from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
+from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch
@@ -76,17 +77,17 @@ class BaseHandler(webapp.RequestHandler):
                                                 debug=DEBUG))
                                                 
 class Admin(BaseHandler):
+    """Provides Admin access to data-entry and initialization tasks.
+    """
     def get(self, pswd=None):
         logging.info('################### Admin:: get() ####################')
         logging.info('################### pswd =' +pswd+ ' #################')        
         if pswd == "backyardchicken":
             badges = getBadges()
             image_upload_url = blobstore.create_upload_url('/upload/image')
-            thumb_upload_url = blobstore.create_upload_url('/upload/thumb')
             template_values = {
                 'badges': badges,
                 'image_upload_url': image_upload_url,
-                'thumb_upload_url': thumb_upload_url,
                 'current_user': self.current_user,
                 'facebook_app_id': FACEBOOK_APP_ID
             }  
@@ -105,6 +106,8 @@ class Admin(BaseHandler):
         self.redirect('/admin/backyardchicken')  
     
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+    """Uploads files to Blobstore.
+    """
     def post(self, form=None):
         upload_files = self.get_uploads('file') 
         blob_info = upload_files[0]
@@ -112,14 +115,15 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         badge = models.Badge.get_by_key_name(key_name)
         if form == "image":
             badge.image = blob_info.key()
-        if form == "thumb":
-            badge.thumb = blob_info.key()
+            badge.image_url = images.get_serving_url(blob_info.key())
         badge.put()   
         logging.info('################# badge.image = '+str(badge.image)+'################')    
         logging.info('################# badge.image.key = '+str(badge.image.key)+'################') 
         self.redirect('/admin/backyardchicken')  
 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    """Serves Blobstore images.
+    """
     def get(self, resource):
         resource = str(urllib2.unquote(resource))
         blob_info = blobstore.BlobInfo.get(resource)
@@ -247,7 +251,7 @@ class GameProfile(BaseHandler):
     def get(self, mid=None, bgg_id=None):
         logging.info('################# GameProfile::get ###################')
         user = self.current_user
-        game = getGame(mid=mid, bgg_id=bgg_id)
+        game = getGame(self=self, mid=mid, bgg_id=bgg_id)
         checkins = getGameCheckins(game)
         host = self.request.host # used for Facebook Like url 
         checked_in = isCheckedIn(user)     
@@ -298,7 +302,8 @@ class UserProfile(BaseHandler):
         self.generate('base_user.html', template_values)
 
 class Checkin(BaseHandler):
-    # Checkin to Game
+    """Accepts Checkin POSTs.
+    """
     def post(self):
         logging.info('#################### Checkin::post ###################')
         user = self.current_user
@@ -379,7 +384,7 @@ def getFBUser(fb_id=None):
     user = models.User.get_by_key_name(fb_id)
     return user
 
-def getGame(bgg_id, mid=None):
+def getGame(self, bgg_id, mid=None):
     """Returns a Game.  Looks for one in memcache, if not then creates one
     using the BGG XML API.
     """
@@ -467,8 +472,13 @@ def getGame(bgg_id, mid=None):
 def parseBGGXML(bgg_game_url):
     """Returns a dictionary of game data retrieved from BGGs XML API.
     """
+    logging.info("########### parseBGGXML = "+bgg_game_url+" ###############")
     result = urllib2.urlopen(bgg_game_url).read()
-    xml = ElementTree.fromstring(result)
+    try:
+        xml = ElementTree.fromstring(result)
+    except Exception:
+        logging.info("################## error parsing BGG #################")
+        return None  
     decoded_result = result.decode("utf-8")
     xml_text = db.Text(decoded_result)
     bgg_data = {'name': findPrimaryName(xml),
@@ -574,9 +584,9 @@ def createCheckin(user, game_key, facebook=False):
     # Create initial json data:
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
-    # 'badges': 
-    #     [{'name':name,'image':img_key,'thumb':thumb_key,'key_name':key_name},
-    #      {'name':name,'image':img_key,'thumb':thumb_key,'key_name':key_name}]
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
@@ -586,14 +596,10 @@ def createCheckin(user, game_key, facebook=False):
     badges=[]
     if badge_entities is not None:
         for b in badge_entities:
-            logging.info('############### badge = ' +str(b)+ '##############')
-            logging.info('############### badge.name = ' +str(b.name)+ '##############')
-            logging.info('############### badge.image= ' +str(b.image.key())+ '##############')
-            image = '/serve/%s' % b.image.key()
-            thumb = '/serve/%s' % b.thumb.key()
+            logging.info('######## badge.name = ' +str(b.name)+ '###########')
+            logging.info('######## badge.image_url= ' +str(b.image_url)+ '##')
             badge = {'name':b.name, 
-                     'image': image,
-                     'thumb': thumb, 
+                     'image_url': b.image_url,
                      'key_name':b.key().name()}
             badges.append(badge)      
     json_dict = {'player': player, 'badges': badges}
@@ -601,6 +607,8 @@ def createCheckin(user, game_key, facebook=False):
     checkin = models.Checkin(player=user, 
                              game=game_key, 
                              json=db.Text(json))    
+    
+    # TODO: either batch put, and run in Transaction or Task.
     checkin.put()   
     user.last_checkin_time = datetime.datetime.now()
     user.put()
@@ -627,8 +635,9 @@ def getUserCheckins(user):
     # Data format:
     # [{'player': 
     #       {'name': name, 'fb_id': fb_id},
-    #   'badges': 
-    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago',
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
@@ -656,8 +665,9 @@ def getGameCheckins(game):
     # Data format:
     # [{'players': 
     #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
-    #   'badges': 
-    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'time': '3 minutes ago'
     #  }]
     ref_checkins = game.checkins.order("-created") 
@@ -676,8 +686,9 @@ def getLatestCheckins():
     # Data format:
     # [{'players': 
     #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
-    #   'badges': 
-    #       [{'name': name, 'id': id}, {'name': name, 'id': id}],
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago',
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
@@ -796,8 +807,7 @@ def createBadges():
     for b in BADGES:
         badge = models.Badge(key_name=b, name=b, description=b)
         updated.append(badge)
-    
-    updated.append(badgeD)      
+   
     db.put(updated)
     return None                      
 
@@ -810,42 +820,6 @@ def isFacebook(path):
     else:
         logging.info("############### facebook NOT detected! ###########")        
         return False
-
-def loadCursors():
-
-    query = [{
-      "id":     None,
-      "type":   "/games/game",
-      "mid":    None,
-      "key": {
-        "namespace": "/user/pak21/boardgamegeek/boardgame",
-        "value":     None,
-        "optional":  False
-      },
-      "limit": 10
-    }]   
-    results = freebase.mqlread(query, extended=True)
-    for r in results:
-        mid = r.mid
-        bgg_id = r.key.value
-        logging.info("############### "+bgg_id + "###"+ mid +" ###########") 
-        game = getGame(bgg_id=bgg_id, mid=mid)
-        logging.info("############### "+str(game.name)+" ###########") 
-    """
-    query = {
-      "id":     None,
-      "type":   "/games/game",
-      "mid":    None,
-      "key": {
-        "namespace": "/user/pak21/boardgamegeek/boardgame",
-        "value":     None,
-        "optional":  False
-      }
-    }
-    results = freebase.mqlreaditer(query, extended=True)
-    for r in results:
-        logging.info("############### "+str(r)+" ###########") 
-    """ 
 
 def buildGames():
     logging.info("################## main.py:: buildGames() ################")   
@@ -905,7 +879,7 @@ application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       ('/game-checkin', Checkin),
                                       (r'/admin/(.*)', Admin),
                                       (r'/upload/(.*)', UploadHandler),
-                                      ('/serve/([^/]+)?', ServeHandler),
+                                      (r'/serve/([^/]+)?', ServeHandler),
                                       (r'/.*', MainHandler)],
                                        debug=True)
 

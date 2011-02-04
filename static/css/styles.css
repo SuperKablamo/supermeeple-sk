@@ -59,6 +59,7 @@ body { background-color: #333; }
 .admin-block label { position: absolute; text-align:right; width:60px; }
 .admin-block input, .admin-block textarea, .admin-block select { margin: 0 0 12px 70px; }
 .admin-block .badge { padding: 4px 0 12px 0; border-top: dotted 2px #222; }
+.admin-block .badge img.thumb { padding: 4px 20px; }
 
 /*MAINBAR*/
 #mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }

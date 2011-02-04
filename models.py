@@ -15,6 +15,7 @@ class User(db.Model):
     badges = db.ListProperty(db.Key, required=True, default=None)   
     last_checkin_time = db.DateTimeProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
+    share_count = db.IntegerProperty(required=True, default=0)
         
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
@@ -55,7 +56,12 @@ class Checkin(db.Model):
     fb_location_name = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now=True)
     
-    # badges:[{'name':name,'img_url':img_url},{'name':name,'img_url':img_url}]}
+    # {'player': 
+    #     {'name':name,'fb_id':fb_id},
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    # }
     json = db.TextProperty(required=False)    
   
 class GameAward(db.Model): # award id is key_name
@@ -66,7 +72,7 @@ class Badge(db.Model):
     description = db.TextProperty(required=True, default='description')
     points = db.IntegerProperty(required=True, default=0)   
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
-    thumb = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False) 
+    image_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/yellow-1st.png")
     @property
     def checkin_badges(self):
         return Checkin.all().filter('badges', self.key())    

@@ -162,9 +162,9 @@
      		</div>
 			</div><!-- /block -->
 			<div class="block">
-				{% if game.bgg_img_url %}
+				{% if game.bgg_thumbnail_url %}
   			<div id="game-image">
-					<img alt="{{ game.name }}" title="{{ game.name }}" src="{{ game.bgg_img_url }}"/>
+					<img alt="{{ game.name }}" title="{{ game.name }}" src="{{ game.bgg_thumbnail_url }}"/>
 				</div>
 				{% endif %}	
 			</div>
@@ -207,7 +207,7 @@
 						</div>
 						<div class="game-badges">
 							{% for b in c.badges %}
-							<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.thumb}}" />
+							<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.image_url}}=s20" />
 						  {% endfor %}
 						</div>						
 					</div>

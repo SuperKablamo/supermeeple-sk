@@ -31,18 +31,6 @@
 				<label>image</label><input type="file" name="file" size="50"><br/> 
 				<input type="submit" name="submit" value="Submit">
 			</form>
-			<h2>Upload Badge Thumb</h2>
-			<form action="{{thumb_upload_url}}" method="POST" enctype="multipart/form-data">
-				<label>name</label>
-				<select name="key_name">
-					{% for b in badges %}
-						<option value="{{b.key.name}}">{{b.name}}</option>
-					{% endfor %}
-					<option>
-				</select>	<br/>
-				<label>thumb</label><input type="file" name="file" size="50"><br/> 
-				<input type="submit" name="submit" value="Submit">
-			</form>
 			<div id="badges-list">
 			{% for b in badges %}
 				<div class="badge">
@@ -50,8 +38,10 @@
 					<p>Key Name: {{b.key_name }}</p>
 					<p>Description: {{b.description}}</p>
 					<p>Points: {{b.points}}</p>
-					<p>Image: <img src="/serve/{{b.image.key}}"/></p>
-					<p>Thumb: <img src="/serve/{{b.thumb.key}}"/></p>	
+					<div class="badge-image">
+						<img src="{{b.image_url}}"/>
+						<img class="thumb" src="{{b.image_url}}=s20"/>
+					</div>
 				</div>			
 			{% endfor %}
 			</div>	
