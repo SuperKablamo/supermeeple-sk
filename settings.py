@@ -11,8 +11,8 @@ SITE="SuperMeeple"
 ##############################################################################
 
 DEBUG = False
-CHECKIN_FREQUENCY = 50 # Checkin frequency in seconds
-#CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
+#CHECKIN_FREQUENCY = 50 # Checkin frequency in seconds
+CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
 BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="

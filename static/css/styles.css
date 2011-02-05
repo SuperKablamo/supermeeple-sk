@@ -66,7 +66,7 @@ body { background-color: #333; }
 #mainbar #page p { padding: 8px 0; }
 #game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
 #game-header { float: left; margin: 0 0 10px 0; }
-#game-header-wrap #facebook-like { float: right; margin-top: 2px; }
+#game-header-wrap #facebook-like .fb_ltr { padding: 0 0 3px 6px; }
 #user-profile #facebook-like { float: right; margin-top: 14px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
@@ -85,7 +85,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 
 #user-profile { height: 60px; padding-bottom: 12px; }
 #profile-image, .checkin .game-image { float: left; }
-#profile-name, .checkin .game-name { margin: 12px 0 0 16px; float: left; }
+#profile-name, .checkin .game-name { margin: 4px 0 0 16px; float: left; }
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
 
 #checkin-list { width: 100%; }
@@ -95,7 +95,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 
 /*SIDEBAR*/
-#sidebar { margin: 42px 0px 4px 10px; width: 300px; float: left; }
+#sidebar { margin: 16px 0px 4px 10px; width: 300px; float: left; }
 #sidebar .block { padding-bottom: 12px; width: 256px; }
 #search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }
@@ -108,10 +108,11 @@ img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-
 #badges ul, #badges li { list-style: disc inside none; }
 h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 .player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
+img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
 #badges, #message { width: 100%; padding: 0 0 10px 0; }
 .tiny-checkin .game-badges { margin: 0 0 0 16px; float: left; }
 .tiny-checkin .player { float: left; }
-
+.player-wrap { padding: 4px 0 0 0; }
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}
 #bottom-nav { float: left; margin: 10px 0px 0px 24px; }

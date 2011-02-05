@@ -17,12 +17,12 @@
 				<div id="game-header">
 					<h1 id="game-title">
 						<span class="name">{{ game.name }}</span>
+						<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
 						<span class="year">({{ game.year_published}})</span>
+						<span id="facebook-like">
+							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
+						</span>					
 					</h1>
-				</div>
-				<div id="facebook-like">
-					<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
-					<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
 				</div>
 		  </div>
 			<div id="game-detail">	
@@ -203,21 +203,23 @@
 						{% for c in checkins %}
 					<div class="tiny-checkin">
 						<p>{{c.created|timesince}} ago</p>
-						<div class="player">
-					  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
-						</div>
-						<div class="game-badges">
+						<div class="player-wrap">
+							<div class="player">
+					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+							</div>
+							<div class="game-badges">
 							{% for b in c.badges %}
-							<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.image_url}}=s20" />
+								<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
 						  {% endfor %}
-						</div>						
-					</div>
+							</div>
+						</div><!-- /player-wrap -->						
+					</div><!-- /tiny-checkin -->
 						{% endfor %}
 					{% else %}
 					<p>No one has checked into {{game.name}} yet. Be the first!
 					{% endif %}	
-				</div>	
-			</div>	
+				</div><!-- /checkin-list -->	
+			</div><!-- /block -->	
 		</div><!-- /sidebar -->	
 		{% endblock %}
 		

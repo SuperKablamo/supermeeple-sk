@@ -20,13 +20,11 @@
 					<p>{{c.created|timesince}} ago </p>
 					<div class="player">
 				  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+							{% for b in c.badges %}
+							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
+						  {% endfor %}
 					</div>
 				</div>	
-				<div class="game-badges">
-					{% for b in c.badges %}
-					<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.image_url}}=s28" />
-				  {% endfor %}
-				</div>				
 			</div>
 			{% endfor %}
 		</div><!-- /checkin-list -->

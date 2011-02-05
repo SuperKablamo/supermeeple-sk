@@ -41,13 +41,10 @@
 				</div>
 				<div class="game-name">
 					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id}}">{{c.game.name}}</a></h3>
-					<p>{{c.created|timesince}} ago </p>
-				</div>	
-				<div class="game-badges">
-					{% for b in c.badges %}
-					<img alt="{{b.name}}" title="{{b.name}}" class="badge" title src="{{b.image_url}}=s20" />
+					<p>{{c.created|timesince}} ago </p>{% for b in c.badges %}
+					<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
 				  {% endfor %}
-				</div>			
+				</div>	
 			</div>
 			{% endfor %}
 		</div><!-- /checkin-list -->	
