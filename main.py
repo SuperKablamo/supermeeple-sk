@@ -103,6 +103,8 @@ class Admin(BaseHandler):
             taskqueue.add(url='/_ah/queue/seed-games')           
         if method == "build-games":
             buildGames()
+        if method == "flush-cache":
+            memcache.flush_all()    
         self.redirect('/admin/backyardchicken')  
     
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
@@ -313,10 +315,16 @@ class Checkin(BaseHandler):
         message = self.request.get('message')
         share = self.request.get('facebook')
         thumbnail = self.request.get('thumbnail')
+        logging.info('#################### mid = '+mid+' ###################')
+        logging.info('#################### bgg_id = '+bgg_id+' #############')
+        logging.info('#################### name = '+name+' #################')
+        logging.info('#################### message = '+message+' ###########')
+        logging.info('#################### facebook = '+share+' ############')
+        logging.info('#################### thumbnail = '+thumbnail+' #######')
         game_key = db.Key.from_path('Game', mid)
         game = models.Game.get(game_key)
         # Check user into game ...
-        badges = createCheckin(user, game, share)
+        badges = createCheckin(user=user, game=game, share=share)
         # Share checkin on Facebook if requested ...
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
             logging.info('#### posting to Facebook '+user.access_token+'####')
@@ -335,8 +343,7 @@ class Checkin(BaseHandler):
             attachment['actions'] = actions     
             results = facebook.GraphAPI(
                user.access_token).put_wall_post(message, attachment)
-               
-        self.response.headers.add_header("content-type", "application/json")       
+  
         return self.response.out.write(simplejson.dumps(badges))
 
 class Page(MainHandler):
@@ -589,7 +596,8 @@ def getBGGIDFromBGG(game_name):
     logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
     return bgg_id
 
-def createCheckin(user, game, facebook=False):
+def createCheckin(user, game, share=False):
+    logging.info('################### createCheckin() ######################')
     players = [user.key()] # A new Checkin has only one User
     # Create initial json data:
     # {'player': 

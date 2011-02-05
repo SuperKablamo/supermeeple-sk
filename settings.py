@@ -1,13 +1,13 @@
 ## APPSPOT.COM - UNCOMMENT FOR PRODUCTION ####################################
-#FACEBOOK_APP_ID = "149881721731503"
-#FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
-#SITE="SuperMeeple"
+FACEBOOK_APP_ID = "149881721731503"
+FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
+SITE="SuperMeeple"
 ##############################################################################
 
 ## LOCALHOST:8080 - UNCOMMENT FOR LOCAL TESTING ##############################
-FACEBOOK_APP_ID = "174331539272451"
-FACEBOOK_APP_SECRET = "f4f8e3762a2abbe62dee8bf44a4967a4"
-SITE="localhosttest-sk"
+#FACEBOOK_APP_ID = "174331539272451"
+#FACEBOOK_APP_SECRET = "f4f8e3762a2abbe62dee8bf44a4967a4"
+#SITE="localhosttest-sk"
 ##############################################################################
 
 DEBUG = False

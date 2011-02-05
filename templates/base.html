@@ -40,6 +40,7 @@
 					type: "POST",  
 				  url: "/game-checkin",  
 				  data: dataString,  
+				  dataType: "json",
           beforeSend: function() {
           	$('#spinner').addClass('loading');
           	$('#checkin-form-inner').hide();

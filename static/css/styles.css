@@ -14,7 +14,7 @@ body { font-family: Helvetica, sans-serif; line-height: 1.4em; font-size: .8em; 
 a { color: #FF8003; cursor: pointer; outline: medium none; text-decoration: none; }
 #container { text-align: left; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
-h1 { font-weight: normal; margin: 5px 0; font-size: 2em; }
+h1 { font-weight: normal; margin: 5px 0; font-size: 2em;  line-height: 1em; }
 h1#error { font-size: 40px; color: red; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 .checkin h3 { font-weight: normal; font-size: 1.6em; }
