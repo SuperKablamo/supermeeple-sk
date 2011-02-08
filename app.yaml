@@ -22,9 +22,12 @@ handlers:
 - url: /js
   static_dir: javascript
 
-- url: /_ah/queue/.*
-  script: meeple_tasks.py
+- url: /_ah/queue/deferred
+  script: $PYTHON_LIB/google/appengine/ext/deferred/deferred.py
   login: admin
+
+- url: /admin/.*
+  script: admin.py
   
 - url: /.*
   script: main.py  

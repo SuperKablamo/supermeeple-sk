@@ -24,6 +24,11 @@
 							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
 						  {% endfor %}
 					</div>
+					<div class="message">
+						{% if c.message %}
+						<p>"{{c.message}}"</p>
+						{% endif %}
+					</div>	
 				</div>	
 			</div>
 			{% endfor %}

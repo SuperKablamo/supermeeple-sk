@@ -55,12 +55,14 @@ class Checkin(db.Model):
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     created = db.DateTimeProperty(required=True, auto_now=True)
+    message = db.StringProperty(required=True, default="message")
     
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #  'message': message
     # }
     json = db.TextProperty(required=False)    
   
@@ -94,4 +96,8 @@ class GameRating(db.Model):
     
 class GameSeed(db.Model): # mid is key_name
     bgg_id = db.StringProperty(required=False) # BoardGameGeek id
-    mid = db.StringProperty(required=False) # Freebase mid
+    mid = db.StringProperty(required=True) # Freebase mid
+    name = db.StringProperty(required=True)
+
+class Config(db.Model):
+    game_seed_cursor = db.StringProperty(required=False)    

@@ -67,7 +67,7 @@ body { background-color: #333; }
 #game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
 #game-header { float: left; margin: 0 0 10px 0; }
 #game-header-wrap #facebook-like .fb_ltr { padding: 0 0 3px 6px; }
-#user-profile #facebook-like { float: right; margin-top: 14px; }
+#user-profile #facebook-like { float: right; margin-top: 8px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #222; padding: 6px 4px 6px; vertical-align: top; }
@@ -78,14 +78,16 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #game-image { padding-top: 10px; }
 #game-image img, #profile-image img, .checkin .game-image img, #comments { border: 3px solid #222; }
 #game-image img { max-width: 200px; }
+#profile-image { float: left; padding: 0 12px 0 0; } 
 #profile-image img { max-width: 50px; }
 .checkin .game-image img { max-width: 80px; }
+#profile-name { float: left; }
 #description { height: 10em; overflow: hidden; }
 #more-less-container { text-align: right; } 
 
 #user-profile { height: 60px; padding-bottom: 12px; }
-#profile-image, .checkin .game-image { float: left; }
-#profile-name, .checkin .game-name { margin: 4px 0 0 16px; float: left; }
+.checkin .game-image { float: right; }
+.checkin .game-name { margin: 4px 0 0 0; }
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
 
 #checkin-list { width: 100%; }

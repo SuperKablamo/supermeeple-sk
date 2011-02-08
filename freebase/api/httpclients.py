@@ -82,10 +82,20 @@ class UrlfetchClient(object):
         self.httpclient = CookiefulUrlfetch(cookiejar=self.cookiejar)
 
     def __call__(self, url, method, body, headers):
+        logging.info('########## url = '+str(url)+' ########################')
+        logging.info('########## headers = '+str(headers)+' ################')
+        logging.info('########## method = '+str(method)+' ##################')  
+        logging.info('########## body = '+str(body)+' ################')  
         resp = self.httpclient.request(url, payload=body, method=method, headers=headers)
 
         if resp.status_code != 200:
-            self._raise_service_error(url, resp.status_code, resp.headers['content-type'], resp.body)
+            logging.info('## resp.status_code = '+str(resp.status_code)+' ##')  
+            try:
+                body = resp.body
+            except AttributeError:
+                body = "" 
+            self._raise_service_error(url, resp.status_code, 
+                                      resp.headers['content-type'], body)
 
         return (resp, resp.content)
 

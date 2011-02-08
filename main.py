@@ -75,38 +75,7 @@ class BaseHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, 
                                                 template_values, 
                                                 debug=DEBUG))
-                                                
-class Admin(BaseHandler):
-    """Provides Admin access to data-entry and initialization tasks.
-    """
-    def get(self, pswd=None):
-        logging.info('################### Admin:: get() ####################')
-        logging.info('################### pswd =' +pswd+ ' #################')        
-        if pswd == "backyardchicken":
-            badges = getBadges()
-            image_upload_url = blobstore.create_upload_url('/upload/image')
-            template_values = {
-                'badges': badges,
-                'image_upload_url': image_upload_url,
-                'current_user': self.current_user,
-                'facebook_app_id': FACEBOOK_APP_ID
-            }  
-            self.generate('base_admin.html', template_values)
-        else: self.redirect(500)  
-        
-    def post(self, method=None):
-        logging.info('################### Admin:: post() ###################')
-        logging.info('################### method =' +method+' ##############')
-        if method == "create-badges":
-            createBadges()
-        if method == "seed-games":
-            taskqueue.add(url='/_ah/queue/seed-games')           
-        if method == "build-games":
-            buildGames()
-        if method == "flush-cache":
-            memcache.flush_all()    
-        self.redirect('/admin/backyardchicken')  
-    
+
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     """Uploads files to Blobstore.
     """
@@ -119,10 +88,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             badge.image = blob_info.key()
             badge.image_url = images.get_serving_url(blob_info.key())
         badge.put()   
-        logging.info('################# badge.image = '+str(badge.image)+'################')    
-        logging.info('################# badge.image.key = '+str(badge.image.key)+'################') 
+        logging.info('######### badge.image = '+str(badge.image)+'##########')    
+        logging.info('######### badge.image.key = '+str(badge.image.key)+'##') 
         self.redirect('/admin/backyardchicken')  
-
+                                                
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
     """Serves Blobstore images.
     """
@@ -204,8 +173,8 @@ class MainHandler(BaseHandler):
                         "limit": 1
                         },
                         "key" : {
-                            "namespace" : "/user/pak21/boardgamegeek/boardgame",
-                            "value" : None
+                            "namespace":"/user/pak21/boardgamegeek/boardgame",
+                            "value":None
                         },
                         "sort": "-!/award/award_honor/honored_for.year.value",
                         "limit": 20
@@ -324,7 +293,8 @@ class Checkin(BaseHandler):
         game_key = db.Key.from_path('Game', mid)
         game = models.Game.get(game_key)
         # Check user into game ...
-        badges = createCheckin(user=user, game=game, share=share)
+        badges = createCheckin(user=user, game=game, 
+                               message=message, share=share)
         # Share checkin on Facebook if requested ...
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
             logging.info('#### posting to Facebook '+user.access_token+'####')
@@ -596,7 +566,7 @@ def getBGGIDFromBGG(game_name):
     logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
     return bgg_id
 
-def createCheckin(user, game, share=False):
+def createCheckin(user, game, message, share=False):
     logging.info('################### createCheckin() ######################')
     players = [user.key()] # A new Checkin has only one User
     # Create initial json data:
@@ -605,6 +575,7 @@ def createCheckin(user, game, share=False):
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #  'message': message
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
@@ -619,10 +590,11 @@ def createCheckin(user, game, share=False):
                      'image_url': b.image_url,
                      'key_name':b.key().name()}
             badges.append(badge)      
-    json_dict = {'player': player, 'badges': badges}
+    json_dict = {'player': player, 'badges': badges, 'message': message}
     json = simplejson.dumps(json_dict)  
     checkin = models.Checkin(player=user, 
                              game=game.key(), 
+                             message=message,
                              json=db.Text(json))    
     
     # TODO: either batch put, and run in Transaction or Task.
@@ -657,7 +629,8 @@ def getUserCheckins(user):
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
+    #    'message': 'message    
     #  }]    
     q_checkins = user.checkins
     deref_checkins = utils.prefetch_refprops(q_checkins, 
@@ -685,7 +658,8 @@ def getGameCheckins(game):
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #   'time': '3 minutes ago'
+    #   'created': '3 minutes ago'
+    #   'message': 'message    
     #  }]
     ref_checkins = game.checkins.order("-created") 
     checkins = [] 
@@ -701,14 +675,15 @@ def getLatestCheckins():
     """
     logging.info('##################### getLatestCheckins ##################')    
     # Data format:
-    # [{'players': 
-    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
+    # [{'player': 
+    #       {'name': name, 'fb_id': fb_id},
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url}
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
+    #    'message': 'message
     #  }]
     q = models.Checkin.all()
     q.order("-created")
@@ -815,19 +790,6 @@ def awardCheckinBadges(user, game_key):
         user.put() 
         return db.Model.get(keys)
 
-def getBadges():
-    """Returns all Badge Entities in the Datastore"""
-    return models.Badge.all().fetch(500)
-    
-def createBadges():
-    updated = []    
-    for b in BADGES:
-        badge = models.Badge(key_name=b, name=b, description=b)
-        updated.append(badge)
-   
-    db.put(updated)
-    return None                      
-
 def isFacebook(path):
     """Returns True if request is from a Facebook iFrame, otherwise False.
     """
@@ -894,7 +856,6 @@ application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       (r'/game(/m/.*)/(.*)', GameProfile),
                                       (r'/user/(.*)', UserProfile),
                                       ('/game-checkin', Checkin),
-                                      (r'/admin/(.*)', Admin),
                                       (r'/upload/(.*)', UploadHandler),
                                       (r'/serve/([^/]+)?', ServeHandler),
                                       (r'/.*', MainHandler)],

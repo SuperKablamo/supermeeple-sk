@@ -4,63 +4,71 @@
       xmlns:fb="http://www.facebook.com/2008/fbml">
 
   <head>
-  <title>{% block title %}Board Games - SuperMeeple{% endblock %}</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  	<title>{% block title %}Board Games - SuperMeeple{% endblock %}</title>
+  	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
-	<meta property="og:website" content="www.supermeeple.com"/>{% endblock %}
+		{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+		<meta property="og:website" content="www.supermeeple.com"/>{% endblock %}
 	
-  <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
-  <link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-  <script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
+  	<link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+  	<link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
+  	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
 	<!-- Freebase Jquery search -->
-	<script type="text/javascript">
-  $(function() {
-    $("#game-search").suggest({type:'/games/game'}).bind("fb-select", function(e, data) {
-    $("#game-id").val(data.id);
-    $("#game-name").val(data.name);
-    });
-  });
-  </script>
-	<!-- Checkin form -->
-	<script type="text/javascript">
-  	$(function() {  
-      $('.error').hide();  
-      $("#checkin-button").click(function() { 
-	      var mid = $("input#mid").val();
-		    var message = $("textarea#message").val();
-			  var facebook = $('input#facebook').is(':checked');
-				var name = $("input#name").val();
-			  var bgg_id = $("input#bgg-id").val();
-			  var thumbnail = $("input#thumbnail").val();
-	      var dataString = 'mid='+mid+'&message='+message+'&facebook='+facebook+'&name='+name+'&bgg_id='+bgg_id+'&thumbnail='+thumbnail;  
-				//alert (dataString);return false;  
-			 	$.ajax({  
-					type: "POST",  
-				  url: "/game-checkin",  
-				  data: dataString,  
-				  dataType: "json",
-          beforeSend: function() {
-          	$('#spinner').addClass('loading');
-          	$('#checkin-form-inner').hide();
-          },
-				  success: function(badges) {  
-				  	$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
-				    $('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
-						$.each(badges, function(i,badge) {
-				  	  $('#badges').append("<h2>New Badge!</h2><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
-				    });
-				  },
-          complete: function() {
-          	$('#spinner').removeClass('loading');
-					}				
-				});
-				
-				return false;
-    	});  
-   	});
-	</script>
+		<script type="text/javascript">
+  		$(function() {
+    		$("#game-search").suggest({type:'/games/game'}).bind("fb-select", function(e, data) {
+    			$("#game-id").val(data.id);
+    			$("#game-name").val(data.name);
+    		});
+  		});
+  	</script>
+		<!-- Checkin form -->
+		<script type="text/javascript">
+  		$(function() {  
+      	$('.error').hide();  
+      	$("#checkin-button").click(function() { 
+	      	var mid = $("input#mid").val();
+		    	var message = $("textarea#message").val();
+			  	var facebook = $('input#facebook').is(':checked');
+					var name = $("input#name").val();
+			  	var bgg_id = $("input#bgg-id").val();
+			  	var thumbnail = $("input#thumbnail").val();
+			 		$.ajax({  
+						type: "POST",  
+				  	url: "/game-checkin",  
+				  	data: {"mid": mid, "message": message, "facebook": facebook, "name": name, "bgg_id": bgg_id, "thumbnail": thumbnail},  
+				  	dataType: "json",
+          	beforeSend: function() {
+          		$('#spinner').addClass('loading');
+          		$('#checkin-form-inner').hide();
+          	},
+				  	success: function(badges) {  
+				  		$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
+				    	$('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
+							$.each(badges, function(i,badge) {
+				  	  	$('#badges').append("<h2>New Badge!</h2><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
+				    	});
+				  	},
+          	complete: function() {
+          		$('#spinner').removeClass('loading');
+						}				
+					});
+					return false;
+    		});  
+   		});
+		</script>
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+	  	var _gaq = _gaq || [];
+	  	_gaq.push(['_setAccount', 'UA-21210851-1']);
+	  	_gaq.push(['_trackPageview']);
+	  	(function() {
+	    	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  		})();
+	  </script>	
   </head> 
   <body>
   <div id="container">

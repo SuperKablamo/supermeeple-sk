@@ -29,7 +29,7 @@ __all__ = ['Cookie', 'CookieJar', 'CookiePolicy', 'DefaultCookiePolicy',
            'FileCookieJar', 'LWPCookieJar', 'LoadError', 'MozillaCookieJar']
 
 import re, urlparse, copy, time
-import urllib_stub as urllib
+import urllib
 try:
     import threading as _threading
 except ImportError:
@@ -646,7 +646,7 @@ def escape_path(path):
     # (And here, for new URI schemes: RFC 2718)
     if isinstance(path, unicode):
         path = path.encode("utf-8")
-    path = urlib.quote(path, HTTP_PATH_SAFE)
+    path = urllib.quote(path, HTTP_PATH_SAFE)
     path = ESCAPED_CHAR_RE.sub(uppercase_escaped_char, path)
     return path
 
