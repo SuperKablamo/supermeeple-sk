@@ -19,9 +19,15 @@
 						<span class="name">{{ game.name }}</span>
 						<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
 						<span class="year">({{ game.year_published}})</span>
+						{% if admin %}
+						<span><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id}}">EDIT</a>
+						</span>	
+						{% else %}
 						<span id="facebook-like">
 							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
-						</span>					
+						</span>
+						{% endif %}		
+									
 					</h1>
 				</div>
 		  </div>

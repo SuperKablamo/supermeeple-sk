@@ -107,7 +107,10 @@ def getBGGIDFromBGG(game_name):
     except KeyError: # Most likely foreign characters in game_name
         return None    
     logging.info('########### game_url = ' + game_url + ' ##################') 
-    result = urllib2.urlopen(game_url).read()
+    try:
+        result = urllib2.urlopen(game_url).read()
+    except Exception:
+        return None
     xml = ElementTree.fromstring(result)
     try:
         bgg_id = xml.find("./boardgame").attrib['objectid']
@@ -120,16 +123,16 @@ def getBGGIDFromBGG(game_name):
     
 def storeBGGIDtoFreebase(mid, bgg_id):
     logging.info('############ putBGGIDtoFreebase('+mid+','+bgg_id+') ######')    
-    if not freebase.sandbox.loggedin():
-        freebase.sandbox.login(username=FREEBASE_USER, password=FREEBASE_PSWD)
+    if not FREEBASE.loggedin():
+        FREEBASE.login(username=FREEBASE_USER, password=FREEBASE_PSWD)
     query = {
         "type":"/games/game",
         "mid":mid,
         "key":{
             "connect":"insert",
-            "namespace": "/user/pak21/boardgamegeek/boardgame",
-            "value":     bgg_id
+            "namespace":BGG_NAMESPACE,
+            "value":bgg_id
             }
         }
-    result = freebase.sandbox.mqlwrite(query)
-    logging.info('############# mqlwrite result = '+result+ ' ##############')    
+    result = FREEBASE.mqlwrite(query)
+    logging.info('############# mqlwrite result = '+str(result)+ ' #########')    

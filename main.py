@@ -27,6 +27,7 @@ from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.api import urlfetch
+from google.appengine.api import users
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
 from google.appengine.ext import webapp
@@ -65,7 +66,7 @@ class BaseHandler(webapp.RequestHandler):
                     user.put()
                 self._current_user = user
         return self._current_user
-
+            
     def generate(self, template_name, template_values):
         template.register_template_library('templatefilters')
         directory = os.path.dirname(__file__)
@@ -225,8 +226,10 @@ class GameProfile(BaseHandler):
         game = getGame(self=self, mid=mid, bgg_id=bgg_id)
         checkins = getGameCheckins(game)
         host = self.request.host # used for Facebook Like url 
-        checked_in = isCheckedIn(user)     
+        checked_in = isCheckedIn(user)   
+        admin = users.is_current_user_admin()  
         template_values = {
+            'admin': admin,
             'checked_in': checked_in,
             'host': host,
             'game': game,

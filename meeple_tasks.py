@@ -8,6 +8,7 @@
 import main
 import models
 import gamebase
+import time
 
 from settings import *
 
@@ -15,11 +16,18 @@ import freebase
 import logging
 
 from google.appengine.api import taskqueue
+from google.appengine.ext import db
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 ############################# METHODS ########################################
 ##############################################################################
+
+def flushSeedGames():
+    q = models.GameSeed.all()
+    results = q.fetch(5000)
+    for r in results:
+        r.delete()
 
 def seedGames():   
     '''Queries Freebase for all games.  Stores IDs in models.GameSeed.
@@ -30,7 +38,7 @@ def seedGames():
         "mid":    None,
         "name":   None,
         "key": {
-            "namespace": "/user/pak21/boardgamegeek/boardgame",
+            "namespace":BGG_NAMESPACE,
             "value":     None,
             "optional":  True
             }
@@ -57,40 +65,31 @@ def seedGames():
     logging.info("################ Total count:: "+str(count)+" ############")            
     return True  
 
-def buildGames():
-    logging.info('#################### buildGames() ########################')
-    q = models.GameSeed.all()
-    config = models.Config.get_by_key_name(CONFIG_KEY_NAME)
-    if config is None:
-        config = models.Config(key_name=CONFIG_KEY_NAME,
-                               cursor=None)
-
-    cursor = config.game_seed_cursor        
-    if cursor is not None: 
-        logging.info('######### cursor = '+str(cursor)+ ' ##################')
-        r = q.with_cursor(cursor)  
-        game_seeds = r.fetch(10)        
-    else: 
-        game_seeds = q.fetch(10)
-    config.game_seed_cursor = q.cursor()
-    config.put()
-    if game_seeds is None: return # No more results with this cursor
+def processGameSeeds(keys, task_number):
+    logging.info('##########################################################')
+    logging.info('#################### processGameSeeds(keys, task_number) #')
+    logging.info('##########################################################')    
+    game_seeds = models.GameSeed.get(keys)
     for gs in game_seeds:
-        logging.info('################# Building game '+gs.name+' ##########')
+        logging.info('################ Processing game '+gs.name+' #########')
+        logging.info('################ Task number '+str(task_number)+' ####')
         # First, try to match any games that are missing a bgg_id
         bgg_id = gs.bgg_id
         mid = gs.mid
         if bgg_id is None:
-            logging.info('################# bgg_id = None ##################')
+            logging.info('################# bgg_id = None, find a match ####')
             name = gs.name
             bgg_id = gamebase.getBGGIDFromBGG(name)
-        # Valid bgg_id, so build a game.
-        if bgg_id is not None:
-            logging.info('################# bgg = '+str(bgg_id)+' ##########')            
+        if bgg_id is not None: # Valid bgg_id, so build a game
+            logging.info('################# bgg_id = '+str(bgg_id)+' #######')            
             gamebase.buildGame(mid, bgg_id)
-            gamebase.storeBGGIDtoFreebase(mid, bgg_id)   
-
-    logging.info('################# exiting buildGames() ###################')
-    freebase.logout()
-    return      
+            gamebase.storeBGGIDtoFreebase(mid, bgg_id)  
+            time.sleep(22) 
+        else: # No bgg_id found, make a note
+            logging.info('################# bgg_id = None, make a note #####')  
+            gs.bgg_id = None        
+        gs.processed = True
+        gs.put()        
+    logging.info('######### exiting processGameSeeds(keys, task_number) ####')
+    return True     
  

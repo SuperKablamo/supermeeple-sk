@@ -21,6 +21,7 @@ class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
     bgg_id = db.StringProperty(required=False) # BoardGameGeek id
     mid = db.StringProperty(required=False) # Freebase mid
+    asin = db.StringProperty(required=False) # ASIN number
     bgg_url = db.LinkProperty(required=False)
     bgg_img_url = db.LinkProperty(required=False)
     bgg_thumbnail_url = db.LinkProperty(required=False)
@@ -95,9 +96,12 @@ class GameRating(db.Model):
     created = db.DateTimeProperty(required=True, auto_now=True)
     
 class GameSeed(db.Model): # mid is key_name
-    bgg_id = db.StringProperty(required=False) # BoardGameGeek id
+    bgg_id = db.StringProperty(required=False, default=None) # BoardGameGeek id
     mid = db.StringProperty(required=True) # Freebase mid
     name = db.StringProperty(required=True)
+    processed = db.BooleanProperty(required=True, default=False)
+    created = db.DateTimeProperty(required=True, auto_now=True)
 
 class Config(db.Model):
-    game_seed_cursor = db.StringProperty(required=False)    
+    game_seed_cursor = db.StringProperty(required=False)   
+    unmatched_games = db.ListProperty(db.Key, required=True, default=None)

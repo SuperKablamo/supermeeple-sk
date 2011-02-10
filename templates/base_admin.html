@@ -16,7 +16,13 @@
 					<label>Seed</label><input type="submit" name="submit" value="Submit">
 			</form>	
 			<p>GameSeed count = {{game_seed_count}}</p>
+			<p>Processed GameSeed count = {{processed_count}}</p>			
 			<p>Game count = {{game_count}}</p>	
+			<p>GameXML count = {{game_xml_count}}</p>	
+			<h2>Flush Seed Games</h2>
+			<form action="/admin/flush-seed-games" method="POST">
+					<label>Flush Seed</label><input type="submit" name="submit" value="Submit">
+			</form>			
 			<h2>Build Games</h2>
 			<form action="/admin/build-games" method="POST">
 					<label>Build</label><input type="submit" name="submit" value="Submit">

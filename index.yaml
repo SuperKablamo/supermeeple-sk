@@ -21,3 +21,8 @@ indexes:
   - name: players
   - name: created
     direction: desc
+
+- kind: GameSeed
+  properties:
+  - name: processed
+  - name: mid

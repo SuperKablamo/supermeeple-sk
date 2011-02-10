@@ -1,3 +1,5 @@
+import freebase
+
 ## APPSPOT.COM - UNCOMMENT FOR PRODUCTION ####################################
 #FACEBOOK_APP_ID = "149881721731503"
 #FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
@@ -17,6 +19,7 @@ CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
 BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
+BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"
 
 ## FREEBASE LIVE #############################################################
 #FREEBASE_USER = "supermeeple"

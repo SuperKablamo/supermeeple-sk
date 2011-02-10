@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+	{% block title %}{{ game.name }} - Board Game Admin - SuperMeeple{% endblock %}
+	
+	{% block main %}	
+	<!-- FULLBAR --> 
+	<div id="fullbar">
+		<h1>Admin :: {{game.name}}</h1>
+		<div class="admin-block">
+			<p>Key Name: {{game.key.name}}</p>
+			<p>Year: {{game.year}}</p>						
+			<p>Freebase ID: {{game.mid}}</p>
+			<p>BGG ID: {{game.bgg_id}}</p>
+			<p>ASIN: {{game.asin}}</p>
+			<p>Created: {{game.created}}</p>			
+			<p>Updated: {{game.updated}}</p>
+			<p>Description: {{game.description}}</p>
+			<h2>Update Game</h2>
+			<form action="/admin/update-game" method="POST">
+				<fieldset>
+					<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>
+					<input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/>
+					<input name="asin" id="asin" value="{{ game.asin }}"/>
+					<label>Update</label><input type="submit" name="submit" value="Submit">
+				</fieldset>
+			</form>			
+		</div>	
+                         
+  </div><!-- /fullbar -->
+	{% endblock %}	
+	{% block sidebar %}	
+	{% endblock %}
