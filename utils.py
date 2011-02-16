@@ -38,7 +38,9 @@ def strToInt(s):
     try:
         i = int(s)
     except ValueError:
-        i = 0    
+        i = 0 
+    except TypeError:
+        i = 0       
     return i
 
 def prefetch_refprops(entities, *props):

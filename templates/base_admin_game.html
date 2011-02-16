@@ -8,7 +8,7 @@
 		<h1>Admin :: {{game.name}}</h1>
 		<div class="admin-block">
 			<p><span class="label">Key Name:</span> {{game.key.name}}</p>
-			<p><span class="label">Year:</span> {{game.year}}</p>						
+			<p><span class="label">Year:</span> {{game.year_published}}</p>						
 			<p><span class="label">Freebase ID:</span> {{game.mid}}</p>
 			<p><span class="label">BGG ID:</span> {{game.bgg_id}}</p>
 			<p><span class="label">ASIN:</span> {{game.asin}}</p>
@@ -25,7 +25,7 @@
 			<br/>
 			{% endfor %}
 			<h2>Update Game</h2>
-			<form action="/admin/update-game" method="POST">
+			<form action="/admin/game{{game.mid}}/{{game.bgg_id}}" method="POST">
 				<fieldset>
 					<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>
 					<label>BGG ID</label><input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/><br/>

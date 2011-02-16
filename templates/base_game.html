@@ -18,7 +18,9 @@
 					<h1 id="game-title">
 						<span class="name">{{ game.name }}</span>
 						<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+						{% if game.year_published %}
 						<span class="year">({{ game.year_published}})</span>
+						{% endif %}
 						{% if admin %}
 						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id}}">EDIT</a>
 						</span>	
@@ -225,6 +227,11 @@
 					<p>No one has checked into {{game.name}} yet. Be the first!
 					{% endif %}	
 				</div><!-- /checkin-list -->	
+			</div><!-- /block -->	
+			<div class="block">
+				{% if game.asin %}
+				<iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=supermeeple-sk-20&o=1&p=8&l=as1&m=amazon&f=ifr&asins={{game.asin}}" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>	
+				{% endif %}
 			</div><!-- /block -->	
 		</div><!-- /sidebar -->	
 		{% endblock %}

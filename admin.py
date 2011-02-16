@@ -45,27 +45,24 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class Admin(webapp.RequestHandler):
     """Provides Admin access to data-entry and initialization tasks.
     """
-    def get(self, pswd=None):
+    def get(self):
         logging.info('################### Admin:: get() ####################')
-        logging.info('################### pswd =' +pswd+ ' #################')        
-        if pswd == "backyardchicken":
-            badges = getBadges()
-            game_seed_count = models.GameSeed.all().count(5000)
-            processed_count = models.GameSeed.all().filter('processed = ', True).count(5000)
-            game_count = models.Game.all().count(5000) 
-            game_xml_count = models.GameXML.all().count(5000)
-            image_upload_url = blobstore.create_upload_url('/upload/image')
-            template_values = {
-                'game_seed_count': game_seed_count,
-                'processed_count': processed_count,
-                'game_count': game_count,
-                'game_xml_count': game_xml_count,
-                'badges': badges,
-                'image_upload_url': image_upload_url,
-                'facebook_app_id': FACEBOOK_APP_ID
-            }  
-            generate(self, 'base_admin.html', template_values)
-        else: self.redirect(500)  
+        badges = getBadges()
+        game_seed_count = models.GameSeed.all().count(5000)
+        processed_count = models.GameSeed.all().filter('processed = ', True).count(5000)
+        game_count = models.Game.all().count(5000) 
+        game_xml_count = models.GameXML.all().count(5000)
+        image_upload_url = blobstore.create_upload_url('/upload/image')
+        template_values = {
+            'game_seed_count': game_seed_count,
+            'processed_count': processed_count,
+            'game_count': game_count,
+            'game_xml_count': game_xml_count,
+            'badges': badges,
+            'image_upload_url': image_upload_url,
+            'facebook_app_id': FACEBOOK_APP_ID
+        }  
+        generate(self, 'base_admin.html', template_values)
         
     def post(self, method=None):
         logging.info('################### Admin:: post() ###################')
@@ -97,6 +94,19 @@ class GameEdit(webapp.RequestHandler):
             'matches': matches
         }  
         generate(self, 'base_admin_game.html', template_values)
+    
+    # POST updated Game data.
+    def post(self, mid=None, bgg_id=None):
+        bgg_id_new = self.request.get('bgg-id')
+        asin = self.request.get('asin')
+        game = models.Game.get_by_key_name(mid)
+        game.asin = asin
+        game.bgg_id = bgg_id_new
+        game.put()
+        memcache.delete(mid) # Clear old data from cache
+        if bgg_id != bgg_id_new:
+            gamebase.storeBGGIDtoFreebase(mid, bgg_id_new)
+        self.redirect('/admin/game'+mid+'/'+bgg_id_new)
         
 ######################## METHODS #############################################
 ##############################################################################
@@ -165,7 +175,7 @@ def generate(self, template_name, template_values):
 ##############################################################################
 ##############################################################################
 application = webapp.WSGIApplication([(r'/admin/game(/m/.*)/(.*)', GameEdit),
-                                      (r'/admin/(.*)', Admin),],
+                                      ('/admin/', Admin),],
                                        debug=True)
 
 def main():
