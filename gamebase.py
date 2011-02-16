@@ -11,18 +11,105 @@ import main
 import models
 import urllib2
 
-from google.appengine.ext import db
 from settings import *
 from utils import strToInt
 from utils import buildDataList
 from utils import findPrimaryName
 from xml.etree import ElementTree 
 
+from google.appengine.api import memcache
+from google.appengine.ext import db
+
 ############################# METHODS ########################################
 ##############################################################################
 
+def getGame(self, bgg_id, mid=None):
+    """Returns a Game.  Looks for one in memcache, if not then creates one
+    using the BGG XML API.
+    """
+    logging.info('########### getGame:: ####################################')
+    ##########################################################################
+    # TODO: nested if statement is  . . . scary - could use a refactor!       #
+    ##########################################################################
+    if mid is None:
+        self.redirect(500)
+    game_cache = memcache.get(mid)
+    game_url = BGG_XML_URI + bgg_id
+    if game_cache is None:
+        game = models.Game.get_by_key_name(mid)
+        if game is None: # Game has never been stored, so build and store it.
+            if bgg_id == '0' or bgg_id is None: # Call BGG XML API for match
+                fb_game = getFBGame(mid)
+                bgg_id = getBGGIDFromBGG(fb_game.name)
+                if bgg_id is None:
+                    self.redirect(500)
+            logging.info('########## Found BGG ID! = '+bgg_id+' ############')        
+            game_xml = models.GameXML.get_by_key_name(bgg_id)
+            # Use BGG XML API to get Game data
+            game_url = BGG_XML_URI + bgg_id # Remake url with new found bgg_id
+            game_data = parseBGGXML(game_url)
+            # Build Game from BGG data
+            game = models.Game(key_name=mid,
+                               mid=mid,
+                               bgg_id=bgg_id,
+                               bgg_img_url=game_data['image_url'],
+                               bgg_thumbnail_url=game_data['thumbnail_url'],
+                               name=game_data['name'],
+                               description=game_data['description'],
+                               year_published = game_data['year_published'],
+                               min_players = game_data['min_players'],
+                               playing_time = game_data['playing_time'],
+                               age = game_data['age'],
+                               publishers = game_data['publishers'],
+                               artists = game_data['artists'],
+                               designers = game_data['designers'],
+                               expansions = game_data['expansions'],
+                               categories = game_data['categories'],
+                               mechanics = game_data['mechanics'],
+                               subdomains = game_data['subdomains'])
+            if game_xml is None:
+                game_xml = models.GameXML(key_name=bgg_id, 
+                                          xml=game_data['xml_text'])  
+            else:
+                game_xml.xml = game_data['xml_text']                 
+            game.put() # Save Game
+            game_xml.put() # Save GameXML       
+            success = memcache.set(key=mid, 
+                                   value=game, 
+                                   time=432000) # expiration 5 days
+            game_cache = game                                        
+        else:
+            game_xml = models.GameXML.get_by_key_name(bgg_id)
+            # Use BGG XML API to get Game data
+            game_data = parseBGGXML(game_url)
+            # Build Game from BGG data            
+            game.name = game_data['name']
+            game.bgg_id = bgg_id
+            game.bgg_thumbnail_url = game_data['thumbnail_url']            
+            game.bgg_img_url = game_data['image_url']
+            game.description = game_data['description']
+            game.year_published = game_data['year_published']
+            game.min_players = game_data['min_players']
+            game.playing_time = game_data['playing_time']
+            game.age = game_data['age']
+            game.publishers = game_data['publishers']
+            game.artists = game_data['artists']
+            game.designers = game_data['designers']  
+            game.expansions = game_data['expansions']
+            game.categories = game_data['categories']
+            game.mechanics = game_data['mechanics']
+            game.subdomains = game_data['subdomains']
+            game_xml.xml = game_data['xml_text']
+            game.put() # Save Game
+            game_xml.put() # Save GameXML
+            success = memcache.set(key=mid, 
+                                   value=game, 
+                                   time=432000) # expiration 5 days
+            game_cache = game        
+    return game_cache
+
 def buildGame(mid, bgg_id):
-    """Builds a Game from the BGG XML API.
+    """Builds a Game from the BGG XML API.  Expects BGG ID to be not None.
     """
     logging.info('######### buildGame('+str(bgg_id)+', '+str(mid)+') #######')
     game = models.Game.get_by_key_name(mid)
@@ -120,6 +207,40 @@ def getBGGIDFromBGG(game_name):
     logging.info('################# MATCH FOUND! ###########################')         
     logging.info('########### bgg_id = ' + str(bgg_id) + ' #################') 
     return bgg_id
+
+def getBGGMatches(game_name, exact=True): 
+    """Returns Board Game Geek Game IDs from Board Game Geek given a Game
+    name.  If exact=True, then the search is for a single exact match.  If
+    exact=False, then the search returns all possible matches.   
+    """
+    logging.info('############# getBGGMatch:: finding bgg_id ###############')
+    logging.info('########### game_name = ' + game_name + ' ################')   
+    if exact == True:
+        bgg_url = BGG_XML_EXACT_SEARCH
+    else:    
+        bgg_url = BGG_XML_SEARCH    
+    try:
+        game_url = bgg_url + urllib2.quote(game_name.encode('utf8'))
+    except KeyError: # Most likely foreign characters in game_name
+        return None    
+    logging.info('########### game_url = ' + game_url + ' ##################') 
+    try:
+        result = urllib2.urlopen(game_url).read()
+    except Exception:
+        return None
+    xml = ElementTree.fromstring(result)
+    try:
+        boardgames = xml.findall("./boardgame")            
+    except AttributeError:
+        logging.info('################# NO MATCH ###########################') 
+        return None    
+    matches = []
+    for x in boardgames:
+        game = {"bgg_id": x.attrib['objectid'],
+                "name": x.findtext("./name"),
+                "year": x.findtext("./yearpublished")}
+        matches.append(game)        
+    return matches
     
 def storeBGGIDtoFreebase(mid, bgg_id):
     logging.info('############ putBGGIDtoFreebase('+mid+','+bgg_id+') ######')    
@@ -129,10 +250,13 @@ def storeBGGIDtoFreebase(mid, bgg_id):
         "type":"/games/game",
         "mid":mid,
         "key":{
-            "connect":"insert",
+            "connect":"update",
             "namespace":BGG_NAMESPACE,
             "value":bgg_id
             }
         }
-    result = FREEBASE.mqlwrite(query)
+    try: # Catch MetawebErrors 
+        result = FREEBASE.mqlwrite(query)
+    except Exception:
+        return
     logging.info('############# mqlwrite result = '+str(result)+ ' #########')    

@@ -84,7 +84,7 @@ def processGameSeeds(keys, task_number):
             logging.info('################# bgg_id = '+str(bgg_id)+' #######')            
             gamebase.buildGame(mid, bgg_id)
             gamebase.storeBGGIDtoFreebase(mid, bgg_id)  
-            time.sleep(22) 
+            time.sleep(10) 
         else: # No bgg_id found, make a note
             logging.info('################# bgg_id = None, make a note #####')  
             gs.bgg_id = None        

@@ -31,6 +31,7 @@ h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
 /*freebase-tag .logo { color: #3885C7; }
 gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
+#game-header-wrap #edit { font-size: .4em; }
 
 /*LAYOUT*/
 body { background-color: #333; }
@@ -67,6 +68,7 @@ body { background-color: #333; }
 #game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
 #game-header { float: left; margin: 0 0 10px 0; }
 #game-header-wrap #facebook-like .fb_ltr { padding: 0 0 3px 6px; }
+#game-header-wrap #edit { margin: 0 0 0 8px; }
 #user-profile #facebook-like { float: right; margin-top: 8px; }
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
@@ -115,6 +117,7 @@ img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; bord
 .tiny-checkin .game-badges { margin: 0 0 0 16px; float: left; }
 .tiny-checkin .player { float: left; }
 .player-wrap { padding: 4px 0 0 0; }
+
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}
 #bottom-nav { float: left; margin: 10px 0px 0px 24px; }

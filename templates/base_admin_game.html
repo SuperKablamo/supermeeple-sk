@@ -7,21 +7,30 @@
 	<div id="fullbar">
 		<h1>Admin :: {{game.name}}</h1>
 		<div class="admin-block">
-			<p>Key Name: {{game.key.name}}</p>
-			<p>Year: {{game.year}}</p>						
-			<p>Freebase ID: {{game.mid}}</p>
-			<p>BGG ID: {{game.bgg_id}}</p>
-			<p>ASIN: {{game.asin}}</p>
-			<p>Created: {{game.created}}</p>			
-			<p>Updated: {{game.updated}}</p>
-			<p>Description: {{game.description}}</p>
+			<p><span class="label">Key Name:</span> {{game.key.name}}</p>
+			<p><span class="label">Year:</span> {{game.year}}</p>						
+			<p><span class="label">Freebase ID:</span> {{game.mid}}</p>
+			<p><span class="label">BGG ID:</span> {{game.bgg_id}}</p>
+			<p><span class="label">ASIN:</span> {{game.asin}}</p>
+			<p><span class="label">Created:</span> {{game.created}}</p>			
+			<p><span class="label">Updated:</span> {{game.updated}}</p>
+			<p><span class="label">Description:</span> {{game.description}}</p>
+			<h2>Boardgamegeek.com Matches</h2>
+			{% for m in matches %}
+			<ul>
+				<li>Name: {{ m.name }}</li> 
+				<li>BGG ID: {{ m.bgg_id }}</li> 
+				<li>Year: {{ m.year }}</li> 
+			</ul>	
+			<br/>
+			{% endfor %}
 			<h2>Update Game</h2>
 			<form action="/admin/update-game" method="POST">
 				<fieldset>
 					<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>
-					<input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/>
-					<input name="asin" id="asin" value="{{ game.asin }}"/>
-					<label>Update</label><input type="submit" name="submit" value="Submit">
+					<label>BGG ID</label><input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/><br/>
+					<label>ASIN</label><input name="asin" id="asin" value="{{ game.asin }}"/><br/>
+					<input type="submit" name="submit" value="Update">
 				</fieldset>
 			</form>			
 		</div>	

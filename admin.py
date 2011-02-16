@@ -5,6 +5,7 @@
 
 ############################# IMPORTS ########################################
 ############################################################################## 
+import gamebase
 import meeple_tasks
 import models
 import utils
@@ -78,7 +79,9 @@ class Admin(webapp.RequestHandler):
         if method == "build-games":
             buildGames(20)
         if method == "flush-cache":
-            memcache.flush_all()    
+            memcache.flush_all() 
+        if method == "update-game":
+            updateGame(self)       
         self.redirect('/admin/backyardchicken')  
 
 class GameEdit(webapp.RequestHandler):
@@ -87,13 +90,13 @@ class GameEdit(webapp.RequestHandler):
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
         logging.info('################# GameEdit::get ######################')
-        game = getGame(self=self, mid=mid, bgg_id=bgg_id)
+        game = gamebase.getGame(self=self, mid=mid, bgg_id=bgg_id)
+        matches = gamebase.getBGGMatches(game.name, exact=False)
         template_values = {
             'game': game,
-            'current_user': user,
-            'facebook_app_id': FACEBOOK_APP_ID
+            'matches': matches
         }  
-        self.generate(self, 'base_admin_game.html', template_values)
+        generate(self, 'base_admin_game.html', template_values)
         
 ######################## METHODS #############################################
 ##############################################################################
@@ -145,6 +148,9 @@ def buildGames(fetch_size=20):
         
         if count >= game_seed_count:
             return               
+
+def updateGame(self):
+    return
 
 def generate(self, template_name, template_values):
     template.register_template_library('templatefilters')
