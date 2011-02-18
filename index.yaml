@@ -22,6 +22,11 @@ indexes:
   - name: created
     direction: desc
 
+- kind: Game
+  properties:
+  - name: bgg_id
+  - name: mid
+
 - kind: GameSeed
   properties:
   - name: processed

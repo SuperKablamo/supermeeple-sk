@@ -5,7 +5,7 @@
 	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
   <meta property="og:title" content="{{game.name}}"/>
   <meta property="og:type" content="game"/>
-  <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}"/>
+  <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}"/>
   <meta property="og:image" content="{{ game.bgg_img_url }}"/>
   <meta property="og:site_name" content="SuperMeeple"/>	
   <meta property="og:description"
@@ -22,11 +22,11 @@
 						<span class="year">({{ game.year_published}})</span>
 						{% endif %}
 						{% if admin %}
-						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id}}">EDIT</a>
+						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}">EDIT</a>
 						</span>	
 						{% else %}
 						<span id="facebook-like">
-							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
+							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
 						</span>
 						{% endif %}		
 									
@@ -148,16 +148,19 @@
 					{% endfor %}
     		</dl>
  				{% endif %}
+				{% if game.bgg_id %}
     		<dl>
     			<dt>Weblinks</dt>
 					<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
     		</dl>
+				{% endif %}
 			</div><!-- /game-detail -->		 
 		</div><!-- /main -->	   			
 		{% endblock %}		
 		
 		{% block sidebar %}	
 		<div id="sidebar">
+			<!-- GAME SEARCH -->
 			<div class="block">			
     		<div id="search">
      			<form name="input" action="/game" method="post">
@@ -169,13 +172,19 @@
 					<p>search for more games</p>
      		</div>
 			</div><!-- /block -->
+			<!-- GAME THUMB -->
 			<div class="block">
 				{% if game.bgg_thumbnail_url %}
   			<div id="game-image">
-					<img alt="{{ game.name }}" title="{{ game.name }}" src="{{ game.bgg_thumbnail_url }}"/>
+					<img alt="{{game.name}}" title="{{game.name}}" src="{{game.bgg_thumbnail_url}}"/>
 				</div>
-				{% endif %}	
+				{% else %}
+  			<div id="game-image">
+					<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{game.mid}}?maxwidth=150&maxheight=150"/>
+				</div>
+				{% endif %}					
 			</div>
+			<!-- CHECKIN FORM -->
 			<div class="block">
 				<div class="tip">
 					<p>Playing {{game.name}}?  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
@@ -203,7 +212,8 @@
 				</div>
 				{% endif %}
 				{% endif %}
-			</div><!-- /block -->			
+			</div><!-- /block -->		
+			<!-- CHECKIN LIST -->	
 			<div class="block">
 				<div class="checkin-list">
 					<h2>Recent checkins</h2>
@@ -228,9 +238,10 @@
 					{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
+			<!-- AMAZON -->
 			<div class="block">
-				{% if game.asin %}
-				<iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=supermeeple-sk-20&o=1&p=8&l=as1&m=amazon&f=ifr&asins={{game.asin}}" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>	
+				{% if game.asin  %}
+				<iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=supermeeple-sk-20&o=1&p=8&l=as1&m=amazon&f=ifr&asins={{ game.asin }}" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>	
 				{% endif %}
 			</div><!-- /block -->	
 		</div><!-- /sidebar -->	

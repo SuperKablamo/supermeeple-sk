@@ -25,14 +25,20 @@
 			<br/>
 			{% endfor %}
 			<h2>Update Game</h2>
-			<form action="/admin/game{{game.mid}}/{{game.bgg_id}}" method="POST">
+			<form action="/admin/game-update{{game.mid}}/{{game.bgg_id}}" method="POST">
 				<fieldset>
-					<input type="hidden" name="mid" id="mid" value="{{game.mid}}"/>
 					<label>BGG ID</label><input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/><br/>
-					<label>ASIN</label><input name="asin" id="asin" value="{{ game.asin }}"/><br/>
+					<label>ASIN</label><input name="asin" id="asin" value="{{game.asin}}"/><br/>
 					<input type="submit" name="submit" value="Update">
 				</fieldset>
-			</form>			
+			</form>	
+			<h2>Remove BGG Reference</h2>
+			<form action="/admin/bgg-delete{{game.mid}}/{{game.bgg_id}}" method="POST">
+				<fieldset>
+					<label>BGG ID</label><input name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/><br/>
+					<input type="submit" name="submit" value="Remove">
+				</fieldset>
+			</form>					
 		</div>	
                          
   </div><!-- /fullbar -->

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+	{% block title %}Unmatched Games - Board Game Admin - SuperMeeple{% endblock %}
+	
+	{% block main %}	
+	<!-- FULLBAR --> 
+	<div id="fullbar">
+		<h1>Admin :: Unmatched Games</h1>
+		<div class="admin-block">
+			{% for g in games %}
+			<ul>
+				<li><a href="/game{{g.key.name}}/{{g.bgg_id|default_if_none:"0"}}">{{g.name}}</a></li> 
+				<li>BGG ID: {{ g.bgg_id }}</li> 
+				<li>Year: {{ g.year }}</li> 
+			</ul>	
+			<br/>
+			{% endfor %}
+		</div>	       
+  </div><!-- /fullbar -->
+	{% endblock %}	
+	{% block sidebar %}	
+	{% endblock %}

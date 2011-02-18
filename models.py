@@ -19,7 +19,7 @@ class User(db.Model):
         
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
-    bgg_id = db.StringProperty(required=False) # BoardGameGeek id
+    bgg_id = db.StringProperty(required=False, default='0') # BoardGameGeek id
     mid = db.StringProperty(required=False) # Freebase mid
     asin = db.StringProperty(required=False) # ASIN number
     bgg_url = db.LinkProperty(required=False)

@@ -79,7 +79,7 @@ class Admin(webapp.RequestHandler):
             memcache.flush_all() 
         if method == "update-game":
             updateGame(self)       
-        self.redirect('/admin/backyardchicken')  
+        self.redirect('/admin/')  
 
 class GameEdit(webapp.RequestHandler):
     """Provides Admin access to editing Game data.
@@ -97,17 +97,47 @@ class GameEdit(webapp.RequestHandler):
     
     # POST updated Game data.
     def post(self, mid=None, bgg_id=None):
+        logging.info('################# GameEdit::post #####################')        
         bgg_id_new = self.request.get('bgg-id')
         asin = self.request.get('asin')
+        logging.info('################# bgg-id = '+bgg_id_new+' ############')   
+        logging.info('################# asin = '+asin+' ####################')                
         game = models.Game.get_by_key_name(mid)
-        game.asin = asin
-        game.bgg_id = bgg_id_new
+        if asin != "None": game.asin = asin
+        if bgg_id_new != "None": 
+            game.bgg_id = bgg_id_new
+            if bgg_id != bgg_id_new:
+                gamebase.updateFreebaseBGGID(mid, bgg_id_new)
         game.put()
         memcache.delete(mid) # Clear old data from cache
-        if bgg_id != bgg_id_new:
-            gamebase.storeBGGIDtoFreebase(mid, bgg_id_new)
         self.redirect('/admin/game'+mid+'/'+bgg_id_new)
-        
+
+class BGGDelete(webapp.RequestHandler):
+    """Removes BGG ID from Freebase.
+    """
+    # POST Game and BGG to remove.
+    def post(self, mid=None, bgg_id=None):
+        logging.info('################# BGGDelete::post ####################')         
+        game = models.Game.get_by_key_name(mid)
+        game.bgg_id = "0"
+        game.put()
+        gamebase.updateFreebaseBGGID(mid, bgg_id, "delete")
+        memcache.delete(mid) # Clear old data from cache
+        self.redirect('/admin/game'+mid+'/'+game.bgg_id)
+
+class UnmatchedGames(webapp.RequestHandler):
+    """Provides Admin access to state of matched Games.
+    """
+    def get(self):
+        logging.info('################# UnmatchedGames::get ################')
+        q = models.Game.all()
+        q.filter("bgg_id =", None)
+        games = q.fetch(5000)
+        template_values = {
+            'games': games
+        }  
+        generate(self, 'base_admin_game_match.html', template_values)        
+            
 ######################## METHODS #############################################
 ##############################################################################
 
@@ -175,7 +205,11 @@ def generate(self, template_name, template_values):
 ##############################################################################
 ##############################################################################
 application = webapp.WSGIApplication([(r'/admin/game(/m/.*)/(.*)', GameEdit),
-                                      ('/admin/', Admin),],
+                                      (r'/admin/game-update(/m/.*)/(.*)', GameEdit),
+                                      (r'/admin/bgg-delete(/m/.*)/(.*)', BGGDelete),
+                                      ('/admin/', Admin),
+                                      ('/admin/unmatched', UnmatchedGames),
+                                      (r'/admin/(.*)', Admin)],
                                        debug=True)
 
 def main():

@@ -23,11 +23,11 @@ from google.appengine.ext import db
 ############################# METHODS ########################################
 ##############################################################################
 
-def getGame(self, bgg_id, mid=None):
+def getGame(self, bgg_id, mid='0'):
     """Returns a Game.  Looks for one in memcache, if not then creates one
     using the BGG XML API.
     """
-    logging.info('########### getGame('+str(bgg_id)+', '+str(mid)+') #######')
+    logging.info('########### getGame('+bgg_id+', '+mid+') #################')
     if mid is None: # If this method is called with an mid, throw error page
         self.redirect(500)
     game_cache = memcache.get(mid)
@@ -35,9 +35,10 @@ def getGame(self, bgg_id, mid=None):
         game = models.Game.get_by_key_name(mid)
         
         if game is None: # Game has never been stored, so build and store it.
-            if bgg_id == '0' or bgg_id is None: # No BGG ID, return FB data
+            if bgg_id == '0': # No BGG ID, return FB data
                 fb_game = getFBGame(mid)
                 game_data = parseFBJSON(fb_game)
+                game_blurb = getFBGameBlurb(mid, 2000)
                 game = models.Game(key_name=mid,
                                  mid=mid,
                                  name=game_data['name'],
@@ -47,7 +48,8 @@ def getGame(self, bgg_id, mid=None):
                                  age = game_data['age'],
                                  publishers = game_data['publishers'],
                                  designers = game_data['designers'],
-                                 expansions = game_data['expansions'])
+                                 expansions = game_data['expansions'],
+                                 description = game_blurb)
                 game.put()
                 success = memcache.set(key=mid, 
                                        value=game, 
@@ -88,10 +90,11 @@ def getGame(self, bgg_id, mid=None):
                                        time=432000) # expiration 5 days
         
         else: # Game has been stored, get it, update data.
-            if bgg_id != '0' or bgg_id is not None: # Ignore if missing BGG ID
+            logging.info('############ bgg_id = '+bgg_id+' #################')
+            if bgg_id != '0': # There is a BGG connection . . . 
                 game_xml = models.GameXML.get_by_key_name(bgg_id)
                 # Use BGG XML API to get Game data
-                game_data = parseBGGXML(game_url)
+                game_data = parseBGGXML(bgg_id)
                 # Build Game from BGG data            
                 game.name = game_data['name']
                 game.bgg_id = bgg_id
@@ -109,7 +112,12 @@ def getGame(self, bgg_id, mid=None):
                 game.categories = game_data['categories']
                 game.mechanics = game_data['mechanics']
                 game.subdomains = game_data['subdomains']
-                game_xml.xml = game_data['xml_text']
+                game_xml = models.GameXML.get_by_key_name(bgg_id)
+                if game_xml is None:
+                    game_xml = models.GameXML(key_name=bgg_id, 
+                                              xml=game_data['xml_text'])  
+                else:
+                    game_xml.xml = game_data['xml_text']
                 game.put() # Save Game
                 game_xml.put() # Save GameXML
                 success = memcache.set(key=mid, 
@@ -118,90 +126,6 @@ def getGame(self, bgg_id, mid=None):
         game_cache = game        
     return game_cache
 
-"""
-def getGame(self, bgg_id, mid=None):
-
-    logging.info('########### getGame:: ####################################')
-    ##########################################################################
-    # TODO: nested if statement is  . . . scary - could use a refactor!      #
-    ##########################################################################
-    if mid is None:
-        self.redirect(500)
-    game_cache = memcache.get(mid)
-    game_url = BGG_XML_URI + bgg_id
-    if game_cache is None:
-        game = models.Game.get_by_key_name(mid)
-        if game is None: # Game has never been stored, so build and store it.
-            if bgg_id == '0' or bgg_id is None: # Call BGG XML API for match
-                fb_game = getFBGame(mid)
-                bgg_id = getBGGIDFromBGG(fb_game.name)
-                if bgg_id is None:
-                    self.redirect(500)
-            logging.info('########## Found BGG ID! = '+bgg_id+' ############')        
-            game_xml = models.GameXML.get_by_key_name(bgg_id)
-            # Use BGG XML API to get Game data
-            game_url = BGG_XML_URI + bgg_id # Remake url with new found bgg_id
-            game_data = parseBGGXML(game_url)
-            # Build Game from BGG data
-            game = models.Game(key_name=mid,
-                               mid=mid,
-                               bgg_id=bgg_id,
-                               bgg_img_url=game_data['image_url'],
-                               bgg_thumbnail_url=game_data['thumbnail_url'],
-                               name=game_data['name'],
-                               description=game_data['description'],
-                               year_published = game_data['year_published'],
-                               min_players = game_data['min_players'],
-                               playing_time = game_data['playing_time'],
-                               age = game_data['age'],
-                               publishers = game_data['publishers'],
-                               artists = game_data['artists'],
-                               designers = game_data['designers'],
-                               expansions = game_data['expansions'],
-                               categories = game_data['categories'],
-                               mechanics = game_data['mechanics'],
-                               subdomains = game_data['subdomains'])
-            if game_xml is None:
-                game_xml = models.GameXML(key_name=bgg_id, 
-                                          xml=game_data['xml_text'])  
-            else:
-                game_xml.xml = game_data['xml_text']                 
-            game.put() # Save Game
-            game_xml.put() # Save GameXML       
-            success = memcache.set(key=mid, 
-                                   value=game, 
-                                   time=432000) # expiration 5 days
-            game_cache = game                                        
-        else:
-            game_xml = models.GameXML.get_by_key_name(bgg_id)
-            # Use BGG XML API to get Game data
-            game_data = parseBGGXML(bgg_id)
-            # Build Game from BGG data            
-            game.name = game_data['name']
-            game.bgg_id = bgg_id
-            game.bgg_thumbnail_url = game_data['thumbnail_url']            
-            game.bgg_img_url = game_data['image_url']
-            game.description = game_data['description']
-            game.year_published = game_data['year_published']
-            game.min_players = game_data['min_players']
-            game.playing_time = game_data['playing_time']
-            game.age = game_data['age']
-            game.publishers = game_data['publishers']
-            game.artists = game_data['artists']
-            game.designers = game_data['designers']  
-            game.expansions = game_data['expansions']
-            game.categories = game_data['categories']
-            game.mechanics = game_data['mechanics']
-            game.subdomains = game_data['subdomains']
-            game_xml.xml = game_data['xml_text']
-            game.put() # Save Game
-            game_xml.put() # Save GameXML
-            success = memcache.set(key=mid, 
-                                   value=game, 
-                                   time=432000) # expiration 5 days
-            game_cache = game        
-    return game_cache
-"""
 def buildGame(mid, bgg_id):
     """Builds a Game from the BGG XML API.  Expects BGG ID to be not None.
     """
@@ -307,7 +231,7 @@ def getBGGMatches(game_name, exact=True):
     name.  If exact=True, then the search is for a single exact match.  If
     exact=False, then the search returns all possible matches.   
     """
-    logging.info('############# getBGGMatch:: finding bgg_id ###############')
+    logging.info('############# getBGGMatches:: finding bgg_id #############')
     logging.info('########### game_name = ' + game_name + ' ################')   
     if exact == True:
         bgg_url = BGG_XML_EXACT_SEARCH
@@ -336,24 +260,22 @@ def getBGGMatches(game_name, exact=True):
         matches.append(game)        
     return matches
     
-def storeBGGIDtoFreebase(mid, bgg_id):
-    logging.info('############ putBGGIDtoFreebase('+mid+','+bgg_id+') ######')    
+def updateFreebaseBGGID(mid, bgg_id, connect="update"):
+    logging.info('############ updateFreebaseBGGID('+mid+','+bgg_id+') #####')    
+    if bgg_id == "0": return # Don't store 0
     if not FREEBASE.loggedin():
         FREEBASE.login(username=FREEBASE_USER, password=FREEBASE_PSWD)
     query = {
         "type":"/games/game",
         "mid":mid,
         "key":{
-            "connect":"update",
+            "connect":connect,
             "namespace":BGG_NAMESPACE,
             "value":bgg_id
             }
         }
-    try: # Catch MetawebErrors 
-        result = FREEBASE.mqlwrite(query)
-    except Exception:
-        return
-    logging.info('############# mqlwrite result = '+str(result)+ ' #########')
+    try: result = FREEBASE.mqlwrite(query)
+    except Exception: return
     
 def getFBGame(mid):
     """Returns a JSON result for Freebase Game data.    
@@ -379,7 +301,16 @@ def getFBGame(mid):
         "optional": True
       }
     }       
-    return freebase.mqlread(query, extended=True)   
+    return FREEBASE.mqlread(query, extended=True)  
+
+def getFBGameBlurb(mid, length=400):
+    """Returns a description of the Game.  Freebase stores descriptions in a 
+    datastore separate from the rest of the data, and can only be retrieved 
+    using the Trans service.
+    """
+    logging.info("############# getFBGameBlurb("+mid+", "+str(length)+") ###")    
+    blurb = FREEBASE.blurb(mid, break_paragraphs=True, maxlength=length)
+    return blurb     
 
 def parseFBJSON(json):
     """Returns a dictionary of game data retrieved from Freebase.
