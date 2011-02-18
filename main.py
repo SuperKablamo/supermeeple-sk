@@ -319,6 +319,35 @@ class Checkin(BaseHandler):
   
         return self.response.out.write(simplejson.dumps(badges))
 
+class GameLog(BaseHandler):
+    """Display and creates a GameLog.
+    """
+    def get(self, checkin):
+        logging.info('#################### GameLog::get ####################')        
+        game_log = db.GameLog.get_by_key_name(checkin)  
+        user = self.current_user # this is the logged in User 
+        template_values = {
+            'game_log': game_log,
+            'current_user': user,
+            'facebook_app_id': FACEBOOK_APP_ID
+        }  
+        self.generate('base_game_log.html', template_values)
+        
+    def post(self, checkin):
+        logging.info('#################### GameLog::post ###################')
+        game_log = db.GameLog.get_by_key_name(checkin)        
+        if game_log: return # game_log already exists!
+        # TODO: read game, checkin and players/scores.  Build game_log and all
+        # scores.  put() in batch.
+        
+        game_log = db.GameLog(key_name=checkin,
+                              game=game.key(),
+                              checkin=checkin.key(),
+                              note=note)
+                               
+        # TODO: return a response to jQuery ajax
+        #return self.response.out.write(simplejson.dumps(badges))
+
 class Page(MainHandler):
     """Returns content for meta pages.
     """   
@@ -669,9 +698,7 @@ def buildGames():
   
     return True  
 
-def seedGames():
-    
-    
+def seedGames():    
     logging.info("################## main.py:: seedGames() ################")   
     query = {
         "type":   "/games/game",
@@ -700,6 +727,7 @@ application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       (r'/game(/m/.*)/(.*)', GameProfile),
                                       (r'/user/(.*)', UserProfile),
                                       ('/game-checkin', Checkin),
+                                      (r'/game-log/(.*)', GameLog),
                                       (r'/upload/(.*)', UploadHandler),
                                       (r'/serve/([^/]+)?', ServeHandler),
                                       (r'/.*', MainHandler)],

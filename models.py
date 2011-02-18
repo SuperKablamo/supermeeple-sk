@@ -16,7 +16,11 @@ class User(db.Model):
     last_checkin_time = db.DateTimeProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
     share_count = db.IntegerProperty(required=True, default=0)
-        
+    score_count = db.IntegerProperty(required=True, default=0)
+    @property
+    def gamelog_players(self):
+        return GameLog.all().filter('players', self.key())    
+            
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
     bgg_id = db.StringProperty(required=False, default='0') # BoardGameGeek id
@@ -66,6 +70,31 @@ class Checkin(db.Model):
     #  'message': message
     # }
     json = db.TextProperty(required=False)    
+
+class Score(db.Model):
+    game = db.ReferenceProperty(Game, required=True)
+    player = db.ReferenceProperty(User, required=True)
+    points = db.IntegerProperty(required=True, default=0)
+    flags = db.IntegerProperty(required=True, default=0)
+    win = db.BooleanProperty(required=True, default=False)
+    created = db.DateTimeProperty(required=True, auto_now=True)
+    @property
+    def gamelog_scores(self):
+        return GameLog.all().filter('scores', self.key())    
+
+class GameLog(db.Model):
+    checkin = db.ReferenceProperty(Checkin, required=True)
+    game = db.ReferenceProperty(Game, required=True)
+    players = db.ListProperty(db.Key, required=True, default=None)
+    scores = db.ListProperty(db.Key, required=True, default=None)
+    note = db.StringProperty(required=False)
+    # {'players': 
+    #     [{'name':name,'fb_id':fb_id,'point':points,'win':win},
+    #      {'name':name,'fb_id':fb_id,'point':points,'win':win}],
+    #  'note': note,
+    #  'game': {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_thumbnail_url':url}
+    # }
+    json = db.TextProperty(required=False)    
   
 class GameAward(db.Model): # award id is key_name
     json_dump = db.TextProperty(required=True)
@@ -82,13 +111,6 @@ class Badge(db.Model):
     @property
     def player_badges(self):
         return User.all().filter('badges', self.key())
-
-class Score(db.Model):
-    checkin = db.ReferenceProperty(Checkin, required=True)
-    game = db.ReferenceProperty(Game, required=True)
-    player = db.ReferenceProperty(User, required=True)
-    points = db.IntegerProperty(required=True, default=0)
-    flags = db.IntegerProperty(required=True, default=0)
     
 class GameRating(db.Model):
     game = db.ReferenceProperty(Game, required=True)  
