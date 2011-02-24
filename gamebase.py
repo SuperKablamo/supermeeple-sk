@@ -23,13 +23,12 @@ from google.appengine.ext import db
 ############################# METHODS ########################################
 ##############################################################################
 
-def getGame(self, bgg_id, mid='0'):
+def getGame(mid, bgg_id='0'):
     """Returns a Game.  Looks for one in memcache, if not then creates one
     using the BGG XML API.
     """
     logging.info('########### getGame('+bgg_id+', '+mid+') #################')
-    if mid is None: # If this method is called with an mid, throw error page
-        self.redirect(500)
+    if mid is None: return None
     game_cache = memcache.get(mid)
     if game_cache is None: # If this Game is not cached, build a new cache
         game = models.Game.get_by_key_name(mid)
@@ -44,6 +43,7 @@ def getGame(self, bgg_id, mid='0'):
                                  name=game_data['name'],
                                  year_published = game_data['year_published'],
                                  min_players = game_data['min_players'],
+                                 max_players = game_data['max_players'],
                                  playing_time = game_data['playing_time'],
                                  age = game_data['age'],
                                  publishers = game_data['publishers'],
@@ -66,6 +66,7 @@ def getGame(self, bgg_id, mid='0'):
                                  description=game_data['description'],
                                  year_published = game_data['year_published'],
                                  min_players = game_data['min_players'],
+                                 max_players = game_data['max_players'],
                                  playing_time = game_data['playing_time'],
                                  age = game_data['age'],
                                  publishers = game_data['publishers'],

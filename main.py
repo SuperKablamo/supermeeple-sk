@@ -12,6 +12,7 @@ import logging
 import facebook
 import gamebase
 import models
+import operator
 import datetime
 import re
 import urllib2
@@ -224,7 +225,7 @@ class GameProfile(BaseHandler):
     def get(self, mid=None, bgg_id=None):
         logging.info('################# GameProfile::get ###################')
         user = self.current_user
-        game = gamebase.getGame(self=self, mid=mid, bgg_id=bgg_id)
+        game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
         checkins = getGameCheckins(game)
         host = self.request.host # used for Facebook Like url 
         checked_in = isCheckedIn(user)   
@@ -265,7 +266,13 @@ class UserProfile(BaseHandler):
         checkins = getUserCheckins(profile_user)
         badges = db.get(profile_user.badges)
         host = self.request.host # used for Facebook Like url 
+        result = facebook.GraphAPI(
+            user.access_token).get_connections('me', 'friends')
+        friends = result["data"]   
+        # Very expensive way to sort list alphabetically.
+        friends.sort(cmp = lambda x,y: cmp(x["name"],y["name"]))      
         template_values = {
+            'friends': friends,
             'host': host,
             'badges': badges,
             'checkins': checkins,
@@ -324,7 +331,7 @@ class GameLog(BaseHandler):
     """
     def get(self, checkin):
         logging.info('#################### GameLog::get ####################')        
-        game_log = db.GameLog.get_by_key_name(checkin)  
+        game_log = db.GameLog.get_by_id(checkin)  
         user = self.current_user # this is the logged in User 
         template_values = {
             'game_log': game_log,
@@ -335,7 +342,7 @@ class GameLog(BaseHandler):
         
     def post(self, checkin):
         logging.info('#################### GameLog::post ###################')
-        game_log = db.GameLog.get_by_key_name(checkin)        
+        game_log = db.GameLog.get_by_id(checkin)        
         if game_log: return # game_log already exists!
         # TODO: read game, checkin and players/scores.  Build game_log and all
         # scores.  put() in batch.
@@ -495,15 +502,16 @@ def getUserCheckins(user):
     """Returns Checkins for a User.
     """
     # Data format:
-    # [{'player': 
+    # [{'checkin':id,    
+    #   'player': 
     #       {'name': name, 'fb_id': fb_id},
-    #  'badges': 
+    #   'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago',
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
-    #    'message': 'message    
+    #   'message': 'message    
     #  }]    
     q_checkins = user.checkins
     deref_checkins = utils.prefetch_refprops(q_checkins, 
@@ -512,6 +520,7 @@ def getUserCheckins(user):
     for c in deref_checkins:
         checkin = simplejson.loads(c.json)
         checkin["created"] = c.created
+        checkin["checkin"] = str(c.key().id())
         game = {"name": c.game.name, 
                 "mid": c.game.mid, 
                 "bgg_id": c.game.bgg_id, 
@@ -543,7 +552,7 @@ def getGameCheckins(game):
         logging.info('############### checkin ='+str(checkin)+' ############')
     return checkins   
 
-def getLatestCheckins():
+def getLatestCheckins(count=10):
     """Returns lastest Checkins.
     """
     logging.info('##################### getLatestCheckins ##################')    
@@ -560,7 +569,7 @@ def getLatestCheckins():
     #  }]
     q = models.Checkin.all()
     q.order("-created")
-    q_checkins = q.fetch(10)  
+    q_checkins = q.fetch(count)  
     deref_checkins = utils.prefetch_refprops(q_checkins, 
                                              models.Checkin.game)    
     checkins = []

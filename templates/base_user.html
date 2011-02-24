@@ -38,14 +38,26 @@
 					{% else %}
 					<a href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}"><img title="Game image missing for {{c.game.name}}" alt="Game image missing for {{c.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
 					{% endif %}
-				</div>
+				</div><!-- /game-image -->
 				<div class="game-name">
 					<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">{{c.game.name}}</a></h3>
 					<p>{{c.created|timesince}} ago </p>{% for b in c.badges %}
 					<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
 				  {% endfor %}
-				</div>	
-			</div>
+				</div><!-- /game-name -->
+				<div class="game-log-form" title="Create Game Log">
+					<form>
+						<fieldset>
+	        		<input type="hidden" name="checkin" id="checkin" value="{{c}}"/>
+							<input type="text" name="points" id="points" />
+	        		<input class="button" value="Go" type="submit"/>
+	       		</fieldset>
+					</form>
+					{% for f in friends %}	
+					<p>{{f.name}}</p>
+					{% endfor %}
+				</div><!-- /game-log -->		
+			</div><!-- /checkin -->
 			{% endfor %}
 		</div><!-- /checkin-list -->	
 	</div><!-- /main -->	   			

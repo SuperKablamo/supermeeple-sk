@@ -87,7 +87,7 @@ class GameEdit(webapp.RequestHandler):
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
         logging.info('################# GameEdit::get ######################')
-        game = gamebase.getGame(self=self, mid=mid, bgg_id=bgg_id)
+        game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
         matches = gamebase.getBGGMatches(game.name, exact=False)
         template_values = {
             'game': game,
