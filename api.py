@@ -2,6 +2,9 @@
 # Copyright 2010 SuperKablamo, LLC
 # info@superkablamo.com
 #
+# api.py defines Handlers and Methods for providing API access to 
+# SuperMeeple.com.
+#
 
 ############################# IMPORTS ########################################
 ############################################################################## 
@@ -67,17 +70,17 @@ def getGame(mid, bgg_id):
     logging.info('################## getGame('+mid+','+bgg_id+') ###########')    
     game = gamebase.getGame(mid, bgg_id)
     r = {"mid":game.mid, 
-            "bgg_id":game.bgg_id, 
-            "name":game.name,
-            "description":game.description,
-            "year_published":game.year_published,
-            "playing_time":game.playing_time,
-            "min_players":game.min_players,
-            "max_players":game.max_players,
-            "age":game.age,
-            "publishers":game.publishers,
-            "designers":game.designers,
-            "expansions":game.expansions}
+         "bgg_id":game.bgg_id, 
+         "name":game.name,
+         "description":game.description,
+         "year_published":game.year_published,
+         "playing_time":game.playing_time,
+         "min_players":game.min_players,
+         "max_players":game.max_players,
+         "age":game.age,
+         "publishers":game.publishers,
+         "designers":game.designers,
+         "expansions":game.expansions}
     r = {"status": "200 OK", "code": "/api/status/ok", "result": r}
     return r
                 

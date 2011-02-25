@@ -45,18 +45,6 @@
 					<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
 				  {% endfor %}
 				</div><!-- /game-name -->
-				<div class="game-log-form" title="Create Game Log">
-					<form>
-						<fieldset>
-	        		<input type="hidden" name="checkin" id="checkin" value="{{c}}"/>
-							<input type="text" name="points" id="points" />
-	        		<input class="button" value="Go" type="submit"/>
-	       		</fieldset>
-					</form>
-					{% for f in friends %}	
-					<p>{{f.name}}</p>
-					{% endfor %}
-				</div><!-- /game-log -->		
 			</div><!-- /checkin -->
 			{% endfor %}
 		</div><!-- /checkin-list -->	

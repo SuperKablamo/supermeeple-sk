@@ -96,6 +96,9 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 .checkin, .tiny-checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
 
+#game-log-form { margin: 12px 0 0 0; }
+#game-log-form input { margin: 4px 0 4px 0; }
+
 #comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 
 /*SIDEBAR*/

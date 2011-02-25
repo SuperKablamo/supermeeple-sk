@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+	{% block title %}{{ current_user.name }} - Board Game Log - SuperMeeple{% endblock %}
+
+	{% block facebook_meta %}
+	<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+	<meta property="og:site_name" content="SuperMeeple"/>	
+	{% endblock %}
+	
+	{% block main %}
+	<div id="mainbar">
+		<div id="game-log">
+			<h2>Game Log</h2>
+			<div class="checkin">
+  			<div class="game-image">
+					{% if checkin.game.bgg_img_url %}
+					<a href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}"><img title="{{checkin.game.name}}" alt="{{checkin.game.name}}"src="{{checkin.game.bgg_img_url}}"/></a>
+					{% else %}
+					<a href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}"><img title="Game image missing for {{checkin.game.name}}" alt="Game image missing for {{checkin.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
+					{% endif %}
+				</div><!-- /game-image -->
+				<div class="game-name">
+					<h3><a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{ checkin.game.bgg_id|default_if_none:"0" }}">{{checkin.game.name}}</a></h3>
+					<p>{{checkin.created|timesince}} ago </p>
+					<div class="player">
+				  	<a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}"><img title="{{checkin.player.name}}" src="http://graph.facebook.com/{{checkin.player.fb_id}}/picture?type=square"/></a><a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}">{{checkin.player.name}}</a>
+						{% for b in checkin.badges %}
+						<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
+						{% endfor %}
+					</div>
+					<div class="message">
+						{% if checkin.message %}
+						<p>"{{checkin.message}}"</p>
+						{% endif %}
+					</div>	
+				</div><!-- /game-name -->				
+				<div id="game-log-form" title="Create Game Log">
+					<form>
+						<fieldset>
+	        		<input type="hidden" name="checkin" id="checkin" value="{{checkin.key.id}}"/>
+	        		<input type="hidden" name="game" id="game" value="{{checkin.game.mid}}"/>	
+							<label>Player 1</label>
+							<input type="text" name="player-1" id="player-1" />
+							<label>Score</label>
+							<input type="text" size="6" name="score-1" id="score-1" /><br/>
+							<label>Player 2</label>
+							<input type="text" name="player-2" id="player-2" />
+							<label>Score</label>
+							<input type="text" size="6" name="score-2" id="score-2" /><br/>							
+							<label>Player 3</label>
+							<input type="text" name="player-3" id="player-3" />
+							<label>Score</label>
+							<input type="text" size="6" name="score-3" id="score-3" /><br/>							
+							<label>Player 4</label>
+							<input type="text" name="player-4" id="player-4" />
+							<label>Score</label>
+							<input type="text" size="6" name="score-4" id="score-4" /><br/>																					
+							<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
+
+	        		<input class="button" value="Save" type="submit"/>
+	       		</fieldset>
+					</form>
+					{% for f in friends %}	
+					<p>{{f.name}}</p>
+					{% endfor %}
+				</div><!-- /game-log -->		
+			</div><!-- /checkin -->
+		</div><!-- /game-log -->
+	</div><!-- /main -->	   			
+	{% endblock %}		
+	
+	{% block sidebar %}	
+	<div id="sidebar">
+		<div class="block">			
+  		<div id="search">
+   			<form name="input" action="/game" method="post">
+       		<input class="search-box" type="text" id="game-search"/>
+       		<input type="hidden" name="game_id" id="game-id" />
+       		<input type="hidden" name="game_name" id="game-name" />
+       		<input class="button" value="Go" type="submit"/>
+     		</form>
+				<p>search for more games</p>
+   		</div>
+		</div><!-- /block  -->
+	</div><!-- /sidebar -->	
+	{% endblock %}
+
