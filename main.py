@@ -329,7 +329,7 @@ class GameLog(BaseHandler):
         game = checkin.game
         checkin_json = simplejson.loads(checkin.json)
         checkin_json['created'] = checkin.created
-        checkin_json['checkin'] = str(checkin.key().id())
+        checkin_json['id'] = str(checkin.key().id())
         logging.info('################# '+str(checkin_json)+' ##############')            
         user = self.current_user # this is the logged in User 
         result = facebook.GraphAPI(
@@ -346,20 +346,68 @@ class GameLog(BaseHandler):
         }  
         self.generate('base_gamelog.html', template_values)
         
-    def post(self, checkin):
-        logging.info('#################### GameLog::post ###################')
-        game_log = db.GameLog.get_by_id(checkin)        
+    def post(self, checkin_id):
+        """Builds GameLog and Scores for a corresponding Checkin.  The
+        Checkin 'id' is used as the GameLog 'key_name'.  Users can add any
+        Players they want to their GameLog, but only Players with an fb_id
+        will be used to create References to Users and Scores.  However,
+        Players without an fb_id will be included in the list of Players
+        updated to Checkin.json.     
+        """
+        logging.info('############# GameLog::post('+checkin_id+') ##########')
+        game_log = models.GameLog.get_by_key_name(checkin_id)  
         if game_log: return # game_log already exists!
-        # TODO: read game, checkin and players/scores.  Build game_log and all
-        # scores.  put() in batch.
+        checkin = models.Checkin.get_by_id(strToInt(checkin_id))
+
+        # Read and organize data ...
+        note = self.request.get('note')
+        mid = self.request.get('mid')  
+        logging.info('############# note = '+note+' ##########')
+        logging.info('############# mid = '+mid+' ##########') 
+        game_key = db.Key.from_path('Game', mid)         
+        scores = [] 
+        player_keys = []
+        entities = []
+        count = 1
+        while (count < 9):
+            player_name = self.request.get('player-'+str(count)+'-name')
+            if player_name:
+                player_id = self.request.get('player-'+str(count)+'-id') 
+                points = self.request.get('points-'+str(count))
+                score = {"name":player_name,"fb_id":player_id,"points":points}
+                logging.info('#### score '+str(count)+' '+str(score)+' ###')
+                scores.append(score)
+                if player_id: # Only Facebook Players ...
+                    player_key = db.Key.from_path('User', player_id)
+                    player_keys.append(player_key)
+                    # Create Score ...
+                    entity = models.Score(game=game_key,
+                                          player=player_key,
+                                          points=strToInt(points))
+                    entities.append(entity)
+            count += 1
+            
+        # Update Checkin with JSON string of Scores ...    
+        game_log_json = {'scores':scores, 'note':note}    
+        checkin_json_dict = simplejson.loads(checkin.json)
+        checkin_json_dict['gamelog'] = game_log_json
+        checkin_json_txt = simplejson.dumps(checkin_json_dict)
+        checkin.json = db.Text(checkin_json_txt)
+        entities.append(checkin)
         
-        game_log = db.GameLog(key_name=checkin,
-                              game=game.key(),
-                              checkin=checkin.key(),
-                              note=note)
+        # Create a new GameLog ...
+        game_log = models.GameLog(key_name=str(checkin.key().id),
+                                  game=game_key,
+                                  checkin=checkin,
+                                  note=note,
+                                  players=player_keys)
+        entities.append(game_log)
+        
+        # Save all entities
+        db.put(entities)
                                
-        # TODO: return a response to jQuery ajax
-        #return self.response.out.write(simplejson.dumps(badges))
+        return self.response.out.write(checkin.json)
+
 
 class Page(MainHandler):
     """Returns content for meta pages.

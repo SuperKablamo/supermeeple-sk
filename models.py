@@ -3,15 +3,15 @@ import logging
 from google.appengine.ext import db
 from google.appengine.ext import blobstore
 
-class User(db.Model):
+class User(db.Model): # fb_id is key_name
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
     name = db.StringProperty(required=True)
     fb_id = db.StringProperty(required=True)
-    fb_profile_url = db.StringProperty(required=True)
+    fb_profile_url = db.LinkProperty(required=True)
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
-    access_token = db.StringProperty(required=True)
+    access_token = db.StringProperty(required=True, default='0')
     badges = db.ListProperty(db.Key, required=True, default=None)   
     last_checkin_time = db.DateTimeProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
@@ -67,8 +67,12 @@ class Checkin(db.Model):
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #  'message': message
-    # }
+    #  'message': message,
+    #  'gamelog':
+    #     {'scores':
+    #       [{'name':name,'fb_id':fb_id,'point':points,'win':win},
+    #        {'name':name,'fb_id':fb_id,'point':points,'win':win}],
+    #      'note': note}    
     json = db.TextProperty(required=False)    
 
 class Score(db.Model):
@@ -88,13 +92,6 @@ class GameLog(db.Model):
     players = db.ListProperty(db.Key, required=True, default=None)
     scores = db.ListProperty(db.Key, required=True, default=None)
     note = db.StringProperty(required=False)
-    # {'players': 
-    #     [{'name':name,'fb_id':fb_id,'point':points,'win':win},
-    #      {'name':name,'fb_id':fb_id,'point':points,'win':win}],
-    #  'note': note,
-    #  'game': {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_thumbnail_url':url}
-    # }
-    json = db.TextProperty(required=False)    
   
 class GameAward(db.Model): # award id is key_name
     json_dump = db.TextProperty(required=True)
