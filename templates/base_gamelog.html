@@ -27,22 +27,18 @@
 	<!-- Game Log form -->
 	<script type="text/javascript">
 		$(function() {  
-			var f = {{friends}};
-			//var f = [{name: "Aaron", id:"01"},{name: "Andy", id:"02"},{name: "Jao", id:"03"}]
-			var friends = [];
-			$.each(f, function() {
-				friends.push({value:this.id, label: this.name});
-			});
-			$("#player-2-name").autocomplete({
+			var friends = {{friends}};
+			$(".player-name").autocomplete({
 				minLength:2,
 				source: friends,
 				focus: function(event, ui) {
-					$("#player-2-name").val(ui.item.label);
+					$(this).val(ui.item.label);
 					return false;
 				},
 				select: function(event, ui) {
-					$("#player.-2-name").val(ui.item.label);
-					$("#player-2-id").val(ui.item.value);					
+					$(this).val(ui.item.label);
+					// Determine the associated input to set the fb_id for this User
+					$("#" + $(this).attr("id").replace("-name", "-id")).val(ui.item.value);
 					return false;
 				}
 			})
@@ -66,11 +62,12 @@
         		$('#game-log-form').hide();
         	},
 			  	success: function(game_log) {  
-			  		$('#game-log-form-wrapper').html("<div id='message'></div><div id='scores'></div>");  
-			    	$('#message').html("<h2>Scores</h2>");  
+			  		$('#game-log-form-wrapper').html("<div id='log'><div id='scores'></div><div id='note></div></div>");  
+			    	$('#log').html("<h2>Score</h2>");  
 						$.each(game_log.scores, function(i,score) {
 			  	  	$('#scores').append("<p>"+score.points+", "+score.name+", "+score.fb_id+"</p>");  
 			    	});
+			    	$('#note').html("<p>"+game_log.note+"</p>");  			
 			  	},
         	complete: function() {
         		$('#spinner').removeClass('loading');
@@ -110,39 +107,52 @@
 					</div>	
 				</div><!-- /game-name -->				
 				<div id="game-log-form-wrapper" title="Create Game Log">
+					{% if checkin.gamelog %}
+					<div id="log">
+						<h2>Score</h2>
+						<div id="scores">
+							<ul>
+						  {% for s in checkin.gamelog.scores %}
+						    <li>{{s.name}} - {{s.points}}</li>
+						  {% endfor %}
+							</ul>
+						</div>
+						<div id="note">
+							{{checkin.gamelog.note}}
+						</div>	
+					</div><!-- /log -->	
+					{% else %}
 					<div id="spinner"></div>
 					<form name="input" id="game-log-form" action="">
 						<fieldset>
 	        		<input type="hidden" name="checkin-id" id="checkin-id" value="{{checkin.id}}" />
 	        		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />	
 							<label>Player 1: {{current_user.name}}</label>
-							<input type="hidden" name="player-1-name" id="player-1-name" value="{{current_user.name}}" />
-							<input type="hidden" name="player-1-id" id="player-1-id" value="{{current_user.fb_id}}" />
+							<input type="hidden" name="player-name-1" id="player-name-1" value="{{current_user.name}}" />
+							<input type="hidden" name="player-id-1" id="player-id-1" value="{{current_user.fb_id}}" />
 							<label>Score</label>
-							<input type="text" size="6" name="points-1" id="points-1" /><br/>
+							<input type="text" size="6" name="player-score-1" id="points-1" /><br/>
 							<label>Player 2</label>
-							<input id="player-2-name" />
-							<input type="hidden" name="player-2-id" id="player-2-id" value="" />
+							<input type="text" name="player-name-2" id="player-name-2" class="player-name" />
+							<input type="hidden" name="player-id-2" id="player-id-2" class="player-id" value="" />
 							<label>Score</label>
-							<input type="text" size="6" name="points-2" id="points-2" /><br/>							
+							<input type="text" size="6" name="player-score-2" id="points-2" /><br/>							
 							<label>Player 3</label>
-							<input type="text" name="player-3-name" id="player-3-name" />
-							<input type="hidden" name="player-3-id" id="player-3-id" value="" />							
+							<input type="text" name="player-name-3" id="player-name-3" class="player-name" />
+							<input type="hidden" name="player-id-3" id="player-id-3" class="player-id" value="" />							
 							<label>Score</label>
-							<input type="text" size="6" name="points-3" id="points-3" /><br/>							
+							<input type="text" size="6" name="player-score-3" id="points-3" /><br/>							
 							<label>Player 4</label>
-							<input type="text" name="player-4-name" id="player-4-name" />
-							<input type="hidden" name="player-4-id" id="player-4-id" value="" />							
+							<input type="text" name="player-name-4" id="player-name-4" class="player-name" />
+							<input type="hidden" name="player-id-4" id="player-id-4" class="player-id" value="" />							
 							<label>Score</label>
-							<input type="text" size="6" name="points-4" id="points-4" /><br/>																					
+							<input type="text" size="6" name="player-score-4" id="points-4" /><br/>																					
 							<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
 	        		<input class="button" id="game-log-button" value="Save" type="submit"/>
 	       		</fieldset>
-					</form>
-					{% for f in friends %}	
-					<p>{{f.name}}</p>
-					{% endfor %}
-				</div><!-- /game-log -->		
+					</form>					
+					{% endif %}
+				</div><!-- /game-log-form-wrapper -->		
 			</div><!-- /checkin -->
 		</div><!-- /game-log -->
 	</div><!-- /main -->	   			

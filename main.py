@@ -334,9 +334,10 @@ class GameLog(BaseHandler):
         user = self.current_user # this is the logged in User 
         result = facebook.GraphAPI(
             user.access_token).get_connections('me', 'friends')
-        friends = result["data"]   
-        # Very expensive way to sort list alphabetically.
-        friends.sort(cmp = lambda x,y: cmp(x["name"],y["name"]))
+        fb_data = result["data"]
+        friends = []
+        for f in fb_data:
+            friends.append({'value':f['id'], 'label':f['name']})
         template_values = {
             'friends': simplejson.dumps(friends),
             'checkin': checkin_json,
@@ -370,10 +371,10 @@ class GameLog(BaseHandler):
         entities = []
         count = 1
         while (count < 9):
-            player_name = self.request.get('player-'+str(count)+'-name')
+            player_name = self.request.get('player-name-'+str(count))
             if player_name:
-                player_id = self.request.get('player-'+str(count)+'-id') 
-                points = self.request.get('points-'+str(count))
+                player_id = self.request.get('player-id-'+str(count)) 
+                points = self.request.get('player-score-'+str(count))
                 score = {"name":player_name,"fb_id":player_id,"points":points}
                 logging.info('#### score '+str(count)+' '+str(score)+' ###')
                 scores.append(score)
