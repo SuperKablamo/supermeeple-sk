@@ -338,7 +338,7 @@ class GameLog(BaseHandler):
         # Very expensive way to sort list alphabetically.
         friends.sort(cmp = lambda x,y: cmp(x["name"],y["name"]))
         template_values = {
-            'friends': friends,
+            'friends': simplejson.dumps(friends),
             'checkin': checkin_json,
             'game': game,
             'current_user': user,
@@ -396,7 +396,7 @@ class GameLog(BaseHandler):
         entities.append(checkin)
         
         # Create a new GameLog ...
-        game_log = models.GameLog(key_name=str(checkin.key().id),
+        game_log = models.GameLog(key_name=checkin_id,
                                   game=game_key,
                                   checkin=checkin,
                                   note=note,
@@ -405,8 +405,7 @@ class GameLog(BaseHandler):
         
         # Save all entities
         db.put(entities)
-                               
-        return self.response.out.write(checkin.json)
+        return self.response.out.write(simplejson.dumps(game_log_json))
 
 
 class Page(MainHandler):
@@ -433,6 +432,27 @@ class Page(MainHandler):
                       'host': self.request.host_url, 
                       'current_user':self.current_user,
                       'facebook_app_id':FACEBOOK_APP_ID})        
+
+class TestHandler(BaseHandler):
+    """Testing.
+    """
+    def get(self, checkin_id):
+        logging.info('#################### TestHandler::get ################')        
+        user = self.current_user # this is the logged in User 
+        access_token = user.access_token
+        result = facebook.GraphAPI(
+            user.access_token).get_connections('me', 'friends')
+        fb_data = result["data"]
+        friends = []
+        for f in fb_data:
+            friends.append({'value':f['id'], 'label':f['name']})
+        template_values = {
+            'friends': simplejson.dumps(friends),
+            'current_user': user,
+            'facebook_app_id': FACEBOOK_APP_ID
+        }  
+        self.generate('base_test.html', template_values)
+
 
 ######################## METHODS #############################################
 ##############################################################################
@@ -792,6 +812,7 @@ application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       (r'/game-log/(.*)', GameLog),
                                       (r'/upload/(.*)', UploadHandler),
                                       (r'/serve/([^/]+)?', ServeHandler),
+                                      (r'/test/(.*)', TestHandler),
                                       (r'/.*', MainHandler)],
                                        debug=True)
 

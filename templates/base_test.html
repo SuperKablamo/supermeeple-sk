@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+	{% block script %}
+	<link rel="stylesheet" type="text/css" href="/static/css/jquery.ui.all.css">
+	
+
+	<script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>	
+	<script type="text/javascript" src="/js/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.position.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.autocomplete.js"></script>
+
+
+		<style>
+		.ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
+		#city { width: 25em; }
+		</style>
+		<script>
+		$(function() {
+			var friends = {{friends}};
+
+			$( "#project" ).autocomplete({
+				minLength: 0,
+				source: friends,
+				focus: function( event, ui ) {
+					$( "#project" ).val( ui.item.label );
+					return false;
+				},
+				select: function( event, ui ) {
+					$( "#project" ).val( ui.item.label );
+					$( "#project-id" ).val( ui.item.value );
+					$( "#project-description" ).html( ui.item.desc );
+					$( "#project-icon" ).attr( "src", "images/" + ui.item.icon );
+
+					return false;
+				}
+			})
+			.data( "autocomplete" )._renderItem = function( ul, item ) {
+				return $( "<li></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.label + "</a>" )
+					.appendTo( ul );
+			};
+		});
+		</script>
+
+
+	{% endblock %}
+	
+	{% block main %}
+	<div class="demo">
+		<div id="project-label">Select a project (type "j" for a start):</div>
+		<img id="project-icon" src="/demos/autocomplete/images/transparent_1x1.png"  class="ui-state-default"//>
+		<input id="project"/>
+		<input type="hidden" id="project-id"/>
+		<p id="project-description"></p>
+	</div><!-- End demo -->
+
+		
+	{% endblock %}		
+
+

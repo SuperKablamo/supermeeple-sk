@@ -8,7 +8,11 @@
 	{% endblock %}
 
 	{% block script %}
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
+	<script type="text/javascript">
+	  google.load("jquery", "1.4.2");
+	  google.load("jqueryui", "1.8.10");
+	</script>
 	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
 
   <!-- Freebase Jquery search -->
@@ -23,7 +27,32 @@
 	<!-- Game Log form -->
 	<script type="text/javascript">
 		$(function() {  
-    	$('.error').hide();  
+			var f = {{friends}};
+			//var f = [{name: "Aaron", id:"01"},{name: "Andy", id:"02"},{name: "Jao", id:"03"}]
+			var friends = [];
+			$.each(f, function() {
+				friends.push({value:this.id, label: this.name});
+			});
+			$("#player-2-name").autocomplete({
+				minLength:2,
+				source: friends,
+				focus: function(event, ui) {
+					$("#player-2-name").val(ui.item.label);
+					return false;
+				},
+				select: function(event, ui) {
+					$("#player.-2-name").val(ui.item.label);
+					$("#player-2-id").val(ui.item.value);					
+					return false;
+				}
+			})
+			.data("autocomplete")._renderItem = function( ul, item ) {
+				return $( "<li></li>" )
+					.data("item.autocomplete", item)
+					.append("<a>" + item.label + "</a>")
+					.appendTo(ul);
+			};
+	  	$('.error').hide();  
     	$("#game-log-button").click(function() { 
 				var checkin_id = $("input#checkin-id").val();
 				var form_data = $("#game-log-form").serialize();				
@@ -36,8 +65,12 @@
         		$('#spinner').addClass('loading');
         		$('#game-log-form').hide();
         	},
-			  	success: function() {  
-			    	$('#message').html("<h2>Success!</h2>");  
+			  	success: function(game_log) {  
+			  		$('#game-log-form-wrapper').html("<div id='message'></div><div id='scores'></div>");  
+			    	$('#message').html("<h2>Scores</h2>");  
+						$.each(game_log.scores, function(i,score) {
+			  	  	$('#scores').append("<p>"+score.points+", "+score.name+", "+score.fb_id+"</p>");  
+			    	});
 			  	},
         	complete: function() {
         		$('#spinner').removeClass('loading');
@@ -88,7 +121,7 @@
 							<label>Score</label>
 							<input type="text" size="6" name="points-1" id="points-1" /><br/>
 							<label>Player 2</label>
-							<input type="text" name="player-2-name" id="player-2-name" />
+							<input id="player-2-name" />
 							<input type="hidden" name="player-2-id" id="player-2-id" value="" />
 							<label>Score</label>
 							<input type="text" size="6" name="points-2" id="points-2" /><br/>							

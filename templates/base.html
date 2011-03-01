@@ -12,9 +12,12 @@
 	
   	<link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
   	<link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
-		
-		{% block script %}
-  	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	  {% block script %}
+		<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
+		<script type="text/javascript">
+		  google.load("jquery", "1.4.2");
+		  google.load("jqueryui", "1.8.10");
+		</script>
   	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
 
 	  <!-- Freebase Jquery search -->
