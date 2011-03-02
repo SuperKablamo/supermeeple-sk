@@ -7,34 +7,58 @@
 		<div id="checkin-list">
 			<h2>Game Checkins</h2>
 			{% for c in checkins %}
-			<div class="checkin">
-  			<div class="game-image">
-					{% if c.game.bgg_img_url %}
-					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-						<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_img_url}}"/>
-					</a>
-					{% else %}
-					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
-					</a>
-					{% endif %}
-				</div>
-				<div class="game-name">
-					<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></h3>
-					<p>{{c.created|timesince}} ago </p>
-					<div class="player">
-				  	<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
-							{% for b in c.badges %}
-							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
-						  {% endfor %}
-					</div>
-					<div class="message">
-						{% if c.message %}
-						<p>"{{c.message}}"</p>
+			<div class="checkin-wrapper">
+				<div class="checkin">
+  				<div class="game-image">
+						{% if c.game.bgg_thumbnail_url %}
+						<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+							<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+						</a>
+						{% else %}
+						<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+							<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+						</a>
 						{% endif %}
-					</div>	
-				</div><!-- /game-name -->	
-			</div>
+					</div>
+					<div class="game-name">
+						<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></h3>
+						<p>{{c.created|timesince}} ago </p>
+						<div class="player">
+				  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+								{% for b in c.badges %}
+								<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
+						  	{% endfor %}
+						</div>
+						<div class="message">
+							{% if c.message %}
+							<p>"{{c.message}}"</p>
+							{% endif %}
+						</div>	
+					</div><!-- /game-name -->	
+					{% if c.gamelog %}
+					<div class="log">
+						<div class="scores">
+						<h3>Score</h3>
+							<ul>
+					  	{% for s in c.gamelog.scores %}
+					    	<li>{{s.name}} - {{s.points}} {% if s.winner %}&nbsp;&nbsp;<strong>WINNER!</strong>{% endif %}</li>
+					  	{% endfor %}
+							</ul>
+						</div>
+						<div class="note">
+							<h3>Note</h3>
+							<p>{{c.gamelog.note}}</p>
+						</div>	
+					</div><!-- /log -->	
+					{% else %}
+					  {% ifequal current_user.fb_id c.player.fb_id %}
+					<div class="log">  
+						<a href=""><img src="/static/images/add-score-button.png"></a>
+					</div>
+						{% endifequal %}
+					{% endif %}
+				</div><!-- /checkin -->
+			</div><!-- /checkin-wrapper -->
 			{% endfor %}
 		</div><!-- /checkin-list -->
 	</div><!-- /mainbar -->	

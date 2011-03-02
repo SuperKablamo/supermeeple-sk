@@ -17,8 +17,9 @@ a { color: #FF8003; cursor: pointer; outline: medium none; text-decoration: none
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em;  line-height: 1em; }
 h1#error { font-size: 40px; color: red; }
 h2 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
-.checkin h3 { font-weight: normal; font-size: 1.6em; }
-.checkin h4 { font-weight: normal; font-size: 1em;}
+h3 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
+.game-name h3 { font-weight: normal; font-size: 1.6em; }
+.checkin h4 { font-weight: normal; font-size: 1em; }
 #mainbar #page p { font-size: 1em; }
 #search p { font-size:.8em; text-transform: uppercase; }
 #game-list caption { color: #999; text-align: left; }
@@ -95,9 +96,18 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #checkin-list { width: 100%; }
 .checkin, .tiny-checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
+.checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
+.checkin .log .scores { float: left; width: 50%; }
+.checkin .log .scores ul { padding: 0 20px 0 0; }
+.checkin .log .note { float: left; width: 50%; }
 
 #game-log-form-wrapper { margin: 12px 0 0 0; }
 #game-log-form input { margin: 4px 0 4px 0; }
+#game-log-form fieldset#player { float: left; }
+#game-log-form fieldset#score { float: left; }
+#game-log-form fieldset#winner { float: left; }
+#game-log-form fieldset#note { clear: both; }
+
 
 #comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 

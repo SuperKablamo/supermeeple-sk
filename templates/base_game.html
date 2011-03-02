@@ -203,8 +203,12 @@
 							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>
 							<input type="hidden" name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/>
 							<input type="hidden" name="name" id="name" value="{{game.name}}"/>
-							<input type="hidden" name="thumbnail" id="thumbnail" value="{{ game.bgg_thumbnail_url }}"/>
-							<textarea class="text-area" id="message" name="message" rows="3" cols="30">Joining a game of {{ game.name }}.</textarea><br/>
+							{% if game.bgg_thumbnail_url %}
+							<input type="hidden" name="thumbnail" id="thumbnail" value="{{game.bgg_thumbnail_url}}"/>
+							{% else %}
+							<input type="hidden" name="thumbnail" id="thumbnail" value="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>							
+							{% endif %}
+							<textarea class="text-area" id="message" name="message" rows="3" cols="30">Joining a game of {{game.name}}.</textarea><br/>
 							<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
 							<input type="image" src="/static/images/check-in-button-small.png" style="float:right" name="submit" class="button" id="checkin-button" value="Checkin" />
 						</fieldset>

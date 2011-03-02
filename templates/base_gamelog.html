@@ -62,11 +62,12 @@
         		$('#game-log-form').hide();
         	},
 			  	success: function(game_log) {  
-			  		$('#game-log-form-wrapper').html("<div id='log'><div id='scores'></div><div id='note></div></div>");  
-			    	$('#log').html("<h2>Score</h2>");  
+			  		$('#game-log-form-wrapper').html("<div id='log'><h2>Score</h2><div id='scores'></div><div id='note'></div></div>");  
+						$('#scores').append("<ul>");
 						$.each(game_log.scores, function(i,score) {
-			  	  	$('#scores').append("<p>"+score.points+", "+score.name+", "+score.fb_id+"</p>");  
+			  	  	$('#scores').append("<li>"+score.name+" - "+score.points+"</li>");  
 			    	});
+						$('#scores').append("</ul>");
 			    	$('#note').html("<p>"+game_log.note+"</p>");  			
 			  	},
         	complete: function() {
@@ -85,10 +86,14 @@
 			<h2>Game Log</h2>
 			<div class="checkin">
   			<div class="game-image">
-					{% if checkin.game.bgg_img_url %}
-					<a href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}"><img title="{{checkin.game.name}}" alt="{{checkin.game.name}}"src="{{checkin.game.bgg_img_url}}"/></a>
+					{% if c.game.bgg_thumbnail_url %}
+					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+						<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+					</a>
 					{% else %}
-					<a href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}"><img title="Game image missing for {{checkin.game.name}}" alt="Game image missing for {{checkin.game.name}}" src="/static/images/game-img-blank.jpg"/></a>
+					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+					</a>
 					{% endif %}
 				</div><!-- /game-image -->
 				<div class="game-name">
@@ -124,32 +129,67 @@
 					{% else %}
 					<div id="spinner"></div>
 					<form name="input" id="game-log-form" action="">
-						<fieldset>
-	        		<input type="hidden" name="checkin-id" id="checkin-id" value="{{checkin.id}}" />
-	        		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />	
-							<label>Player 1: {{current_user.name}}</label>
-							<input type="hidden" name="player-name-1" id="player-name-1" value="{{current_user.name}}" />
-							<input type="hidden" name="player-id-1" id="player-id-1" value="{{current_user.fb_id}}" />
-							<label>Score</label>
-							<input type="text" size="6" name="player-score-1" id="points-1" /><br/>
-							<label>Player 2</label>
-							<input type="text" name="player-name-2" id="player-name-2" class="player-name" />
-							<input type="hidden" name="player-id-2" id="player-id-2" class="player-id" value="" />
-							<label>Score</label>
-							<input type="text" size="6" name="player-score-2" id="points-2" /><br/>							
-							<label>Player 3</label>
-							<input type="text" name="player-name-3" id="player-name-3" class="player-name" />
-							<input type="hidden" name="player-id-3" id="player-id-3" class="player-id" value="" />							
-							<label>Score</label>
-							<input type="text" size="6" name="player-score-3" id="points-3" /><br/>							
-							<label>Player 4</label>
-							<input type="text" name="player-name-4" id="player-name-4" class="player-name" />
-							<input type="hidden" name="player-id-4" id="player-id-4" class="player-id" value="" />							
-							<label>Score</label>
-							<input type="text" size="6" name="player-score-4" id="points-4" /><br/>																					
-							<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
-	        		<input class="button" id="game-log-button" value="Save" type="submit"/>
-	       		</fieldset>
+        		<input type="hidden" name="checkin-id" id="checkin-id" value="{{checkin.id}}" />
+        		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />
+						<table>
+							<tr>
+								<th>Player</th>
+								<th>Points</th>
+								<th>Winner?</th>
+							</tr>	
+							<tr>
+								<td>
+									<input type="text" name="player-name-1" id="player-name-1" value="{{current_user.name}}" />
+									<input type="hidden" name="player-id-1" id="player-id-1" value="{{current_user.fb_id}}" />
+								</td>
+								<td>
+									<input type="text" size="6" name="player-score-1" id="points-1" />
+								</td>
+								<td>
+									<input type="radio" name="winner" value="player-name-1" />
+								</td>								
+							</tr>
+							<tr>
+								<td>
+									<input type="text" name="player-name-2" id="player-name-2" class="player-name" />
+									<input type="hidden" name="player-id-2" id="player-id-2" class="player-id" value="" />
+								</td>
+								<td>
+									<input type="text" size="6" name="player-score-2" id="points-2" />
+								</td>		
+								<td>
+									<input type="radio" name="winner" value="player-name-2" />
+								</td>						
+							</tr>	
+							<tr>
+								<td>
+									<input type="text" name="player-name-3" id="player-name-3" class="player-name" />
+									<input type="hidden" name="player-id-3" id="player-id-3" class="player-id" value="" />
+								</td>
+								<td>
+									<input type="text" size="6" name="player-score-3" id="points-3" />
+								</td>
+								<td>
+									<input type="radio" name="winner" value="player-name-3" />
+								</td>								
+							</tr>
+							<tr>
+								<td>
+									<input type="text" name="player-name-4" id="player-name-4" class="player-name" />
+									<input type="hidden" name="player-id-4" id="player-id-4" class="player-id" value="" />
+								</td>
+								<td>
+									<input type="text" size="6" name="player-score-4" id="points-4" />
+								</td>
+								<td>
+									<input type="radio" name="winner" value="player-name-4" />
+								</td>								
+							</tr>														
+						</table>	
+						<label>Note:</label><br/>
+						<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
+						<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
+						<input class="button" id="game-log-button" value="Save" type="submit"/>
 					</form>					
 					{% endif %}
 				</div><!-- /game-log-form-wrapper -->		

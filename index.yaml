@@ -18,6 +18,12 @@ indexes:
 
 - kind: Checkin
   properties:
+  - name: player
+  - name: created
+    direction: desc
+
+- kind: Checkin
+  properties:
   - name: players
   - name: created
     direction: desc

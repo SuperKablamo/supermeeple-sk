@@ -7,6 +7,7 @@
 ############################################################################## 
 import os
 import cgi
+import checkinbase
 import freebase
 import logging
 import facebook
@@ -32,6 +33,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import users
 from google.appengine.ext import blobstore
 from google.appengine.ext import db
+from google.appengine.ext import deferred
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp import util
@@ -359,10 +361,11 @@ class GameLog(BaseHandler):
         game_log = models.GameLog.get_by_key_name(checkin_id)  
         if game_log: return # game_log already exists!
         checkin = models.Checkin.get_by_id(strToInt(checkin_id))
-
+        user = self.current_user
         # Read and organize data ...
         note = self.request.get('note')
         mid = self.request.get('mid')  
+        winner = self.request.get('winner')
         logging.info('############# note = '+note+' ##########')
         logging.info('############# mid = '+mid+' ##########') 
         game_key = db.Key.from_path('Game', mid)         
@@ -375,16 +378,24 @@ class GameLog(BaseHandler):
             if player_name:
                 player_id = self.request.get('player-id-'+str(count)) 
                 points = self.request.get('player-score-'+str(count))
-                score = {"name":player_name,"fb_id":player_id,"points":points}
+
+                if winner == 'player-name-'+str(count):
+                    win = True
+                else: win = False    
+                score = {"name":player_name,
+                         "fb_id":player_id,
+                         "points":points,
+                         "winner":win}
                 logging.info('#### score '+str(count)+' '+str(score)+' ###')
-                scores.append(score)
+                scores.append(score)                    
                 if player_id: # Only Facebook Players ...
                     player_key = db.Key.from_path('User', player_id)
                     player_keys.append(player_key)
                     # Create Score ...
                     entity = models.Score(game=game_key,
                                           player=player_key,
-                                          points=strToInt(points))
+                                          points=strToInt(points),
+                                          win=win)
                     entities.append(entity)
             count += 1
             
@@ -404,10 +415,21 @@ class GameLog(BaseHandler):
                                   players=player_keys)
         entities.append(game_log)
         
+        # Update User's score count ...
+        user.score_count += 1
+        entities.append(user)
+                
         # Save all entities
         db.put(entities)
-        return self.response.out.write(simplejson.dumps(game_log_json))
+      
+        # Share checkin on Facebook if requested ...
+        share = self.request.get('facebook')
+        deferred.defer(checkinbase.shareGameLog, 
+                       share, 
+                       user, 
+                       simplejson.loads(checkin.json))
 
+        return self.response.out.write(simplejson.dumps(game_log_json))
 
 class Page(MainHandler):
     """Returns content for meta pages.
@@ -550,7 +572,7 @@ def createCheckin(user, game, message, share=False):
     game_data = {'name': game.name, 
                  'mid': game.mid, 
                  'bgg_id': game.bgg_id, 
-                 'bgg_img_url': game.bgg_img_url}          
+                 'bgg_thumbnail_url': game.bgg_thumbnail_url}          
     json_dict = {'player': player, 
                  'badges': badges, 
                  'message': message, 
@@ -597,7 +619,7 @@ def getUserCheckins(user):
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
     #   'message': 'message    
     #  }]    
-    q_checkins = user.checkins
+    q_checkins = user.checkins.order('-created')
     deref_checkins = utils.prefetch_refprops(q_checkins, 
                                              models.Checkin.game)    
     checkins = []
