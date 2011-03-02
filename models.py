@@ -76,8 +76,10 @@ class Checkin(db.Model):
     json = db.TextProperty(required=False)    
 
 class Score(db.Model):
-    game = db.ReferenceProperty(Game, required=True)
-    player = db.ReferenceProperty(User, required=True)
+    author = db.ReferenceProperty(User, required=True, collection_name='scored')
+    game = db.ReferenceProperty(Game, required=True, collection_name='scores')
+    player = db.ReferenceProperty(User, required=True, collection_name='scores')
+    gamelog_id = db.IntegerProperty(required=True)
     points = db.IntegerProperty(required=True, default=0)
     flags = db.IntegerProperty(required=True, default=0)
     win = db.BooleanProperty(required=True, default=False)

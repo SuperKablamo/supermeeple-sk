@@ -228,7 +228,8 @@ class GameProfile(BaseHandler):
         logging.info('################# GameProfile::get ###################')
         user = self.current_user
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
-        checkins = getGameCheckins(game)
+        checkins = getGameCheckins(game, 4)
+        high_scores = checkinbase.getGameHighScores(game, 4)
         host = self.request.host # used for Facebook Like url 
         checked_in = isCheckedIn(user)   
         admin = users.is_current_user_admin()  
@@ -238,6 +239,7 @@ class GameProfile(BaseHandler):
             'host': host,
             'game': game,
             'checkins': checkins,
+            'high_scores': high_scores,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -265,13 +267,15 @@ class UserProfile(BaseHandler):
         logging.info('################# UserProfile::get ###################')
         user = self.current_user # this is the logged in User
         profile_user = getFBUser(user_fb_id)
-        checkins = getUserCheckins(profile_user)
+        checkins = getUserCheckins(profile_user, 10)
+        scores = checkinbase.getScoresFromFriends(profile_user, 10)
         badges = db.get(profile_user.badges)
         host = self.request.host # used for Facebook Like url 
         template_values = {
             'host': host,
             'badges': badges,
             'checkins': checkins,
+            'scores': scores,
             'profile_user': profile_user,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
@@ -394,8 +398,10 @@ class GameLog(BaseHandler):
                     # Create Score ...
                     entity = models.Score(game=game_key,
                                           player=player_key,
+                                          gamelog_id=strToInt(checkin_id),
                                           points=strToInt(points),
-                                          win=win)
+                                          win=win, 
+                                          author=user)
                     entities.append(entity)
             count += 1
             
@@ -604,7 +610,7 @@ def isCheckedIn(user):
     elif last_time > time:
         return True
 
-def getUserCheckins(user):
+def getUserCheckins(user, count=10):
     """Returns Checkins for a User.
     """
     # Data format:
@@ -619,7 +625,7 @@ def getUserCheckins(user):
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
     #   'message': 'message    
     #  }]    
-    q_checkins = user.checkins.order('-created')
+    q_checkins = user.checkins.order('-created').fetch(count)
     deref_checkins = utils.prefetch_refprops(q_checkins, 
                                              models.Checkin.game)    
     checkins = []
@@ -631,7 +637,7 @@ def getUserCheckins(user):
         logging.info('############# checkin ='+str(checkin)+' ##############')
     return checkins
 
-def getGameCheckins(game):
+def getGameCheckins(game, count=10):
     """Returns Checkins for a Game.
     """
     logging.info('##################### getGameCheckins ####################')    
@@ -644,7 +650,7 @@ def getGameCheckins(game):
     #   'created': '3 minutes ago'
     #   'message': 'message    
     #  }]
-    ref_checkins = game.checkins.order('-created') 
+    ref_checkins = game.checkins.order('-created').fetch(count)
     checkins = [] 
     for c in ref_checkins:
         checkin = simplejson.loads(c.json)

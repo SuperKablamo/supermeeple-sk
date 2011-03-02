@@ -224,7 +224,6 @@
 					{% if checkins %}
 						{% for c in checkins %}
 					<div class="tiny-checkin">
-						<p>{{c.created|timesince}} ago</p>
 						<div class="player-wrap">
 							<div class="player">
 					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
@@ -235,6 +234,9 @@
 						  {% endfor %}
 							</div>
 						</div><!-- /player-wrap -->						
+						<div class="time">
+							<p>{{c.created|timesince}} ago</p>
+						</div>	
 					</div><!-- /tiny-checkin -->
 						{% endfor %}
 					{% else %}
@@ -242,6 +244,32 @@
 					{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
+			<!-- HIGH SCORES -->
+			<div class="block">
+				<div class="high-scores-list">
+				<h2>High Scores</h2>
+				{% if high_scores %}
+					{% for s in high_scores %}
+						<div class="tiny-score">
+							<div class="player">
+								{% if s.player.fb_id%}
+					  		<a title="{{s.player.name}}" href="/user/{{s.player.fb_id}}">
+									<img alt="{{s.player.name}}" title="{{s.player.name}}" src="http://graph.facebook.com/{{s.player.fb_id}}/picture?type=square"/>
+								</a>
+								<a title="{{s.player.name}}" href="/user/{{s.player.fb_id}}">{{s.player.name}}</a>
+								{% else %}
+								{{s.player.name}}
+								{% endif %}
+								<span class="points">{{s.points}}</span>
+							</div>							
+							<div class="time">
+								<p>{{s.created|timesince}} ago</p>
+							</div>
+						</div>	
+					{% endfor %}
+				{% endif %}
+				</div><!-- /high-scores-list -->	
+			</div><!-- /block -->
 			<!-- AMAZON -->
 			<div class="block">
 				{% if game.asin  %}

@@ -33,6 +33,7 @@ h3 { color: #999; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
 gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
 #game-header-wrap #edit { font-size: .4em; }
+.tiny-score .points, .tiny-friend-score .points { font-weight: bold; color: #299F25; font-size: 1.2em; }
 
 /*LAYOUT*/
 body { background-color: #333; }
@@ -94,7 +95,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
 
 #checkin-list { width: 100%; }
-.checkin, .tiny-checkin { margin: 0 0 16px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
+.checkin, .tiny-checkin, .tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #222; }
 .checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
 .checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
 .checkin .log .scores { float: left; width: 50%; }
@@ -127,9 +128,11 @@ h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6
 .player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
 img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
 #badges, #message { width: 100%; padding: 0 0 10px 0; }
-.tiny-checkin .game-badges { margin: 0 0 0 16px; float: left; }
+.tiny-checkin .game-badges { margin: 0 0 0 16px; }
 .tiny-checkin .player { float: left; }
-.player-wrap { padding: 4px 0 0 0; }
+.tiny-checkin .time, .tiny-score .time { margin: 4px 0 0 0; }
+.tiny-score .points { padding: 0 0 0 6px; }
+.player-wrap { padding: 4px 0 0 0; overflow: hidden; }
 
 /*FOOTER*/
 #footer { height: 40px; margin: 20px 0 0 0; clear: both; border-top: dotted 2px #222; border-right: dotted 2px #222;}

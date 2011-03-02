@@ -37,3 +37,14 @@ indexes:
   properties:
   - name: processed
   - name: mid
+
+- kind: Score
+  properties:
+  - name: game
+  - name: points
+    direction: desc
+
+- kind: Score
+  properties:
+  - name: player
+  - name: author
