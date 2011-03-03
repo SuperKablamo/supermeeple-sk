@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-	{% block title %}{{ current_user.name }} - Board Game Geek - SuperMeeple{% endblock %}
+	{% block title %}{{profile_user.name}} - Board Game Geek - SuperMeeple{% endblock %}
 
 	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
   <meta property="og:title" content="{{current_user.name}}"/>
@@ -30,6 +30,7 @@
     </div><!-- /user-profile -->		
 		<div id="checkin-list">
 			<h2>Game Checkins</h2>
+		{% if checkins %}
 			{% for c in checkins %}
 			<div class="checkin-wrapper">
 				<div class="checkin">
@@ -74,7 +75,19 @@
 					{% endif %}					
 				</div><!-- /checkin -->
 			</div><!-- /checkin-wrapper -->	
-			{% endfor %}
+			{% endfor %}			
+		{% else %}
+			<p>You don't have any Checkins yet.</p>
+			<div class="tip">
+				<p>Search for your Game and Checkin.  Game Checkins allow you to:</p>
+				<ul>
+					<li>Earn Badges</li>
+					<li>Score you and your friends in each Game</li>
+					<li>Get ranked</li>
+					<li>Find other players in your area</li>
+				</ul>	
+			</div>
+		{% endif %}
 		</div><!-- /checkin-list -->	
 	</div><!-- /main -->	   			
 	{% endblock %}		
@@ -101,7 +114,7 @@
 					<img alt="{{b.image.name}}" title="{{b.image.name}}" class="badge" title src="{{b.image_url}}" />
 					{% endfor %}
    			{% else %}
-				<p>This user doesn't have any Badges yet.</p>
+				<p>You don't have any Badges yet.</p>
 				<div class="tip">
 					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
 					<ul>
@@ -114,11 +127,11 @@
 				{% endif %}
 			</div>
 		</div><!-- /block  -->	
+		{% if scores %}
 		<!-- FRIEND SCORES -->
 		<div class="block">
 			<h2>Scored By Friends</h2>
 			<div id="scores-list">
-			{% if scores %}
 				{% for s in scores %}
 				<div class="tiny-friend-score">
 					<div class="player">
@@ -133,9 +146,9 @@
 					</div>							
 				</div><!-- /tiny-friend-score -->	
 				{% endfor %}
-			{% endif %}
 		  </div><!-- /scores-list -->	
 		</div><!-- /block -->		
+		{% endif %}
 	</div><!-- /sidebar -->	
 	{% endblock %}
 

@@ -122,8 +122,8 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #checkmark { float: left; }
 img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
 .tip { border: dotted 2px #222; padding: 6px; margin: 0 0 12px 0; }
-#badges p { padding: 0 0 12px 0; }
-#badges ul, #badges li { list-style: disc inside none; }
+#badges p, .tip p, #checkin-list p { padding: 0 0 12px 0; }
+#badges ul, #badges li, .tip ul, .tip li { list-style: disc inside none; }
 h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 .player img { width: 20px; margin-right: 4px; border: 1px solid #222; vertical-align: middle; } 
 img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 

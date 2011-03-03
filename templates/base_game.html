@@ -240,16 +240,16 @@
 					</div><!-- /tiny-checkin -->
 						{% endfor %}
 					{% else %}
-					<p>No one has checked into {{game.name}} yet. Be the first!
+					<p>No one has checked into {{game.name}} yet. Be the first!</p>
 					{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
 			<!-- HIGH SCORES -->
 			<div class="block">
 				<div class="high-scores-list">
-				<h2>High Scores</h2>
-				{% if high_scores %}
-					{% for s in high_scores %}
+					<h2>High Scores</h2>
+			    {% if high_scores %}
+						{% for s in high_scores %}
 						<div class="tiny-score">
 							<div class="player">
 								{% if s.player.fb_id%}
@@ -266,8 +266,10 @@
 								<p>{{s.created|timesince}} ago</p>
 							</div>
 						</div>	
-					{% endfor %}
-				{% endif %}
+					  {% endfor %}
+			    {% else %}
+					<p>No one has logged a score for {{game.name}} yet. Be the first!  Checkin and then add a score.</p>			
+			    {% endif %}
 				</div><!-- /high-scores-list -->	
 			</div><!-- /block -->
 			<!-- AMAZON -->

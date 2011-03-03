@@ -6,7 +6,7 @@ api_version: 1
 
 builtins:
 - datastore_admin: on
-- appstats: off
+- appstats: on
 
 handlers:
 - url: /static
