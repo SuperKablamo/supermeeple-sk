@@ -53,7 +53,9 @@ class Admin(webapp.RequestHandler):
         game_count = models.Game.all().count(5000) 
         game_xml_count = models.GameXML.all().count(5000)
         image_upload_url = blobstore.create_upload_url('/upload/image')
+        checkin_counter = models.Game.all().filter('checkin_count >', 0).count()
         template_values = {
+            'checkin_counter': checkin_counter,
             'game_seed_count': game_seed_count,
             'processed_count': processed_count,
             'game_count': game_count,
@@ -65,8 +67,8 @@ class Admin(webapp.RequestHandler):
         generate(self, 'base_admin.html', template_values)
         
     def post(self, method=None):
-        logging.info('################### Admin:: post() ###################')
-        logging.info('################### method =' +method+' ##############')
+        logging.info('################## Admin:: post() ####################')
+        logging.info('################## method = ' +method+' ##############')
         if method == "create-badges":
             createBadges()
         if method == "flush-seed-games":
@@ -78,7 +80,9 @@ class Admin(webapp.RequestHandler):
         if method == "flush-cache":
             memcache.flush_all() 
         if method == "update-game":
-            updateGame(self)       
+            updateGame(self)  
+        if method == "reset":
+            reset(self)         
         self.redirect('/admin/')  
 
 class GameEdit(webapp.RequestHandler):
@@ -191,6 +195,16 @@ def buildGames(fetch_size=20):
 
 def updateGame(self):
     return
+
+def reset(self):
+    logging.info('####################### reset() ##########################')    
+    games = models.Game.all().filter('checkin_count >', 0).fetch(5000)
+    updated = []
+    for g in games:
+        g.checkin_count = 0
+        updated.append(g)
+    db.put(updated)
+    return    
 
 def generate(self, template_name, template_values):
     template.register_template_library('templatefilters')

@@ -62,12 +62,16 @@ class BaseHandler(webapp.RequestHandler):
                 # a round-trip to Facebook on every request
                 user = models.User.get_by_key_name(cookie["uid"])
                 if not user: # Build a User
-                    user = getUser(
+                    user = createUser(
                             facebook.GraphAPI(cookie["access_token"]),
                             cookie)
-                elif user.access_token != cookie["access_token"]:
-                    user.access_token = cookie["access_token"]
-                    user.put()
+                # Update the user data if it has changed.
+                # TODO: if the access_token has changed, may need to
+                # re-solicit permissions.            
+                else:
+                    user = updateUser(user,
+                            facebook.GraphAPI(cookie["access_token"]),
+                            cookie)    
                 self._current_user = user
         return self._current_user
             
@@ -394,6 +398,11 @@ class GameLog(BaseHandler):
                 scores.append(score)                    
                 if player_id: # Only Facebook Players ...
                     player_key = db.Key.from_path('User', player_id)
+                    player = models.User.get(player_key)
+                    # If the player has never logged on, create them
+                    if player is None:
+                        player = createLiteUser(player_name, player_id)
+                        entities.append(player)
                     player_keys.append(player_key)
                     # Create Score ...
                     entity = models.Score(game=game_key,
@@ -485,7 +494,7 @@ class TestHandler(BaseHandler):
 
 ######################## METHODS #############################################
 ##############################################################################
-def getUser(graph, cookie):
+def createUser(graph, cookie):
     """Returns a User model, built from the Facebook Graph API data.  
     """
     # Build User from Facebook Graph API ...
@@ -504,6 +513,47 @@ def getUser(graph, cookie):
                        fb_location_name=loc_name,
                        access_token=cookie["access_token"])
     user.put() 
+    return user
+  
+def updateUser(user, graph, cookie):
+    """Returns a User model, updated from the Facebook Graph API data.  
+    """
+    logging.info('###################### updateUser ########################')
+    props = user.properties() # This is what's in the Datastore
+    profile = graph.get_object("me") # This is what Facebook has
+    new_access_token = cookie["access_token"]
+    new_profile_url = profile["link"]
+    try: # If the user has no location set, make the default "Earth"
+        new_loc_id = fb_location_id=profile["location"]["id"]
+        new_loc_name = fb_location_name=profile["location"]["name"]
+    except KeyError:
+        new_loc_id = "000000000000001"
+        new_loc_name = "Earth"    
+    update = False
+    # Compare properties and only update if things have changed ...
+    if new_profile_url != props['fb_profile_url']:
+        user.fb_profile_url = new_profile_url
+        update = True
+    if new_loc_id != props['fb_location_id']:
+        user.fb_location_id = new_loc_id
+        update = True
+    if new_loc_name != props['fb_location_name']:
+        user.fb_location_name = new_loc_name
+        udpate = True
+    if new_access_token != props['access_token']:    
+        user.access_token = new_access_token
+        update = True
+    if update == True:
+        user.put() 
+    return user
+    
+def createLiteUser(name, fb_id):
+    """Returns a new User model, built using the minumum data requirements.
+    """
+    logging.info('########## createLiteUser('+name+', '+fb_id+') ###########')
+    user = models.User(key_name=fb_id,
+                       fb_id=fb_id,
+                       name=name)    
     return user
 
 def getFBUser(fb_id=None):
@@ -614,7 +664,7 @@ def getUserCheckins(user, count=10):
     """Returns Checkins for a User.
     """
     # Data format:
-    # [{'checkin':id,    
+    # [{'id':id,    
     #   'player': 
     #       {'name': name, 'fb_id': fb_id},
     #   'badges': 
@@ -632,7 +682,7 @@ def getUserCheckins(user, count=10):
     for c in deref_checkins:
         checkin = simplejson.loads(c.json)
         checkin['created'] = c.created
-        checkin['checkin'] = str(c.key().id())
+        checkin['id'] = str(c.key().id())
         checkins.append(checkin)
         logging.info('############# checkin ='+str(checkin)+' ##############')
     return checkins
@@ -642,9 +692,10 @@ def getGameCheckins(game, count=10):
     """
     logging.info('##################### getGameCheckins ####################')    
     # Data format:
-    # [{'players': 
-    #       [{'name': name, 'fb_id': fb_id},{'name': name, 'fb_id': fb_id}],
-    #  'badges': 
+    # [{'id':id,     
+    #   'player': 
+    #       {'name': name, 'fb_id': fb_id},
+    #   'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
     #        {'name':name,'key_name':key_name,'image_url':image_url}],
     #   'created': '3 minutes ago'
@@ -655,6 +706,7 @@ def getGameCheckins(game, count=10):
     for c in ref_checkins:
         checkin = simplejson.loads(c.json)
         checkin['created'] = c.created
+        checkin['id'] = str(c.key().id())
         checkins.append(checkin)
         logging.info('############### checkin ='+str(checkin)+' ############')
     return checkins   
@@ -664,7 +716,8 @@ def getLatestCheckins(count=10):
     """
     logging.info('##################### getLatestCheckins ##################')    
     # Data format:
-    # [{'player': 
+    # [{'id':id,     
+    #   'player':
     #       {'name': name, 'fb_id': fb_id},
     #  'badges': 
     #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
@@ -683,6 +736,7 @@ def getLatestCheckins(count=10):
     for c in deref_checkins:
         checkin = simplejson.loads(c.json)
         checkin['created'] = c.created
+        checkin['id'] = str(c.key().id())
         checkins.append(checkin)
         logging.info('############# checkin ='+str(checkin)+' ##############')
     return checkins

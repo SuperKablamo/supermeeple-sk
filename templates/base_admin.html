@@ -19,6 +19,11 @@
 			<p>Processed GameSeed count = {{processed_count}}</p>			
 			<p>Game count = {{game_count}}</p>	
 			<p>GameXML count = {{game_xml_count}}</p>	
+			<h2>Reset Counts</h2>
+			<form action="/admin/reset" method="POST">
+					<label>Reset</label><input type="submit" name="submit" value="Submit">
+			</form>		
+			<p>Games with checkin_count > 0 = {{checkin_counter}}</p>	
 			<h2>Flush Seed Games</h2>
 			<form action="/admin/flush-seed-games" method="POST">
 					<label>Flush Seed</label><input type="submit" name="submit" value="Submit">

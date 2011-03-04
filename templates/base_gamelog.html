@@ -86,18 +86,18 @@
 			<h1>Game Log</h1>
 			<div class="checkin">
   			<div class="game-image">
-					{% if c.game.bgg_thumbnail_url %}
-					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-						<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+					{% if checkin.game.bgg_thumbnail_url %}
+					<a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}">
+						<img title="{{checkin.game.name}}" alt="{{checkin.game.name}}"src="{{checkin.game.bgg_thumbnail_url}}"/>
 					</a>
 					{% else %}
-					<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+					<a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}">
+						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{checkin.game.mid}}?maxwidth=80&maxheight=100"/>
 					</a>
 					{% endif %}
 				</div><!-- /game-image -->
 				<div class="game-name">
-					<h3><a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{ checkin.game.bgg_id|default_if_none:"0" }}">{{checkin.game.name}}</a></h3>
+					<h3><a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0" }}">{{checkin.game.name}}</a></h3>
 					<p>{{checkin.created|timesince}} ago </p>
 					<div class="player">
 				  	<a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}"><img title="{{checkin.player.name}}" src="http://graph.facebook.com/{{checkin.player.fb_id}}/picture?type=square"/></a><a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}">{{checkin.player.name}}</a>

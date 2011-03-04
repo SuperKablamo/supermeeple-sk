@@ -53,7 +53,7 @@
 					{% else %}
 					  {% ifequal current_user.fb_id c.player.fb_id %}
 					<div class="log">  
-						<a href=""><img src="/static/images/add-score-button.png"></a>
+						<a href="/game-log/{{c.id}}"><img src="/static/images/add-score-button.png"></a>
 					</div>
 						{% endifequal %}
 					{% endif %}

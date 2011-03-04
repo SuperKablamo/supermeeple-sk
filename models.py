@@ -8,7 +8,7 @@ class User(db.Model): # fb_id is key_name
     updated = db.DateTimeProperty(auto_now=True)
     name = db.StringProperty(required=True)
     fb_id = db.StringProperty(required=True)
-    fb_profile_url = db.LinkProperty(required=True)
+    fb_profile_url = db.LinkProperty(required=False)
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     access_token = db.StringProperty(required=True, default='0')
