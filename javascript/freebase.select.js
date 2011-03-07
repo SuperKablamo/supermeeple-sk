@@ -1207,6 +1207,7 @@ p.list_load = function(input) {//fb.log("list_load", input);
                 '"query":[{' +
                     '"name":null,' +
                     '"id":null,' +
+                    '"mid":null,' +
                     '"sort":"name",' +
                     '"type":"'+options.type+'",'+
                     '"limit":'+options.limit +

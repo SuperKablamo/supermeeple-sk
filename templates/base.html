@@ -23,9 +23,17 @@
 	  <!-- Freebase Jquery search -->
 		<script type="text/javascript">
   		$(function() {
-    		$("#game-search").suggest({type:'/games/game'}).bind("fb-select", function(e, data) {
+    		$("#game-search").suggest({service_url:"http://api.freebase.com",
+				service_path:"/api/service/search",
+				flyout_service_url:"http://www.freebase.com"});
+				var inst = $("#game-search").data("suggest");
+				inst.options.ac_param.type = '/games/game';
+				inst.options.ac_param.mql_output = JSON.stringify([{id:null, mid:null,
+				name:null}]);
+        $("#game-search").bind("fb-select", function(e, data) {
     			$("#game-id").val(data.id);
     			$("#game-name").val(data.name);
+					$("#game-mid").val(data.mid);
     		});
   		});
   	</script>
