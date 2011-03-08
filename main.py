@@ -674,6 +674,11 @@ def getUserCheckins(user, count=10):
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
     #   'message': 'message    
+    #   'gamelog':
+    #     {'note':note, 
+    #      [{'winner':boolean, 'points':int, 'name':player, 'fb_id':fb_id},
+    #       {'winner':boolean, 'points':int, 'name':player, 'fb_id':fb_id}]
+    #     } 
     #  }]    
     q_checkins = user.checkins.order('-created').fetch(count)
     deref_checkins = utils.prefetch_refprops(q_checkins, 
