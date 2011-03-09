@@ -129,7 +129,7 @@
 					{% else %}
 					<div id="spinner"></div>
 					<form name="input" id="game-log-form" action="">
-        		<input type="hidden" name="checkin-id" id="checkin-id" value="{{checkin.id}}" />
+        		<input type="hidden" name="checkin_id" id="checkin-id" value="{{checkin.id}}" />
         		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />
 						<table>
 							<tr>
@@ -139,50 +139,50 @@
 							</tr>	
 							<tr>
 								<td>
-									<input type="text" name="player-name-1" id="player-name-1" value="{{current_user.name}}" />
-									<input type="hidden" name="player-id-1" id="player-id-1" value="{{current_user.fb_id}}" />
+									<input type="text" name="name1" id="player-name-1" value="{{current_user.name}}" />
+									<input type="hidden" name="fb_id1" id="player-id-1" value="{{current_user.fb_id}}" />
 								</td>
 								<td>
-									<input type="text" size="6" name="player-score-1" id="points-1" />
+									<input type="text" size="6" name="score1" id="points-1" />
 								</td>
 								<td>
-									<input type="radio" name="winner" value="player-name-1" />
+									<input type="checkbox" name="win1" value="True" />
 								</td>								
 							</tr>
 							<tr>
 								<td>
-									<input type="text" name="player-name-2" id="player-name-2" class="player-name" />
-									<input type="hidden" name="player-id-2" id="player-id-2" class="player-id" value="" />
+									<input type="text" name="name2" id="player-name-2" class="player-name" />
+									<input type="hidden" name="fb_id2" id="player-id-2" class="player-id" value="" />
 								</td>
 								<td>
-									<input type="text" size="6" name="player-score-2" id="points-2" />
+									<input type="text" size="6" name="score2" id="points-2" />
 								</td>		
 								<td>
-									<input type="radio" name="winner" value="player-name-2" />
+									<input type="checkbox" name="win2" value="True" />
 								</td>						
 							</tr>	
 							<tr>
 								<td>
-									<input type="text" name="player-name-3" id="player-name-3" class="player-name" />
-									<input type="hidden" name="player-id-3" id="player-id-3" class="player-id" value="" />
+									<input type="text" name="name3" id="player-name-3" class="player-name" />
+									<input type="hidden" name="fb_id3" id="player-id-3" class="player-id" value="" />
 								</td>
 								<td>
-									<input type="text" size="6" name="player-score-3" id="points-3" />
+									<input type="text" size="6" name="score3" id="points-3" />
 								</td>
 								<td>
-									<input type="radio" name="winner" value="player-name-3" />
+									<input type="checkbox" name="win3" value="True" />
 								</td>								
 							</tr>
 							<tr>
 								<td>
-									<input type="text" name="player-name-4" id="player-name-4" class="player-name" />
-									<input type="hidden" name="player-id-4" id="player-id-4" class="player-id" value="" />
+									<input type="text" name="name4" id="player-name-4" class="player-name" />
+									<input type="hidden" name="fb_id4" id="player-id-4" class="player-id" value="" />
 								</td>
 								<td>
-									<input type="text" size="6" name="player-score-4" id="points-4" />
+									<input type="text" size="6" name="score4" id="points-4" />
 								</td>
 								<td>
-									<input type="radio" name="winner" value="player-name-4" />
+									<input type="checkbox" name="win4" value="True" />
 								</td>								
 							</tr>														
 						</table>	

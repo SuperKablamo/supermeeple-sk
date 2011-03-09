@@ -22,6 +22,10 @@ BGG_XML_EXACT_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&searc
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?search="
 BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"
 
+API200 = {"status": "200 OK", "code": "/api/status/ok"}
+API404 = {"status": "404 Not Found", "code": "/api/status/error"}
+API500 = {"status": "500 Internal Server Error", "code": "/api/status/error"}
+
 ## FREEBASE LIVE #############################################################
 #FREEBASE_USER = "supermeeple"
 #FREEBASE_PSWD = "Super52556!"

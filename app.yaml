@@ -1,6 +1,6 @@
 application: supermeeple-sk
-version: 1
-#version: staging
+#version: 1
+version: staging
 runtime: python
 api_version: 1
 
@@ -37,7 +37,5 @@ handlers:
 - url: /.*
   script: main.py  
 
-error_handlers:
-  - file: templates/base_404.html
 
   

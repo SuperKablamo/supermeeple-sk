@@ -5,6 +5,8 @@
 
 ############################# IMPORTS ########################################
 ############################################################################## 
+import awardbase
+import datetime
 import facebook
 import freebase
 import logging
@@ -17,9 +19,56 @@ from utils import strToInt
 
 from django.utils import simplejson
 from google.appengine.ext import db
+from google.appengine.ext import deferred
 
 ############################# METHODS ########################################
 ##############################################################################
+def createCheckin(user, game, message, share=False):
+    logging.info('################### createCheckin() ######################')
+    # Create initial json data:
+    # {'player': 
+    #     {'name':name,'fb_id':fb_id},
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #  'message': message,
+    #  'game':
+    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url}
+    # }
+    player = {'name' : user.name, 'fb_id': user.fb_id}
+    user.checkin_count += 1
+    game.checkin_count += 1
+    badge_entities = awardbase.awardCheckinBadges(user, game.key())  
+    badges=[]
+    if badge_entities is not None:
+        for b in badge_entities:
+            logging.info('######## badge.name = ' +str(b.name)+ '###########')
+            logging.info('######## badge.image_url= ' +str(b.image_url)+ '##')
+            badge = {'name':b.name, 
+                     'image_url': b.image_url,
+                     'key_name':b.key().name()}
+            badges.append(badge)   
+    game_data = {'name': game.name, 
+                 'mid': game.mid, 
+                 'bgg_id': game.bgg_id, 
+                 'bgg_thumbnail_url': game.bgg_thumbnail_url}          
+    json_dict = {'player': player, 
+                 'badges': badges, 
+                 'message': message, 
+                 'game':game_data}
+    json = simplejson.dumps(json_dict)  
+    checkin = models.Checkin(player=user, 
+                             game=game.key(), 
+                             message=message,
+                             json=db.Text(json))    
+    
+    # TODO: either batch put, and run in Transaction or Task.
+    checkin.put()   
+    user.last_checkin_time = datetime.datetime.now()
+    user.put()
+    game.put()
+    return badges
+
 def getUserCheckins(user, count=10):
     """Returns Checkins for a User.
     """
@@ -51,7 +100,90 @@ def getUserCheckins(user, count=10):
         checkins.append(checkin)
         logging.info('############# checkin ='+str(checkin)+' ##############')
     return checkins
+
+def createGameLog(self, checkin_id):
+    """Creates new GameLog and Returns JSON Response of Checkin, Scores,
+    Badges and Game.
+    """
+    logging.info('############## createGameLog('+checkin_id+') #############')
+    game_log = models.GameLog.get_by_key_name(checkin_id)  
+    if game_log: return # game_log already exists!
+    checkin = models.Checkin.get_by_id(strToInt(checkin_id))
+    user = models.User.get_by_key_name(self.request.get('fb_id1'))    
+    # Read and organize data ...
+    note = self.request.get('note')
+    mid = self.request.get('mid')  
+    logging.info('############# note = '+note+' ##########')
+    logging.info('############# mid = '+mid+' ##########') 
+    game_key = db.Key.from_path('Game', mid)         
+    scores = [] 
+    player_keys = []
+    entities = []
+    count = 1
+    while (count < 9):
+        player_name = self.request.get('name'+str(count))
+        if player_name:
+            player_id = self.request.get('fb_id'+str(count)) 
+            points = self.request.get('score'+str(count))
+            win = self.request.get('win'+str(count))
+            if win == "True": win = True
+            else: win = False
+            score = {"name":player_name,
+                     "fb_id":player_id,
+                     "points":points,
+                     "winner":win}
+            logging.info('#### score '+str(count)+' '+str(score)+' ###')
+            scores.append(score)                    
+            if player_id: # Only Facebook Players ...
+                player_key = db.Key.from_path('User', player_id)
+                player = models.User.get(player_key)
+                # If the player has never logged on, create them
+                if player is None:
+                    player = main.createLiteUser(player_name, player_id)
+                    entities.append(player)
+                player_keys.append(player_key)
+                # Create Score ...
+                entity = models.Score(game=game_key,
+                                      player=player_key,
+                                      gamelog_id=strToInt(checkin_id),
+                                      points=strToInt(points),
+                                      win=win, 
+                                      author=user)
+                entities.append(entity)
+        count += 1
+        
+    # Update Checkin with JSON string of Scores ...    
+    game_log_json = {'scores':scores, 'note':note}    
+    checkin_json_dict = simplejson.loads(checkin.json)
+    checkin_json_dict['gamelog'] = game_log_json
+    checkin_json_txt = simplejson.dumps(checkin_json_dict)
+    checkin.json = db.Text(checkin_json_txt)
+    entities.append(checkin)
     
+    # Create a new GameLog ...
+    game_log = models.GameLog(key_name=checkin_id,
+                              game=game_key,
+                              checkin=checkin,
+                              note=note,
+                              players=player_keys)
+    entities.append(game_log)
+    
+    # Update User's score count ...
+    user.score_count += 1
+    entities.append(user)
+            
+    # Save all entities
+    db.put(entities)
+  
+    # Share checkin on Facebook if requested ...
+    share = self.request.get('facebook')
+    deferred.defer(shareGameLog, 
+                   share, 
+                   user, 
+                   simplejson.loads(checkin.json))
+
+    return game_log_json
+
 def shareGameLog(share, user, checkin_json):
     if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
         logging.info('#### posting to Facebook '+user.access_token+'####')
