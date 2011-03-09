@@ -206,7 +206,7 @@ class MainHandler(BaseHandler):
                                        time=2592000) # expiration 30 days
                 meeples_cache = meeples                     
                                        
-        checkins = getLatestCheckins()       
+        checkins = checkinbase.getLatestCheckins()       
         template_values = {
             'checkins': checkins,
             'spiels': spiels_cache,
@@ -232,10 +232,10 @@ class GameProfile(BaseHandler):
         logging.info('################# GameProfile::get ###################')
         user = self.current_user
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
-        checkins = getGameCheckins(game, 4)
+        checkins = checkinbase.getGameCheckins(game, 4)
         high_scores = checkinbase.getGameHighScores(game, 4)
         host = self.request.host # used for Facebook Like url 
-        checked_in = isCheckedIn(user)   
+        checked_in = checkinbase.isCheckedIn(user)   
         admin = users.is_current_user_admin()  
         template_values = {
             'admin': admin,
@@ -271,7 +271,7 @@ class UserProfile(BaseHandler):
         logging.info('################# UserProfile::get ###################')
         user = self.current_user # this is the logged in User
         profile_user = getFBUser(user_fb_id)
-        checkins = getUserCheckins(profile_user, 10)
+        checkins = checkinbase.getUserCheckins(profile_user, 10)
         scores = checkinbase.getScoresFromFriends(profile_user, 10)
         badges = db.get(profile_user.badges)
         host = self.request.host # used for Facebook Like url 
@@ -307,8 +307,8 @@ class Checkin(BaseHandler):
         game_key = db.Key.from_path('Game', mid)
         game = models.Game.get(game_key)
         # Check user into game ...
-        badges = createCheckin(user=user, game=game, 
-                               message=message, share=share)
+        badges = checkinbase.createCheckin(user=user, game=game, 
+                                           message=message, share=share)
         # Share checkin on Facebook if requested ...
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
             logging.info('#### posting to Facebook '+user.access_token+'####')
@@ -522,153 +522,6 @@ def getBGGIDFromBGG(game_name):
     logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
     return bgg_id
 
-def createCheckin(user, game, message, share=False):
-    logging.info('################### createCheckin() ######################')
-    players = [user.key()] # A new Checkin has only one User
-    # Create initial json data:
-    # {'player': 
-    #     {'name':name,'fb_id':fb_id},
-    #  'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #  'message': message,
-    #  'game':
-    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url}
-    # }
-    player = {'name' : user.name, 'fb_id': user.fb_id}
-    user.checkin_count += 1
-    game.checkin_count += 1
-    badge_entities = awardCheckinBadges(user, game.key())  
-    badges=[]
-    if badge_entities is not None:
-        for b in badge_entities:
-            logging.info('######## badge.name = ' +str(b.name)+ '###########')
-            logging.info('######## badge.image_url= ' +str(b.image_url)+ '##')
-            badge = {'name':b.name, 
-                     'image_url': b.image_url,
-                     'key_name':b.key().name()}
-            badges.append(badge)   
-    game_data = {'name': game.name, 
-                 'mid': game.mid, 
-                 'bgg_id': game.bgg_id, 
-                 'bgg_thumbnail_url': game.bgg_thumbnail_url}          
-    json_dict = {'player': player, 
-                 'badges': badges, 
-                 'message': message, 
-                 'game':game_data}
-    json = simplejson.dumps(json_dict)  
-    checkin = models.Checkin(player=user, 
-                             game=game.key(), 
-                             message=message,
-                             json=db.Text(json))    
-    
-    # TODO: either batch put, and run in Transaction or Task.
-    checkin.put()   
-    user.last_checkin_time = datetime.datetime.now()
-    user.put()
-    game.put()
-    return badges
-    
-def isCheckedIn(user):
-    """Returns True if the User is checked into a Game with the check in grace
-    period.   
-    """
-    time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
-    try:
-        last_time = user.last_checkin_time
-    except AttributeError:
-        return False    
-    if last_time is None:
-        return False
-    elif last_time > time:
-        return True
-
-def getUserCheckins(user, count=10):
-    """Returns Checkins for a User.
-    """
-    # Data format:
-    # [{'id':id,    
-    #   'player': 
-    #       {'name': name, 'fb_id': fb_id},
-    #   'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #   'created': '3 minutes ago',
-    #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
-    #   'message': 'message    
-    #   'gamelog':
-    #     {'note':note, 
-    #      [{'winner':boolean, 'points':int, 'name':player, 'fb_id':fb_id},
-    #       {'winner':boolean, 'points':int, 'name':player, 'fb_id':fb_id}]
-    #     } 
-    #  }]    
-    q_checkins = user.checkins.order('-created').fetch(count)
-    deref_checkins = utils.prefetch_refprops(q_checkins, 
-                                             models.Checkin.game)    
-    checkins = []
-    for c in deref_checkins:
-        checkin = simplejson.loads(c.json)
-        checkin['created'] = c.created
-        checkin['id'] = str(c.key().id())
-        checkins.append(checkin)
-        logging.info('############# checkin ='+str(checkin)+' ##############')
-    return checkins
-
-def getGameCheckins(game, count=10):
-    """Returns Checkins for a Game.
-    """
-    logging.info('##################### getGameCheckins ####################')    
-    # Data format:
-    # [{'id':id,     
-    #   'player': 
-    #       {'name': name, 'fb_id': fb_id},
-    #   'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #   'created': '3 minutes ago'
-    #   'message': 'message    
-    #  }]
-    ref_checkins = game.checkins.order('-created').fetch(count)
-    checkins = [] 
-    for c in ref_checkins:
-        checkin = simplejson.loads(c.json)
-        checkin['created'] = c.created
-        checkin['id'] = str(c.key().id())
-        checkins.append(checkin)
-        logging.info('############### checkin ='+str(checkin)+' ############')
-    return checkins   
-
-def getLatestCheckins(count=10):
-    """Returns lastest Checkins.
-    """
-    logging.info('##################### getLatestCheckins ##################')    
-    # Data format:
-    # [{'id':id,     
-    #   'player':
-    #       {'name': name, 'fb_id': fb_id},
-    #  'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #   'created': '3 minutes ago',
-    #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
-    #    'message': 'message
-    #  }]
-    q = models.Checkin.all()
-    q.order('-created')
-    q_checkins = q.fetch(count)  
-    deref_checkins = utils.prefetch_refprops(q_checkins, 
-                                             models.Checkin.game)    
-    checkins = []
-    for c in deref_checkins:
-        checkin = simplejson.loads(c.json)
-        checkin['created'] = c.created
-        checkin['id'] = str(c.key().id())
-        checkins.append(checkin)
-        logging.info('############# checkin ='+str(checkin)+' ##############')
-    return checkins
-
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
     """
@@ -689,73 +542,6 @@ def parseGameAwards(game_award):
         games.append(game)
     return games
 
-def awardCheckinBadges(user, game_key):
-    """Returns any badges earned by a User.  Checks Checkins for badge
-    triggers.  If any triggers are met, the Badges are awarded/saved.
-    """
-    keys = []
-    ######## AWARD 1ST CHECKIN ###############################################
-    q = models.Checkin.all()
-    q.filter('game =', game_key)  
-    any_checkin = q.get()
-    if any_checkin is None: 
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_1ST))   
-        
-    ######## AWARD CHECKIN LEVELS ############################################
-    checkin_count = user.checkin_count
-    if checkin_count == 2:
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_1))   
-    elif checkin_count == 8:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_2))  
-    elif checkin_count == 16:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_3)) 
-    elif checkin_count == 26:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_4))
-    elif checkin_count == 38:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_5))
-    elif checkin_count == 52:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_6))
-    elif checkin_count == 68:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_7))
-    elif checkin_count == 86:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_8))  
-    elif checkin_count == 106:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_9))
-    elif checkin_count == 128:    
-        keys.append(db.Key.from_path('Badge', BADGE_CHKN_LVL_10))                                                       
-
-    ######## AWARD CHARE LEVELS ##############################################
-    share_count = user.share_count
-    if share_count == 2:
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_1))   
-    elif share_count == 8:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_2))  
-    elif share_count == 16:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_3)) 
-    elif share_count == 26:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_4))
-    elif share_count == 38:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_5))
-    elif share_count == 52:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_6))
-    elif share_count == 68:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_7))
-    elif share_count == 86:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_8))  
-    elif share_count == 106:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_9))
-    elif share_count == 128:    
-        keys.append(db.Key.from_path('Badge', BADGE_SHARE_LVL_10))
-
-    ######## AWARD BADGES ############################################
-    # TODO: other badge awards go here . . .
-    
-    if not keys: return None
-    else:
-        user.badges.extend(keys)
-        user.put() 
-        return db.Model.get(keys)
-
 def isFacebook(path):
     """Returns True if request is from a Facebook iFrame, otherwise False.
     """
@@ -765,54 +551,7 @@ def isFacebook(path):
     else:
         logging.info("############### facebook NOT detected! ###########")        
         return False
-
-def buildGames():
-    logging.info("################## main.py:: buildGames() ################")   
-    query = {
-        "type":   "/games/game",
-        "mid":    None,
-        "key": {
-            "namespace": "/user/pak21/boardgamegeek/boardgame",
-            "value":     None,
-            "optional":  False
-            }
-        }
-    results = freebase.mqlreaditer(query, extended=True)
-    count = 0
-    for r in results:
-        logging.info("################ result:: "+str(r)+" #################")    
-        mid = r.mid
-        bgg_id = r.key.value
-        taskqueue.add(url='/_ah/queue/build-games', 
-                      params={'bgg_id': bgg_id, 'mid': mid})
-        
-        count +=1
-        if count > 300: return True              
-  
-    return True  
-
-def seedGames():    
-    logging.info("################## main.py:: seedGames() ################")   
-    query = {
-        "type":   "/games/game",
-        "mid":    None,
-        "key": {
-            "namespace": "/user/pak21/boardgamegeek/boardgame",
-            "value":     None,
-            "optional":  False
-            }
-        }
-    results = freebase.mqlreaditer(query, extended=True)
-    count = 0
-    for r in results:
-        logging.info("################ result:: "+str(r)+" #################")    
-        mid = r.mid
-        bgg_id = r.key.value
-        taskqueue.add(url='/_ah/queue/seed-games', 
-                      params={'bgg_id': bgg_id, 'mid': mid})
-        
-  
-    return True             
+          
 ##############################################################################
 ##############################################################################
 application = webapp.WSGIApplication([(r'/page/(.*)', Page),

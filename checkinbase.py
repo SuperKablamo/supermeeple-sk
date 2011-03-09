@@ -69,6 +69,20 @@ def createCheckin(user, game, message, share=False):
     game.put()
     return badges
 
+def isCheckedIn(user):
+    """Returns True if the User is checked into a Game with the check in grace
+    period.   
+    """
+    time = datetime.datetime.now() - datetime.timedelta(0, CHECKIN_FREQUENCY)
+    try:
+        last_time = user.last_checkin_time
+    except AttributeError:
+        return False    
+    if last_time is None:
+        return False
+    elif last_time > time:
+        return True
+
 def getUserCheckins(user, count=10):
     """Returns Checkins for a User.
     """
@@ -90,6 +104,60 @@ def getUserCheckins(user, count=10):
     #     } 
     #  }]    
     q_checkins = user.checkins.order('-created').fetch(count)
+    deref_checkins = utils.prefetch_refprops(q_checkins, 
+                                             models.Checkin.game)    
+    checkins = []
+    for c in deref_checkins:
+        checkin = simplejson.loads(c.json)
+        checkin['created'] = c.created
+        checkin['id'] = str(c.key().id())
+        checkins.append(checkin)
+        logging.info('############# checkin ='+str(checkin)+' ##############')
+    return checkins
+
+def getGameCheckins(game, count=10):
+    """Returns Checkins for a Game.
+    """
+    logging.info('##################### getGameCheckins ####################')    
+    # Data format:
+    # [{'id':id,     
+    #   'player': 
+    #       {'name': name, 'fb_id': fb_id},
+    #   'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #   'created': '3 minutes ago'
+    #   'message': 'message    
+    #  }]
+    ref_checkins = game.checkins.order('-created').fetch(count)
+    checkins = [] 
+    for c in ref_checkins:
+        checkin = simplejson.loads(c.json)
+        checkin['created'] = c.created
+        checkin['id'] = str(c.key().id())
+        checkins.append(checkin)
+        logging.info('############### checkin ='+str(checkin)+' ############')
+    return checkins   
+
+def getLatestCheckins(count=10):
+    """Returns lastest Checkins.
+    """
+    logging.info('##################### getLatestCheckins ##################')    
+    # Data format:
+    # [{'id':id,     
+    #   'player':
+    #       {'name': name, 'fb_id': fb_id},
+    #  'badges': 
+    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #   'created': '3 minutes ago',
+    #   'game': 
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
+    #    'message': 'message
+    #  }]
+    q = models.Checkin.all()
+    q.order('-created')
+    q_checkins = q.fetch(count)  
     deref_checkins = utils.prefetch_refprops(q_checkins, 
                                              models.Checkin.game)    
     checkins = []
