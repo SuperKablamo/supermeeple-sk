@@ -109,6 +109,7 @@ def getLatestCheckins(count=10):
     for c in deref_checkins:
         checkin = simplejson.loads(c.json)
         checkin["created"] = str(c.created)
+        checkin["id"] = str(c.key().id())
         data.append(checkin)
     r = API200
     r['result'] = data 
