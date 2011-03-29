@@ -54,7 +54,7 @@ class BaseHandler(webapp.RequestHandler):
     """
     @property
     def current_user(self):
-        logging.info('############# BaseHandler:: current_user #############')
+        logging.info(TRACE+' BaseHandler:: current_user()')
         if not hasattr(self, "_current_user"):
             self._current_user = None
             cookie = facebook.get_user_from_cookie(
@@ -62,18 +62,17 @@ class BaseHandler(webapp.RequestHandler):
             if cookie:
                 # Store a local instance of the user data so we don't need
                 # a round-trip to Facebook on every request
+                token = cookie[TOKEN]
+                logging.info(TRACE+' access_token = '+token)
                 user = models.User.get_by_key_name(cookie["uid"])
+                graph = facebook.GraphAPI(token)                
                 if not user: # Build a User
-                    user = createUser(
-                            facebook.GraphAPI(cookie["access_token"]),
-                            cookie)
+                    user = createUser(graph, cookie)
                 # Update the user data if it has changed.
                 # TODO: if the access_token has changed, may need to
                 # re-solicit permissions.            
                 else:
-                    user = updateUser(user,
-                            facebook.GraphAPI(cookie["access_token"]),
-                            cookie)    
+                    user = updateUser(user, graph, cookie)    
                 self._current_user = user
         return self._current_user
             
@@ -425,8 +424,8 @@ def createUser(graph, cookie):
     # Build User from Facebook Graph API ...
     profile = graph.get_object("me")
     try: # If the user has no location set, make the default "Earth"
-        loc_id = fb_location_id=profile["location"]["id"]
-        loc_name = fb_location_name=profile["location"]["name"]
+        loc_id = profile["location"]["id"]
+        loc_name = profile["location"]["name"]
     except KeyError:
         loc_id = "000000000000001"
         loc_name = "Earth"    
@@ -436,21 +435,22 @@ def createUser(graph, cookie):
                        fb_profile_url=profile["link"],
                        fb_location_id=loc_id,
                        fb_location_name=loc_name,
-                       access_token=cookie["access_token"])
+                       access_token=cookie[TOKEN])
     user.put() 
     return user
   
 def updateUser(user, graph, cookie):
     """Returns a User model, updated from the Facebook Graph API data.  
     """
-    logging.info('###################### updateUser ########################')
+    logging.info(TRACE+' updateUser()')
+    access_token = cookie[TOKEN]
+    logging.info(TRACE+' access_token = '+access_token)    
     props = user.properties() # This is what's in the Datastore
     profile = graph.get_object("me") # This is what Facebook has
-    new_access_token = cookie["access_token"]
-    new_profile_url = profile["link"]
+    new_profile_url = profile["link"]  
     try: # If the user has no location set, make the default "Earth"
-        new_loc_id = fb_location_id=profile["location"]["id"]
-        new_loc_name = fb_location_name=profile["location"]["name"]
+        new_loc_id = profile["location"]["id"]
+        new_loc_name = profile["location"]["name"]
     except KeyError:
         new_loc_id = "000000000000001"
         new_loc_name = "Earth"    
@@ -465,8 +465,8 @@ def updateUser(user, graph, cookie):
     if new_loc_name != props['fb_location_name']:
         user.fb_location_name = new_loc_name
         udpate = True
-    if new_access_token != props['access_token']:    
-        user.access_token = new_access_token
+    if access_token != props[TOKEN]:    
+        user.access_token = access_token
         update = True
     if update == True:
         user.put() 
