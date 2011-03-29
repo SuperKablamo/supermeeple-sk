@@ -1,8 +1,18 @@
-# Datastore
+# ============================================================================
+# Copyright (c) 2011, SuperMeeple, LLC.
+# All rights reserved.
+# info@supermeeple.com
+#
+# ============================================================================
+
+############################# GAE IMPORTS ####################################
+##############################################################################
 import logging
 from google.appengine.ext import db
 from google.appengine.ext import blobstore
 
+############################# MODELS  ########################################
+##############################################################################
 class User(db.Model): # fb_id is key_name
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)

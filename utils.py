@@ -1,6 +1,10 @@
+# ============================================================================
+# Copyright (c) 2011, SuperMeeple, LLC.
+# All rights reserved.
+# info@supermeeple.com
 #
-# Copyright 2010 SuperKablamo, LLC
-#
+# ============================================================================
+
 import logging
 
 from google.appengine.ext import db

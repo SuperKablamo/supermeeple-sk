@@ -1,7 +1,12 @@
+# ============================================================================
+# Copyright (c) 2011, SuperMeeple, LLC.
+# All rights reserved.
+# info@supermeeple.com
 #
-# Copyright 2010 SuperKablamo, LLC
-# info@superkablamo.com
+# api.py defines Handlers and Methods for providing API access to 
+# SuperMeeple.com.
 #
+# ============================================================================
 
 ############################# IMPORTS ########################################
 ############################################################################## 

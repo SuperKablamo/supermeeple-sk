@@ -1,19 +1,28 @@
+# ============================================================================
+# Copyright (c) 2011, SuperMeeple, LLC.
+# All rights reserved.
+# info@supermeeple.com
+#
+# ============================================================================
+
 import freebase
 
 ## APPSPOT.COM - UNCOMMENT FOR PRODUCTION ####################################
-FACEBOOK_APP_ID = "149881721731503"
-FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
-SITE="SuperMeeple"
+#FACEBOOK_APP_ID = "149881721731503"
+#FACEBOOK_APP_SECRET = "8e79a7b1a2a58bc4824312094092c03e"
+#SITE="SuperMeeple"
 ##############################################################################
 
 ## LOCALHOST:8080 - UNCOMMENT FOR LOCAL TESTING ##############################
-#FACEBOOK_APP_ID = "174331539272451"
-#FACEBOOK_APP_SECRET = "f4f8e3762a2abbe62dee8bf44a4967a4"
-#SITE="localhosttest-sk"
+FACEBOOK_APP_ID = "174331539272451"
+FACEBOOK_APP_SECRET = "f4f8e3762a2abbe62dee8bf44a4967a4"
+SITE="localhosttest-sk"
 ##############################################################################
 
 CONFIG_KEY_NAME = "v1"
 DEBUG = False
+TRACE = '##-TRACE-## '
+
 #CHECKIN_FREQUENCY = 50 # Checkin frequency in seconds
 CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
@@ -22,19 +31,15 @@ BGG_XML_EXACT_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&searc
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?search="
 BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"
 
-API200 = {"status": "200 OK", "code": "/api/status/ok"}
-API404 = {"status": "404 Not Found", "code": "/api/status/error"}
-API500 = {"status": "500 Internal Server Error", "code": "/api/status/error"}
-
 ## FREEBASE LIVE #############################################################
-FREEBASE_USER = "supermeeple"
-FREEBASE_PSWD = "Super52556!"
-FREEBASE = freebase
+#FREEBASE_USER = "supermeeple"
+#FREEBASE_PSWD = "Super52556!"
+#FREEBASE = freebase
 
 ## FREEBASE SANDBOX ##########################################################
-#FREEBASE_USER = "wmerydith"
-#FREEBASE_PSWD = "free1945"
-#FREEBASE = freebase.sandbox
+FREEBASE_USER = "wmerydith"
+FREEBASE_PSWD = "free1945"
+FREEBASE = freebase.sandbox
 
 ################### WE DO NEED SOME STINKIN' BADGES ##########################
 BADGE_CHKN_1ST = 'Pioneer'

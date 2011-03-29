@@ -1,3 +1,10 @@
+# ============================================================================
+# Copyright (c) 2011, SuperMeeple, LLC.
+# All rights reserved.
+# info@supermeeple.com
+#
+# ============================================================================
+
 from google.appengine.ext.webapp import template
 from django import template as django_template
 
