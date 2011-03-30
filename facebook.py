@@ -32,11 +32,13 @@ usage of this module might look like this:
         friends = graph.get_connections("me", "friends")
 
 """
+from settings import *
 
 import cgi
 import hashlib
 import time
 import urllib
+import urllib2
 import logging
 
 # Find a JSON parser
@@ -169,25 +171,17 @@ class GraphAPI(object):
             else:
                 args["access_token"] = self.access_token
         post_data = None if post_args is None else urllib.urlencode(post_args)
-        """ Trace statements and Exception handling added by 
-        will@superkablamo.com.  Attempt to handle and debug an error when 
-        posting data to Facebook.
-        """
-        try:
-            file = urllib.urlopen("https://graph.facebook.com/" + path + "?" +
-                              urllib.urlencode(args), post_data)
-        except Exception:
-            logging.error('************* DownloadError *********************')
+        url = "https://graph.facebook.com/" + path + "?" + urllib.urlencode(args)
+        logging.info(TRACE+'GraphAPI:: request(): url = '+str(url))
+        file = urllib2.urlopen(url, post_data)
         try:
             response = _parse_json(file.read())
-            logging.info('************* GraphAPI.request:: _parse_json *****')
-            logging.info('************* response = '+str(response)+' *******')
         finally:
             file.close()
         if response.get("error"):
             raise GraphAPIError(response["error"]["type"],
                                 response["error"]["message"])
-        return response
+        return response        
 
 
 class GraphAPIError(Exception):

@@ -29,7 +29,7 @@ from google.appengine.ext import deferred
 ############################# METHODS ########################################
 ##############################################################################
 def createCheckin(user, game, message, share=False):
-    logging.info('################### createCheckin() ######################')
+    logging.info(TRACE+'createCheckin()')
     # Create initial json data:
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
@@ -47,8 +47,8 @@ def createCheckin(user, game, message, share=False):
     badges=[]
     if badge_entities is not None:
         for b in badge_entities:
-            logging.info('######## badge.name = ' +str(b.name)+ '###########')
-            logging.info('######## badge.image_url= ' +str(b.image_url)+ '##')
+            logging.info(TRACE+'createCheckin():: badge.name = ' +str(b.name))
+            logging.info(TRACE+'createCheckin():: badge.image_url= ' +str(b.image_url))
             badge = {'name':b.name, 
                      'image_url': b.image_url,
                      'key_name':b.key().name()}
@@ -69,10 +69,12 @@ def createCheckin(user, game, message, share=False):
     
     # TODO: either batch put, and run in Transaction or Task.
     checkin.put()   
+    json_dict['id'] = checkin.key().id()
+    json_dict['created'] = str(checkin.created)
     user.last_checkin_time = datetime.datetime.now()
     user.put()
     game.put()
-    return badges
+    return json_dict
 
 def isCheckedIn(user):
     """Returns True if the User is checked into a Game with the check in grace

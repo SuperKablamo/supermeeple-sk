@@ -98,8 +98,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             badge.image = blob_info.key()
             badge.image_url = images.get_serving_url(blob_info.key())
         badge.put()   
-        logging.info('######### badge.image = '+str(badge.image)+'##########')    
-        logging.info('######### badge.image.key = '+str(badge.image.key)+'##') 
+        logging.info(TRACE+'UploadHandler:: badge.image = '+str(badge.image))    
+        logging.info(TRACE+'UploadHandler:: badge.image.key = '+str(badge.image.key)) 
         self.redirect('/admin/backyardchicken')  
                                                 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -114,7 +114,7 @@ class MainHandler(BaseHandler):
     """Return content for index.html.     
     """
     def get(self):
-        logging.info('################# MainHandler:: get() ################')
+        logging.info(TRACE+'MainHandler:: get()')
         spiel_id = "/en/spiel_des_jahres"
         meeples_id = "/en/meeples_choice_award"
         spiels_cache = memcache.get(spiel_id)
@@ -230,7 +230,7 @@ class GameProfile(BaseHandler):
     """
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
-        logging.info('################# GameProfile::get ###################')
+        logging.info(TRACE+'GameProfile:: get()')
         user = self.current_user
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
         checkins = checkinbase.getGameCheckins(game, 4)
@@ -252,7 +252,7 @@ class GameProfile(BaseHandler):
 
     # Game search POST
     def post(self):
-        logging.info('################### GameProfile::post ################')
+        logging.info(TRACE+'GameProfile:: post()')
         user = self.current_user
         game_ids = getBGGIDFromFB(self.request.get('game_id'))
         mid = game_ids["mid"]
@@ -269,7 +269,7 @@ class UserProfile(BaseHandler):
     """Returns content for User Profile pages.
     """
     def get(self, user_fb_id=None):
-        logging.info('################# UserProfile::get ###################')
+        logging.info(TRACE+'UserProfile:: get()')
         user = self.current_user # this is the logged in User
         profile_user = getFBUser(user_fb_id)
         checkins = checkinbase.getUserCheckins(profile_user, 10)
@@ -291,7 +291,7 @@ class Checkin(BaseHandler):
     """Accepts Checkin POSTs.
     """
     def post(self):
-        logging.info('#################### Checkin::post ###################')
+        logging.info(TRACE+'Checkin:: post()')
         user = self.current_user
         mid = self.request.get('mid')
         bgg_id = self.request.get('bgg_id')
@@ -299,20 +299,21 @@ class Checkin(BaseHandler):
         message = self.request.get('message')
         share = self.request.get('facebook')
         thumbnail = self.request.get('thumbnail')
-        logging.info('#################### mid = '+mid+' ###################')
-        logging.info('#################### bgg_id = '+bgg_id+' #############')
-        logging.info('#################### name = '+name+' #################')
-        logging.info('#################### message = '+message+' ###########')
-        logging.info('#################### facebook = '+share+' ############')
-        logging.info('#################### thumbnail = '+thumbnail+' #######')
+        logging.info(TRACE+'Checkin:: mid = '+mid)
+        logging.info(TRACE+'Checkin:: bgg_id = '+bgg_id)
+        logging.info(TRACE+'Checkin:: name = '+name)
+        logging.info(TRACE+'Checkin:: message = '+message)
+        logging.info(TRACE+'Checkin:: facebook = '+share)
+        logging.info(TRACE+'Checkin:: thumbnail = '+thumbnail)
         game_key = db.Key.from_path('Game', mid)
         game = models.Game.get(game_key)
         # Check user into game ...
-        badges = checkinbase.createCheckin(user=user, game=game, 
-                                           message=message, share=share)
+        checkin = checkinbase.createCheckin(user=user, game=game, 
+                                            message=message, share=share)
+                                            
         # Share checkin on Facebook if requested ...
         if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
-            logging.info('#### posting to Facebook '+user.access_token+'####')
+            logging.info(TRACE+'Checkin:: posting to Facebook '+user.access_token)
             attachment = {}
             description = utils.smart_truncate(game.description, length=300)
             url = 'http://www.supermeeple.com' + mid + '/' + bgg_id
@@ -328,20 +329,21 @@ class Checkin(BaseHandler):
             attachment['actions'] = actions     
             results = facebook.GraphAPI(
                user.access_token).put_wall_post(message, attachment)
-  
+               
+        badges = checkin['badges']
         return self.response.out.write(simplejson.dumps(badges))
 
 class GameLog(BaseHandler):
     """Display and creates a GameLog.
     """
     def get(self, checkin_id):
-        logging.info('#################### GameLog::get ####################')        
+        logging.info(TRACE+'GameLog:: get()')        
         checkin = models.Checkin.get_by_id(strToInt(checkin_id)) 
         game = checkin.game
         checkin_json = simplejson.loads(checkin.json)
         checkin_json['created'] = checkin.created
         checkin_json['id'] = str(checkin.key().id())
-        logging.info('################# '+str(checkin_json)+' ##############')            
+        logging.info(TRACE+'GameLog:: '+str(checkin_json))            
         user = self.current_user # this is the logged in User 
         result = facebook.GraphAPI(
             user.access_token).get_connections('me', 'friends')
@@ -366,7 +368,7 @@ class GameLog(BaseHandler):
         Players without an fb_id will be included in the list of Players
         updated to Checkin.json.     
         """
-        logging.info('############# GameLog::post('+checkin_id+') ##########')
+        logging.info(TRACE+'GameLog:: post('+checkin_id+')')
         game_log_json = checkinbase.createGameLog(self, checkin_id)
         return self.response.out.write(simplejson.dumps(game_log_json))
 
@@ -389,7 +391,7 @@ class Page(MainHandler):
             template = path+"base_terms.html"        
         else:
             template = path+"base_404.html"   
-        logging.info("############### template ="+template+" ###############")    
+        logging.info(TRACE+'Page:: template = '+template)    
         self.generate(template, {
                       'host': self.request.host_url, 
                       'current_user':self.current_user,
@@ -399,7 +401,7 @@ class TestHandler(BaseHandler):
     """Testing.
     """
     def get(self, checkin_id):
-        logging.info('#################### TestHandler::get ################')        
+        logging.info(TRACE+'TestHandler:: get()')        
         user = self.current_user # this is the logged in User 
         access_token = user.access_token
         result = facebook.GraphAPI(
@@ -475,7 +477,7 @@ def updateUser(user, graph, cookie):
 def createLiteUser(name, fb_id):
     """Returns a new User model, built using the minumum data requirements.
     """
-    logging.info('########## createLiteUser('+name+', '+fb_id+') ###########')
+    logging.info(TRACE+' createLiteUser('+name+', '+fb_id+')')
     user = models.User(key_name=fb_id,
                        fb_id=fb_id,
                        name=name)    
@@ -484,7 +486,7 @@ def createLiteUser(name, fb_id):
 def getFBUser(fb_id=None):
     """Returns a User for the given fb_id.
     """
-    logging.info('##################### getUser ############################')        
+    logging.info(TRACE+' getFBUser()')        
     user = models.User.get_by_key_name(fb_id)
     return user
 
@@ -504,30 +506,30 @@ def getBGGIDFromFB(game_id):
     result = freebase.mqlread(query, extended=True)
     if result.key is not None: # The FB game entry has a BGG id
         game_ids = {"bgg_id":result.key.value, "mid":result.mid}  
-        logging.info('########## bgg_id = ' +game_ids["bgg_id"]+' ##########')  
+        logging.info(TRACE+'getBGGIDFromFB():: bgg_id = ' +game_ids["bgg_id"])  
         return game_ids
     else:
         game_ids = {"bgg_id":None, "mid":result.mid}
-        logging.info('#################### bgg_id = None ###################')         
+        logging.info(TRACE+'getBGGIDFromFB():: bgg_id = None')         
         return game_ids   
         
 def getBGGIDFromBGG(game_name):
     """Returns the Board Game Geek Game ID from Board Game Geek.    
     """
-    logging.info('############ getBGGIDFromBGG:: finding bgg_id ############')
-    logging.info('########### game_name = ' + game_name + ' ###########')   
+    logging.info(TRACE+'getBGGIDFromBGG():: finding bgg_id')
+    logging.info(TRACE+'getBGGIDFromBGG():: game_name = ' + game_name)   
     game_url = BGG_XML_SEARCH + urllib2.quote(game_name)
-    logging.info('########### game_url = ' + game_url + ' ###########') 
+    logging.info(TRACE+'getBGGIDFromBGG():: game_url = ' + game_url) 
     result = urllib2.urlopen(game_url).read()
     xml = ElementTree.fromstring(result)
     bgg_id = xml.find("./boardgame").attrib['objectid']
-    logging.info('########### bgg_id = ' + str(bgg_id) + ' ###########') 
+    logging.info(TRACE+'getBGGIDFromBGG():: bgg_id = ' + str(bgg_id)) 
     return bgg_id
 
 def parseGameAwards(game_award):
     """Returns a template iteratible list of game award winners.  
     """
-    logging.info('##################### parseGameAwards ####################')       
+    logging.info(TRACE+'parseGameAwards()')       
     json_game_award = simplejson.loads(game_award.json_dump)
     games = []
     count = 0
@@ -548,10 +550,10 @@ def isFacebook(path):
     """Returns True if request is from a Facebook iFrame, otherwise False.
     """
     if re.search(r".facebook\.*", path): # match a Facebook apps uri
-        logging.info("############### facebook detected! ###############")
+        logging.info(TRACE+'isFacebook():: facebook detected!')
         return True
     else:
-        logging.info("############### facebook NOT detected! ###########")        
+        logging.info(TRACE+'isFacebook():: facebook NOT detected!')        
         return False
           
 ##############################################################################

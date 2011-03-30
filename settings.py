@@ -8,15 +8,15 @@
 import freebase
 
 ## APPSPOT.COM - UNCOMMENT FOR PRODUCTION ####################################
-FACEBOOK_APP_ID = "149881721731503"
-FACEBOOK_APP_SECRET = "95d5f3afab330cdc970e120e519c36d6"
-SITE="SuperMeeple"
+#FACEBOOK_APP_ID = "149881721731503"
+#FACEBOOK_APP_SECRET = "95d5f3afab330cdc970e120e519c36d6"
+#SITE="SuperMeeple"
 ##############################################################################
 
 ## LOCALHOST:8080 - UNCOMMENT FOR LOCAL TESTING ##############################
-#FACEBOOK_APP_ID = "174331539272451"
-#FACEBOOK_APP_SECRET = "173988eedb97c654f3cfe2d60ce6129d"
-#SITE="localhosttest-sk"
+FACEBOOK_APP_ID = "174331539272451"
+FACEBOOK_APP_SECRET = "173988eedb97c654f3cfe2d60ce6129d"
+SITE="localhosttest-sk"
 ##############################################################################
 
 TOKEN = 'access_token'
@@ -28,7 +28,7 @@ TRACE = '##-TRACE-## '
 #CHECKIN_FREQUENCY = 50 # Checkin frequency in seconds
 CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
-BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
+BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgamee/"
 BGG_XML_EXACT_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?search="
 BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"

@@ -267,8 +267,8 @@ def createCheckin(self):
     game = models.Game.get(game_key)  
     user = models.User.get(user_key)  
     # Check user into game ...
-    badges = checkinbase.createCheckin(user=user, game=game, 
-                                       message=message, share=share)
+    checkin = checkinbase.createCheckin(user=user, game=game, 
+                                        message=message, share=share)
     # Share checkin on Facebook if requested ...
     if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
         logging.info(TRACE+'posting to Facebook '+user.access_token)
@@ -288,9 +288,8 @@ def createCheckin(self):
         results = facebook.GraphAPI(
            user.access_token).put_wall_post(message, attachment)
     
-    data = {'badges': badges}       
     r = API200
-    r['result'] = data 
+    r['result'] = checkin 
     return r
                         
 ##############################################################################
