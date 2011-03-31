@@ -28,7 +28,7 @@ TRACE = '##-TRACE-## '
 #CHECKIN_FREQUENCY = 50 # Checkin frequency in seconds
 CHECKIN_FREQUENCY = 300 # Checkin frequency in seconds
 UPDATE_FREQUENCY = 604800 # Game data update frequency in seconds
-BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgamee/"
+BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
 BGG_XML_EXACT_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?search="
 BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"

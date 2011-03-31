@@ -163,6 +163,10 @@ def buildFBGame(mid):
     fb_game = getFBGame(mid)
     game_data = parseFBJSON(fb_game)
     game_blurb = getFBGameBlurb(mid, 2000)
+    if game_blurb is not None:
+        game_blurb_text = db.Text(game_blurb.decode("utf-8"))  
+    else:
+        game_blurb_text = None      
     game = models.Game(key_name=mid,
                      mid=mid,
                      name=game_data['name'],
@@ -174,7 +178,7 @@ def buildFBGame(mid):
                      publishers = game_data['publishers'],
                      designers = game_data['designers'],
                      expansions = game_data['expansions'],
-                     description = game_blurb)
+                     description = game_blurb_text)
     game.put()
     success = memcache.set(key=mid, 
                            value=game, 
@@ -328,7 +332,11 @@ def getFBGameBlurb(mid, length=400):
     using the Trans service.
     """
     logging.info(TRACE+'getFBGameBlurb('+mid+', '+str(length)+')')    
-    blurb = FREEBASE.blurb(mid, break_paragraphs=True, maxlength=length)
+    try:
+        blurb = FREEBASE.blurb(mid, break_paragraphs=True, maxlength=length)
+    except Exception:
+        # The Freebase module raises a MetawebError if a blurb is not found
+        return None
     return blurb     
 
 def parseFBJSON(json):
