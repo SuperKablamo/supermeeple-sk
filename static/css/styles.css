@@ -22,7 +22,7 @@ body {
 
 #content {
 	width:1057px;
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/bg_body2.png); 
+	background-image:url(/static/images/bg_body2.png); 
 	background-repeat:repeat-y;
 	float:left;
 }
@@ -68,14 +68,14 @@ body {
 #top {
 	width:1057px;
 	height:189px;
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/bg_header.png);
+	background-image:url(/static/images/bg_header.png);
 	background-repeat:no-repeat;	
 	color:#4a4a4a;
 }
 
 
 #liner {
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/liner.png); 
+	background-image:url(/static/images/liner.png); 
 	width:300px; 
 	height:2px; 
 	padding:0px; 
@@ -84,7 +84,7 @@ body {
 }
 
 #footer {
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/bg_footer.png); 
+	background-image:url(/static/images/bg_footer.png); 
 	background-repeat:no-repeat;
 	height:60px; 
 	width:1057px; 
@@ -170,7 +170,7 @@ body {
 #logo {
 	width:1057px;
 	height:142px;
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/logo.png);
+	background-image:url(/static/images/logo.png);
 	background-repeat:no-repeat;	
 
 }
@@ -199,7 +199,7 @@ body {
 
 
 #steps {
-	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/3steps.png); 
+	background-image:url(/static/images/3steps.png); 
 	background-repeat:no-repeat; 
 	height:60px; 
 	width:1057px; 

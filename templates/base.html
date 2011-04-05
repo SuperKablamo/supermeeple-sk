@@ -3,15 +3,23 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="http://www.facebook.com/2008/fbml">
 
+
   <head>
   	<title>{% block title %}Board Games - SuperMeeple{% endblock %}</title>
-  	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-		{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
-		<meta property="og:website" content="www.supermeeple.com"/>{% endblock %}
+		<meta name="Description" content="SuperMeeple">
+		<meta name="Keywords" content="SuperMeeple, games, boardgames, scores, players">
+
+		{% block facebook_meta %}
+		<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+		<meta property="og:website" content="www.supermeeple.com"/>
+		{% endblock %}
 	
   	<link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+  	<link rel="stylesheet" type="text/css" href="/static/css/gamemod_styles.css" />
   	<link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
+
 	  {% block script %}
 		<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
 		<script type="text/javascript">
@@ -20,11 +28,46 @@
 		</script>
   	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
 
+
+		<!-- Styles Script -->
+		<script type="text/javascript">
+			function getAppVersion() {
+				appname= navigator.appName;
+				appversion = navigator.appVersion;
+				majorver = appversion.substring(0, 1); 
+				if ( (appname == "Netscape") && ( majorver >= 3 ) ) return 1;
+				if ( (appname == "Microsoft Internet Explorer") && (majorver >= 4) ) return 1;
+				return 0;
+			}
+			function swtch(num, imgname) {
+				if (getAppVersion()) {
+					document[imgname].src = img[num].src; document[imgname].src = img[num].src;
+				}
+			}
+			imgsrc = new Array();
+			imgsrc[0] = "/static/images/home_1.png";
+			imgsrc[1] = "/static/images/home_2.png";
+			imgsrc[2] = "/static/images/mygames_1.png";
+			imgsrc[3] = "/static/images/mygames_2.png";
+			imgsrc[4] = "/static/images/friendsgames_1.png";
+			imgsrc[5] = "/static/images/friendsgames_2.png";
+			imgsrc[6] = "/static/images/scores_1.png";
+			imgsrc[7] = "/static/images/scores_2.png";
+
+			if (getAppVersion()) {
+				img = new Array();
+				for (i = 0; i < imgsrc.length; i++) {
+					img[i] = new Image();
+					img[i].src = imgsrc[i];
+				}
+			}
+		</script>
+
 	  <!-- Freebase Jquery search -->
 		<script type="text/javascript">
   		$(function() {
     		$("#game-search").suggest({service_url:"http://api.freebase.com",
-				service_path:"/api/service/search",
+				service_path:"/ap/static/images/service/search",
 				flyout_service_url:"http://www.freebase.com"});
 				var inst = $("#game-search").data("suggest");
 				inst.options.ac_param.type = '/games/game';
@@ -72,7 +115,6 @@
     		});  
    		});
 		</script>
-		{% endblock %}
 		
 		<!-- Google Analytics -->
 		<script type="text/javascript">
@@ -85,76 +127,240 @@
 	    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  		})();
 	  </script>	
+		{% endblock %}
+		
   </head> 
-  <body>
-  <div id="container">
-    <div id="header">
-     	<div id="title">
-         <a href="/">SuperMeeple</a>
-    	</div>
-			<div id="fb-login">
-    		{% if current_user %}
-      	<div id="fb-profile">
-					<p>Hello, <a href="/user/{{current_user.fb_id}}">{{current_user.name}}</a></p>
-				</div>
-    		{% endif %}
-				<div id="fb-button">
-					<fb:login-button autologoutlink="true" perms="publish_checkins,publish_stream" show-faces="false" width="200"></fb:login-button>
-				</div>
-			</div>
-    </div><!-- /header -->
-    <div id="content"> 
-    	{% block main %}
-    	{% endblock %} 
+	<body topmargin="0" leftmargin="0">
+		<div id="outer-wrapper" style="width: 100%; text-align: center;">
+			<div id="inner-wrapper" style="width: 1057px; margin: 0pt auto;">
+        <div id="top">
+				  		
+					<!--FB LOGIN BOX & PROFILE INFORMATION-->  
+          <div id="login" class="text11w">
+ 						<div id="profile-image"><a href="http://www.facebook.com/tiffanyjessup"><img src="index_files/picture.jpg" alt="Profile Image" border="0" height="25" width="25"></a></div>
+						<div id="fb-profile">Hello, <a href="">Tiffany Middleton Jessup</a></div>
+ 						<div id="fb-logout"><a href=""><img src="index_files/fb_logout.png" alt="Facebook Logout" border="0" height="20" width="74"></a></div>
+					</div><!-- /login -->
+          <br><br>
+            
+					<!--NAVIGATION & SEARCH-->  
+          <div id="logo">
+           	<div id="navigation">
+							<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/mygames.html" onmouseover="swtch('3','mygames')" onmouseout="swtch('2','mygames')"><img src="index_files/mygames_1.png" name="mygames" style="padding: 0px; border-style: none;" border="0" height="49" hspace="0" vspace="0" width="129"></a>
+ 							<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/friendsgames.html" onmouseover="swtch('5','friendsgames')" onmouseout="swtch('4','friendsgames')"><img src="index_files/friendsgames_1.png" name="friendsgames" style="padding: 0px; border-style: none;" border="0" height="49" hspace="0" vspace="0" width="129"></a>             
+  						<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/scores.html" onmouseover="swtch('7','scores')" onmouseout="swtch('6','scores')"><img src="index_files/scores_1.png" name="scores" style="padding: 0px; border-style: none;" border="0" height="49" hspace="0" vspace="0" width="129"></a>              
+  						<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/index.html"><img src="index_files/home_2.png" name="home" style="padding: 0px; border-style: none;" border="0" height="49" hspace="0" vspace="0" width="129"></a>
+						</div><!-- /navigation -->
+            
+           	<div id="search" class="text11g">
+           		<div style="width: 120px; padding: 4px 2px 0pt 0pt; float: left;"><strong>Search for Games</strong></div>
+           		<div style="width: 170px; float: left;">                	
+               	<form name="input" action="/game" method="post">
+                 	<input class="search-box" id="game-search" size="15" type="text">
+                 	<input name="game_id" id="game-id" type="hidden">
+                 	<input name="game_name" id="game-name" type="hidden">
+                 	<input class="button" value="Go" type="submit">
+                 </form>
+               </div>
+           	</div><!-- /search -->
+          </div><!-- /logo -->
+            
+					<!--STEPS-->     
+					<div id="content"><br clear="all">
+        		<div id="steps">
+          		<form name="input" action="/game" method="post">
+            		<input class="search-box" id="game-search" size="16" type="text">
+              	<input name="game_id" id="game-id" type="hidden">
+              	<input name="game_name" id="game-name" type="hidden">                   
+              	<input class="button" value="Go" type="submit">
+              	<div><a href="#"><img src="index_files/close_x.png" alt="Close" style="padding: 0pt 100px 0px 0pt;" align="right" border="0" height="15" width="16"></a></div>
+							</form>
+						</div><!-- /steps -->
+                
+						<!--RECENT CHECKINS--> 	
+						<br clear="all">		
+                
+						<div id="house">   
+							{% block leftcolumn %}
+							<div id="leftcolumn">   				
+								<div id="headerleft" class="header" style="background-image: url(&quot;/static/images/header_float.png&quot;); margin: 0pt 0pt 0pt 96px;">
+								</div>
+            
+								<!--GAME MODULE -->
+            		<div id="gamemod">
+            			<div id="gameheader">
+              			<div id="gametitle">
+                			<span class="subheader"><a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/boardgame.html">Ra</a></span><br>
+                  		<span class="text11w">2 hours, 19 minutes ago</span>                                
+                		</div><!-- /gametitle -->
+                		<div id="badgecontainer">
+                			<div class="firstcheck_banner"></div>
+                  		<div class="sharing1_banner"></div>
+                  		<div class="_banner"></div> 
+                		</div><!-- /badgecontainer -->
+              		</div><!-- /gameheader --> 
+              
+									<div id="gamedets">
+              			<div style="width: 300px; float: left;">
+                			<div id="modprofileimg"><a href="http://www.facebook.com/tiffanyjessup">
+                  			<img class="img" src="index_files/picture.jpg" alt="Profile Image" style="border: 1px solid rgb(255, 156, 85);" height="50" width="50"></a>
+											</div><!-- /modprofileimg -->
+                  		<div id="modprofiledets">
+                   			<span class="name"><a href="http://www.facebook.com/tiffanyjessup">Tiffany Middleton Jessup</a></span><br>
+                    		<span class="text11g">is about to get my Ra on with a bunch of my buds, watch me kick some butt.</span>
+											</div>
+                  		<div style="width: 300px; float: left;">
+                   			<div id="players">
+                     			<div id="headercol2" class="text11g">Player</div>
+                      		<div id="playercol" class="text11g">Tiffany Middleton Jessup</div>
+                      		<div id="playercol" class="text11g">Kate Winslet</div>
+                      		<div id="playercol" class="text11g">Jessica Steinhebel</div>
+                    		</div><!-- /players -->
+                    		<div id="scores">
+                     			<div id="headercol" class="text11g">Score</div>
+                      		<div id="scorecol" class="text11g">20</div>
+                      		<div id="scorecol" class="text11g">40</div>
+                      		<div id="scorecol" class="text11g">36</div>
+                    		</div><!-- /scores -->  
+                    		<div id="winner">
+                     			<div id="headercol" class="text11g">Winner</div>
+                      		<div id="scorecol" class="text11g">0</div>
+                      		<div id="scorecol" class="text11g"><img src="index_files/winner.png" vspace="3"></div>
+                      		<div id="scorecol" class="text11g">0</div>
+                    		</div><!-- /winner -->  
+                  		</div>
+										</div><!-- /modprofiledets -->
+                		<div style="width: 200px; float: left;"> 
+                 			<div id="gameimg">
+                   			<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/boardgame.html"><img class="img" src="index_files/pic544927_t.jpg" alt="Game" border="0"></a>
+											</div><!-- /gameimg --> 
+                		</div>
+									</div><!-- gamedets -->     
+              		<div id="gamenotes" class="text11g">
+               			<strong>Notes:</strong><br>
+                		No one should ever play RA against me, because I will always win and kick your butt. I am the RA master.       
+              		</div><!-- /gamenotes -->
+            		</div><!-- /gamemod -->
+				  
+				  		</div><!-- /leftcolumn -->
+							{% endblock %}
+							
+     				  {% block rightcolumn %}
+						  <!--RIGHT COLUMN--> 
+						  <div id="rightcolumn">   
 
-			{% block main1 %}
-			{% endblock %}
+								<!--MY CHECKINS-->     
+            		<div id="mygames2">
+            			<div style="background-image: url(&quot;/static/images/header_mycheckins.png&quot;); height: 29px; width: 300px;">
+            			</div>     
+						    	<div id="mygamesheader"></div>  
+									<div id="gamedetscontainer2">
+              			<span class="text13g"><a href="#">Ra</a></span><br>
+                		<span class="text10g">1 hour, 19 minutes ago</span><br>                         
+                		<a href="#"><img src="index_files/scoreit_butt.png" alt="Score It" style="padding: 0px;" border="0" vspace="6"></a>
+									</div><!-- /mygamesheader -->
+              		<div id="badgecontainer2">
+              			<a href="#"><img src="index_files/checkin1_100x100.png" alt="Checkin" style="padding: 0px;" border="0" height="30" width="30"></a>
+                		<a href="#"><img src="index_files/social_100x100.png" alt="Social Gamer" style="padding: 0px;" border="0" height="30" width="30"></a>
+                		<a href="#"><img src="index_files/highscore_100x100.png" alt="High Score" style="padding: 0px;" border="0" height="30" width="30"></a>                        
+									</div><!-- /badgecontainer2 -->   
+              		<div id="liner"></div>
+               
+									<div id="bottomlink" class="text11g">
+              			<a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/mygames.html"><strong>All My Games &gt;&gt;</strong></a>
+									</div><!-- /bottomlink -->                     
+					  		</div><!-- /mygames2 -->
+                                    
+						    <!--SPIEL DES JAHRES WINNERS-->  
+								<div id="spieldesjahres" class="text11g">
+									<div id="columnrightg">
+										<div id="headertopright" class="headerg">Spiel Des Jahres Winners</div>
+            				<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Dixit</a></span></div>
+                		<div id="gamedetsright2" style="float: right;"><span class="text11g">2010</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Dominion</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2009</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Keltis</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2008</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Zooloretto</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2007</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Thurn and Taxis</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2006</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Niagra</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2005</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Ticket to Ride</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2004</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Alhambra</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2003</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Villa Paletti</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2002</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Carcassone</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2001</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Torres</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2000</span></div>                             	
+									</div><!-- /columnrightg -->                                           
+								</div><!-- /spieldesjahres -->  
+ 
+ 							  <!--MEEPLE'S CHOICE WINNERS-->  
+            		<div id="spieldesjahres" class="text11g">
+									<div id="columnrightg">
+										<div id="headertopright" class="headerg">Meeple's Choice Winners</div>
+            				<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Dixit</a></span></div>
+            				<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Dominion</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2009</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Keltis</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2008</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Zooloretto</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2007</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Thurn and Taxis</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2006</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Niagra</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2005</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Ticket to Ride</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2004</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Alhambra</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2003</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Villa Paletti</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2002</span></div> 
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Carcassone</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2001</span></div>  
+										<div id="gamedetsright" style="float: left;"><span class="text11g"><a href="#">Torres</a></span></div>
+										<div id="gamedetsright2" style="float: right;"><span class="text11g">2000</span></div>   
+									</div><!-- /columnrightg -->                                     
+								</div><!-- /spieldesjahres --> 
 
-			{% block main2 %}
-			{% endblock %}
-			
-			{% block main3 %}
-			{% endblock %}
-			
-			{% block sidebar%}
-			{% endblock %}
+							</div><!-- /rightcolumn --> 
+          	  <br clear="all">
+						  {% endblock %}
 
-		</div><!-- /content -->
-	 	<div id="footer">
-			<div id="bottom-nav">
-				<ul>
-					<li><a href="/page/about">About</a></li>
-					<li>|</li>
-					<li><a href="/page/contact">Contact</a></li>							
-				</ul>
-			</div>
-		  <!--<div id="copyright"><p>Design by SuperKablamo</p></div>-->
-		  <div id="freebase-tag">
-				data by <a href="http://freebase.com"><span class="logo">Freebase</span></a> and <a href="http://boardgamegeek.com"><span class="logo">Board Game Geek</span></a>
-			</div>
-			<div id="plus">+</div>
-		  <div id="gae-tag">
-				powered by <a href="http://code.google.com/appengine/"><span class="logo">Google App Engine</span></a>
-			</div>
-		</div><!-- /footer -->
-	</div><!-- /container -->
-  <!-- Facebook Single Sign-on -->
-  <div id="fb-root"></div>
-  <script>
-    window.fbAsyncInit = function() {
-      FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
-               xfbml: true});
-      FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
-        window.location.reload();
-      });
-    };
-    (function() {
-      var e = document.createElement('script');
-      e.type = 'text/javascript';
-      e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-      e.async = true;
-      document.getElementById('fb-root').appendChild(e);
-    }());
-  </script>
-  </body>
+							<!-- FOOTER -->
+          		<div id="footer" class="text11w">
+          			© Copyright 2011 SuperMeeple  |  <a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/aboutus.html">About Us</a>  |  <a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/contact.html">Contact Us</a><br>
+            		Powered by <a href="http://code.google.com/appengine/" target="_blank">Google App Engine</a> + Data by <a href="http://www.freebase.com/" target="_blank">Freebase</a> &amp; <a href="http://boardgamegeek.com/" target="_blank">Board Game Geek</a>
+							</div><!-- /footer -->
+        
+						</div><!-- /house -->   
+      		</div><!-- /content -->
+    		</div><!-- /top --> 
+  		</div><!-- /inner-wrapper -->
+		</div><!-- /outer-wrapper -->
+	
+  	<!-- Facebook Single Sign-on -->
+  	<div id="fb-root"></div>
+  	<script>
+    	window.fbAsyncInit = function() {
+      	FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
+               	xfbml: true});
+      	FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
+        	window.location.reload();
+      	});
+    	};
+    	(function() {
+      	var e = document.createElement('script');
+      	e.type = 'text/javascript';
+      	e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+      	e.async = true;
+      	document.getElementById('fb-root').appendChild(e);
+    	}());
+  	</script>
+	</body>
 </html>
