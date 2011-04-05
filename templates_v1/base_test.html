@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+	{% block script %}
+	<link rel="stylesheet" type="text/css" href="/static/css/jquery.ui.all.css">
+	
+
+	<script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>	
+	<script type="text/javascript" src="/js/jquery.ui.core.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.widget.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.position.js"></script>
+	<script type="text/javascript" src="/js/jquery.ui.autocomplete.js"></script>
+
+
+		<style>
+		.ui-autocomplete-loading { background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat; }
+		#city { width: 25em; }
+		</style>
+		<script>
+		$(function() {
+			var friends = {{friends}};
+
+			$( "#project" ).autocomplete({
+				minLength: 0,
+				source: friends,
+				focus: function( event, ui ) {
+					$( "#project" ).val( ui.item.label );
+					return false;
+				},
+				select: function( event, ui ) {
+					$( "#project" ).val( ui.item.label );
+					$( "#project-id" ).val( ui.item.value );
+					$( "#project-description" ).html( ui.item.desc );
+					$( "#project-icon" ).attr( "src", "images/" + ui.item.icon );
+
+					return false;
+				}
+			})
+			.data( "autocomplete" )._renderItem = function( ul, item ) {
+				return $( "<li></li>" )
+					.data( "item.autocomplete", item )
+					.append( "<a>" + item.label + "</a>" )
+					.appendTo( ul );
+			};
+		});
+		</script>
+
+
+	{% endblock %}
+	
+	{% block main %}
+	<div class="demo">
+		<div id="project-label">Select a project (type "j" for a start):</div>
+		<img id="project-icon" src="/demos/autocomplete/images/transparent_1x1.png"  class="ui-state-default"//>
+		<input id="project"/>
+		<input type="hidden" id="project-id"/>
+		<p id="project-description"></p>
+	</div><!-- End demo -->
+	<br/><br/>	
+	<hr>
+	<div class="form">
+		<form action="/api/checkin/new" method="post">
+			<input type="hidden" name="mid" id="mid" value="/m/0cn_gq3">
+			<input type="hidden" name="bgg_id" id="bgg_id" value="39856">
+			<input type="hidden" name="name" id="name" value="Dixit">			
+			<input type="hidden" name="facebook" id="facebook" value="false">				
+			<input type="hidden" name="message" id="message" value="This is a message">			
+			<input type="hidden" name="thumbnail" id="thumbnail" value="http://path.to.image/image.jpg">			
+			<input type="hidden" name="fb_id" id="fb_id" value="679874743">			
+			<input type="hidden" name="access_token" id="access_token" value="174331539272451|2.CEJ65zgsoJAMuTRmNyZYag__.3600.1299610800-679874743|W2IVMjfCLtKGaYWNCG2MJIyJgfY">	
+			<input type="image" src="/static/images/check-in-button-small.png" name="submit" class="button" id="checkin-button" value="Checkin" />
+		</form>		
+	</div>	
+	<hr>
+	<br/><br/>
+	<div class="form">
+		<form name="input" id="game-log-form" action="/api/gamelog/new" method="post">
+  		<input type="hidden" name="access_token" value="174331539272451|2.rQeEfcGJjAjbZCCiAr__9w__.3600.1299654000-679874743|15lWAo5qRwW4eQoK7sZyU7Myuc4">
+			<label>checkin_id</label><input type="text" name="checkin_id" id="checkin-id" value="" />
+  		<label>mid</label><input type="text" name="mid" id="mid" value="/m/04ycmv7" />
+			<table>
+				<tr>
+					<th>Player</th>
+					<th>Points</th>
+					<th>Winner?</th>
+				</tr>	
+				<tr>
+					<td>
+						<input type="text" name="name1" id="player-name-1" value="{{current_user.name}}" />
+						<input type="hidden" name="fb_id1" id="player-id-1" value="{{current_user.fb_id}}" />
+					</td>
+					<td>
+						<input type="text" size="6" name="score1" id="points-1" />
+					</td>
+					<td>
+						<input type="checkbox" name="win1" value="True" />
+					</td>								
+				</tr>
+				<tr>
+					<td>
+						<input type="text" name="name2" id="player-name-2" class="player-name" />
+						<input type="hidden" name="fb_id2" id="player-id-2" class="player-id" value="" />
+					</td>
+					<td>
+						<input type="text" size="6" name="score2" id="points-2" />
+					</td>		
+					<td>
+						<input type="checkbox" name="win2" value="True" />
+					</td>						
+				</tr>	
+				<tr>
+					<td>
+						<input type="text" name="name3" id="player-name-3" class="player-name" />
+						<input type="hidden" name="fb_id3" id="player-id-3" class="player-id" value="" />
+					</td>
+					<td>
+						<input type="text" size="6" name="score3" id="points-3" />
+					</td>
+					<td>
+						<input type="checkbox" name="win3" value="True" />
+					</td>								
+				</tr>
+				<tr>
+					<td>
+						<input type="text" name="name4" id="player-name-4" class="player-name" />
+						<input type="hidden" name="fb_id4" id="player-id-4" class="player-id" value="" />
+					</td>
+					<td>
+						<input type="text" size="6" name="score4" id="points-4" />
+					</td>
+					<td>
+						<input type="checkbox" name="win4" value="True" />
+					</td>								
+				</tr>														
+			</table>	
+			<label>Note:</label><br/>
+			<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
+			<p>Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
+			<input class="button" id="game-log-button" value="Save" type="submit"/>
+		</form>		
+
+		
+	{% endblock %}		
+
+

@@ -1,0 +1,474 @@
+/* 
+  ------------------------------------
+  SuperMeeple Style Sheet
+  ------------------------------------
+*/
+
+
+
+/* GAME MODULES */
+
+#gamemod {
+	width:630px;
+	float:left;
+	margin:0px;
+	padding:0 0 0 96px;
+	text-align:left;
+}
+
+
+#gameheader {
+ 	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/blank_header.png);
+	background-repeat:no-repeat; 
+	height:50px; 
+	width:530px; 
+	float:left;
+}
+
+
+#gametitle {
+	width:325px;
+	padding:14px 0 0 10px; 
+	float:left;
+}
+
+
+#badgecontainer {
+	width:185px;  
+	padding:5px 0 0 0;
+	float:left;
+}
+
+
+#badgebanner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badge_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+#gamedets {
+ 	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/bg_checkin.png);
+	background-repeat:repeat-y;
+	width:510px; 
+	padding:10px; 
+	float:left;
+}
+
+#gamedets2 {
+ 	width:280px; 
+	padding:10px;
+	text-align:left; 
+	float:left;
+}
+
+#gamedets3 {
+ 	width:300px; 
+	padding:10px;
+	text-align:left; 
+	float:left;
+}
+
+
+#playergrid {
+	width:310px; 
+	float:left;
+}
+
+
+#players {
+	width:180px; 
+	float:left;
+}
+
+#scores {
+	width:50px; 
+	float:left;
+}
+
+#winner {
+	width:50px; 
+	float:left;
+}
+
+
+#playercol {
+	border-right:1px solid #e5e5e5;
+	border-bottom:1px solid #e5e5e5;
+	border-left:1px solid #e5e5e5;
+	height:20px;
+	padding:3px 0 0 2px;
+	text-align:left;
+	overflow:hidden;
+}
+
+#scorecol {
+	border-right:1px solid #e5e5e5;
+	border-bottom:1px solid #e5e5e5;
+	text-align:center;
+	height:20px;
+	padding-top:3px;
+	overflow:hidden;
+}
+
+#headercol {
+	border-right:1px solid #e5e5e5;
+	border-bottom:1px solid #e5e5e5;
+	border-top:1px solid #e5e5e5;
+	text-align:center;
+	height:20px;
+	font-weight:bold;
+}
+
+#headercol2 {
+	border:1px solid #e5e5e5;
+	text-align:left;
+	height:20px;
+	font-weight:bold;
+	padding:0 0 0 2px;
+}
+
+#gamenotes {
+	width:498px; 
+	background-color:#e4e5e5; 
+	padding:15px; 
+	border:1px solid #cfcfcf;
+	margin:0 0 20px 0; 
+	float:left;
+}
+
+
+#gamenotes2 {
+	width:280px; 
+	padding:0 10px; 
+	text-align:left;
+	float:left;
+}
+
+#module_footer {
+	width:498px; 
+	background-color:#e4e5e5; 
+	padding:10px 15px; 
+	border:1px solid #cfcfcf;
+	margin:0 0 20px 0; 
+	float:left;
+}
+
+
+#modprofileimg {
+	width:55px; 
+	height:50px;
+	padding:0 5px 5px 0; 
+	float:left; 
+	
+}
+
+
+#modprofiledets {
+	width:230px; 
+	height:50px;  
+	padding:10px 10px 10px 0;
+	float:left;
+	
+}
+
+
+#gameimg {
+	width:200px;  
+	padding:0px; 
+	vertical-align:top;
+	float:left;
+	
+}
+
+
+
+
+
+/*Badge Banners*/
+
+
+.firstcheck_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/firstcheck_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin1_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin1_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin2_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin2_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin3_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin3_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin4_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin4_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin5_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin5_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin6_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin6_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin7_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin7_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin8_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin8_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.checkin9_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin9_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.checkin10_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/checkin10_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.sharing1_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing1_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing2_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing2_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing3_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing3_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing4_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing4_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing5_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing5_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing6_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing6_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing7_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing7_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing8_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing8_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.sharing9_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing9_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.sharing10_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/sharing10_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.origins_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/origins_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.pax_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/pax_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.gencon_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/gencon_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.wargamer_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/wargamer_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+.social_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/social_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+.highscore_banner {
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/highscore_banner.png); 
+	background-repeat:no-repeat; 
+	width:44px; 
+	height:44px; 
+	float:right;
+}
+
+
+
+
+/* BADGES 31x31 */
+.origins_31x31 { 
+	background-image:url(http://www.tiffanyjessup.com/testing/SuperMeeple_Website/i/badges_100x100/origins_100x100.png); 
+	background-repeat:no-repeat; 
+	width:31px; 
+	height:31px; 
+	float:right;
+}
+
+
+
+
+/* FONTS */
+.copyright {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:9px; line-height:11px;}
+.copyright A,.copyright A:link, .copyright A:active, .copyright A:hover, .copyright A:visited {color:#ffffff; text-decoration:none;}
+
+.text11w {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:14px; letter-spacing:0px;}.text11 A,.text11w A:link, .text11w A:active, .text11w A:hover, .text11w A:visited {color:#ff9c55; text-decoration:none;}
+
+.text10g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px; letter-spacing:0px;}.text10g A,.text10g A:link, .text10g A:active, .text10g A:hover, .text10g A:visited {color:#c36931; text-decoration:none;}
+
+.text11g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:11px; line-height:12px; letter-spacing:0px;}.text11g A,.text11g A:link, .text11g A:active, .text11g A:hover, .text11g A:visited {color:#c36931; text-decoration:none;}
+
+.text15g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px;}.text15g A,.text15g A:link, .text15g A:active, .text15g A:hover, .text15g A:visited {color:#c36931; text-decoration:none;}
+
+.text15b {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:19px; letter-spacing:0px; text-decoration:underline;}.text15b A,.text15b A:link, .text15b A:active, .text15b A:hover, .text15b A:visited {color:#c36931; text-decoration:underline;}
+
+.headerg {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:underline;}.headerg A,.headerg A:link, .headerg A:active, .headerg A:hover, .headerg A:visited {color:#c36931; text-decoration:underline;}
+
+.name {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:13px; line-height:14px; letter-spacing:0px;}.name A,.name A:link, .name A:active, .name A:hover, .name A:visited {color:#b5561c; text-decoration:none;}
+
+.header {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:20px; line-height:22px; text-decoration:none; letter-spacing:0px;}.header A,.header A:link, .header A:active, .header A:hover, .header A:visited {color:#444242; text-decoration:none;}
+
+.header2 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}.header2 A,.header2 A:link, .header2 A:active, .header2 A:hover, .header2 A:visited {color:#444242; text-decoration:none;}
+
+.subheader {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:18px; text-decoration:none; letter-spacing:0px;}.subheader A,.subheader A:link, .subheader A:active, .subheader A:hover, .subheader A:visited {color:#ff9c55; text-decoration:none;}
+
+.subheader2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}.subheader2 A,.subheader2 A:link, .subheader2 A:active, .subheader2 A:hover, .subheader2 A:visited {color:#c36931; text-decoration:none;}
+
+.liner {color:#939191; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px;}.liner A,.liner A:link, .liner A:active, .liner A:hover, .liner A:visited {color:#939191; text-decoration:none;}
+
+
+
+
+/* IMAGES */
+
+.img: {
+	opacity:.2;
+}
+
+
+
+.img:hover {
+	-moz-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	-webkit-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+
+}
+
+
+.img2 {
+	-moz-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	-webkit-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+}
+
+
+.img3 {
+	border-style:none;
+	outline: 0;
+}
+
+.img3:hover {
+	border-style:none;
+	outline: 0;
+
+}
+
+
+a:focus {
+    outline: 0px;
+}
+
+

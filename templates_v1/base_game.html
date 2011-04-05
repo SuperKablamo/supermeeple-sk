@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+	{% block title %}{{ game.name }} - Board Game - SuperMeeple{% endblock %}
+
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+  <meta property="og:title" content="{{game.name}}"/>
+  <meta property="og:type" content="game"/>
+  <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}"/>
+  <meta property="og:image" content="{{ game.bgg_img_url }}"/>
+  <meta property="og:site_name" content="SuperMeeple"/>	
+  <meta property="og:description"
+        content="{{ game.description|truncatewords_html:40 }}"/>{% endblock %}	
+
+		{% block main %}
+		<div id="mainbar">
+			<div id="game-header-wrap">
+				<div id="game-header">
+					<h1 id="game-title">
+						<span class="name">{{ game.name }}</span>
+						<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+						{% if game.year_published %}
+						<span class="year">({{ game.year_published}})</span>
+						{% endif %}
+						{% if admin %}
+						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}">EDIT</a>
+						</span>	
+						{% else %}
+						<span id="facebook-like">
+							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
+						</span>
+						{% endif %}		
+					</h1>
+				</div>
+		  </div>
+			<div id="game-detail">	
+				{% if game.description %}
+  			<h2>Overview</h2>
+				<div id="description">
+					{{ game.description }}
+				</div>
+				<div id="more-less-container">
+					<a href="#" id="more-less">show more >></a>
+				</div>	
+				<script>
+				var open = false;
+				$('#more-less').click(function() {
+				    if (open) {
+				        $('#description').animate({height:'10em'}); 
+				        $('#more-less').text('show more >>');				
+				    }
+				    else {
+				        $('#description').animate({height:'100%'});
+				 				$('#more-less').text('show less <<');	
+				    }
+				    open = !open;
+				});
+				</script>
+				{% endif %}
+
+			  {% if game.designers %}
+    		<dl>
+    			<dt>Designed by</dt>
+					{% for x in game.designers %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.artists %}
+    		<dl>
+    			<dt>Art by</dt>
+					{% for x in game.artists %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.publishers %}
+    		<dl>
+    			<dt>Published by</dt>
+					{% for x in game.publishers %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.year_published %}
+    		<dl>
+    			<dt>Introduced</dt>
+					<dd>{{ game.year_published }}</dd>
+    		</dl>
+ 				{% endif %}
+
+     		{% if game.min_players and game.max_players %}
+    		<dl>
+    			<dt># of players</dt>
+					<dd>{{ game.min_players }} - {{ game.max_players }}</dd>
+    		</dl>
+				{% endif %}
+
+			  {% if game.playing_time %}
+    		<dl>
+    			<dt>Playing time</dt>
+					<dd>{{ game.playing_time }}</dd>
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.age %}
+    		<dl>
+    			<dt>Ages</dt>
+					<dd>{{ game.age }} and up</dd>
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.categories %}
+    		<dl>
+    			<dt>Tags</dt>
+					{% for x in game.categories %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.subdomains %}
+    		<dl>
+    			<dt>Categories</dt>
+					{% for x in game.subdomains %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.mechanics %}
+    		<dl>
+    			<dt>Mechanics</dt>
+					{% for x in game.mechanics %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+
+			  {% if game.expansions %}
+    		<dl>
+    			<dt>Expansions</dt>
+					{% for x in game.expansions %}
+					<dd>{{ x }}</dd>
+					{% endfor %}
+    		</dl>
+ 				{% endif %}
+				{% if game.bgg_id %}
+    		<dl>
+    			<dt>Weblinks</dt>
+					<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
+    		</dl>
+				{% endif %}
+			</div><!-- /game-detail -->		 
+		</div><!-- /main -->	   			
+		{% endblock %}		
+		
+		{% block sidebar %}	
+		<div id="sidebar">
+			<!-- GAME SEARCH -->
+			<div class="block">			
+    		<div id="search">
+     			<form name="input" action="/game" method="post">
+         		<input class="search-box" type="text" id="game-search"/>
+         		<input type="hidden" name="game_id" id="game-id" />
+         		<input type="hidden" name="game_name" id="game-name" />
+         		<input class="button" value="Go" type="submit"/>
+       		</form>
+					<p>search for more games</p>
+     		</div>
+			</div><!-- /block -->
+			<!-- GAME THUMB -->
+			<div class="block">
+				{% if game.bgg_thumbnail_url %}
+  			<div id="game-image">
+					<img alt="{{game.name}}" title="{{game.name}}" src="{{game.bgg_thumbnail_url}}"/>
+				</div>
+				{% else %}
+  			<div id="game-image">
+					<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{game.mid}}?maxwidth=150&maxheight=150"/>
+				</div>
+				{% endif %}					
+			</div>
+			<!-- CHECKIN FORM -->
+			<div class="block">
+				<div class="tip">
+					<p>Playing {{game.name}}?  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
+				</div>
+				{% if current_user %}
+				{% if checked_in %}
+				<div id="checkin">
+					<h2>You are checked into a game</h2>
+					<p>Players must wait 5 minutes before making another check in.</p>
+				</div>				
+				{% else %}
+				<div id="checkin-form">
+					<div id="spinner"></div>
+					<form name="input" id="checkin-form-inner" action="">
+						<fieldset>
+							<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>
+							<input type="hidden" name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/>
+							<input type="hidden" name="name" id="name" value="{{game.name}}"/>
+							{% if game.bgg_thumbnail_url %}
+							<input type="hidden" name="thumbnail" id="thumbnail" value="{{game.bgg_thumbnail_url}}"/>
+							{% else %}
+							<input type="hidden" name="thumbnail" id="thumbnail" value="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>							
+							{% endif %}
+							<textarea class="text-area" id="message" name="message" rows="3" cols="30">Joining a game of {{game.name}}.</textarea><br/>
+							<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
+							<input type="image" src="/static/images/check-in-button-small.png" style="float:right" name="submit" class="button" id="checkin-button" value="Checkin" />
+						</fieldset>
+					</form>
+				</div>
+				{% endif %}
+				{% endif %}
+			</div><!-- /block -->		
+			<!-- CHECKIN LIST -->	
+			<div class="block">
+				<div class="checkin-list">
+					<h2>Recent checkins</h2>
+					{% if checkins %}
+						{% for c in checkins %}
+					<div class="tiny-checkin">
+						<div class="player-wrap">
+							<div class="player">
+					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+							</div>
+							<div class="game-badges">
+							{% for b in c.badges %}
+								<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
+						  {% endfor %}
+							</div>
+						</div><!-- /player-wrap -->						
+						<div class="time">
+							<p>{{c.created|timesince}} ago</p>
+						</div>	
+					</div><!-- /tiny-checkin -->
+						{% endfor %}
+					{% else %}
+					<p>No one has checked into {{game.name}} yet. Be the first!</p>
+					{% endif %}	
+				</div><!-- /checkin-list -->	
+			</div><!-- /block -->	
+			<!-- HIGH SCORES -->
+			<div class="block">
+				<div class="high-scores-list">
+					<h2>High Scores</h2>
+			    {% if high_scores %}
+						{% for s in high_scores %}
+						<div class="tiny-score">
+							<div class="player">
+								{% if s.player.fb_id%}
+					  		<a title="{{s.player.name}}" href="/user/{{s.player.fb_id}}">
+									<img alt="{{s.player.name}}" title="{{s.player.name}}" src="http://graph.facebook.com/{{s.player.fb_id}}/picture?type=square"/>
+								</a>
+								<a title="{{s.player.name}}" href="/user/{{s.player.fb_id}}">{{s.player.name}}</a>
+								{% else %}
+								{{s.player.name}}
+								{% endif %}
+								<span class="points">{{s.points}}</span>
+							</div>							
+							<div class="time">
+								<p>{{s.created|timesince}} ago</p>
+							</div>
+						</div>	
+					  {% endfor %}
+			    {% else %}
+					<p>No one has logged a score for {{game.name}} yet. Be the first!  Checkin and then add a score.</p>			
+			    {% endif %}
+				</div><!-- /high-scores-list -->	
+			</div><!-- /block -->
+			<!-- AMAZON -->
+			<div class="block">
+				{% if game.asin  %}
+				<iframe src="http://rcm.amazon.com/e/cm?lt1=_blank&bc1=FFFFFF&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=supermeeple-sk-20&o=1&p=8&l=as1&m=amazon&f=ifr&asins={{ game.asin }}" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>	
+				{% endif %}
+			</div><!-- /block -->	
+		</div><!-- /sidebar -->	
+		{% endblock %}
+		

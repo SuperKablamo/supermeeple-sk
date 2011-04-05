@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+	{% block title %}{{profile_user.name}} - Board Game Geek - SuperMeeple{% endblock %}
+
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+  <meta property="og:title" content="{{current_user.name}}"/>
+  <meta property="og:type" content="geek"/>
+  <meta property="og:url" content="http://{{host}}//user/{{profile_user.fb_id}}"/>
+  <meta property="og:image" content="http://graph.facebook.com/{{ profile_user.fb_id }}/picture?type=square"/>
+  <meta property="og:site_name" content="SuperMeeple"/>	
+	{% endblock %}
+	
+	{% block main %}
+	<div id="mainbar">
+  	<!-- user-profile: container for the user's avatar and name. -->
+  	<div id="user-profile">
+    	<div id="profile-image">
+      	<a href="{{profile_user.fb_profile_url}}"><img src="http://graph.facebook.com/{{profile_user.fb_id}}/picture?type=square"/></a></p>
+      </div>
+      <div id="profile-name">
+      	<h1 id="user-name">
+					<span class="name">{{profile_user.name|escape }} </span>
+					<span class="beans">{{beans}}</span>
+				</h1>
+      </div>
+			<div id="facebook-like">
+				<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+				<fb:like href="http://{{host}}//user/{{profile_user.fb_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+			</div>
+    </div><!-- /user-profile -->		
+		<div id="checkin-list">
+			<h2>Game Checkins</h2>
+		{% if checkins %}
+			{% for c in checkins %}
+			<div class="checkin-wrapper">
+				<div class="checkin">
+  				<div class="game-image">
+						{% if c.game.bgg_thumbnail_url %}
+						<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+							<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+						</a>
+						{% else %}
+						<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+							<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+						</a>
+						{% endif %}					
+					</div><!-- /game-image -->
+					<div class="game-name">
+						<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">{{c.game.name}}</a></h3>
+						<p>{{c.created|timesince}} ago </p>{% for b in c.badges %}
+						<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
+				  	{% endfor %}
+					</div><!-- /game-name -->
+					{% if c.gamelog %}
+					<div class="log">
+						<div class="scores">
+						<h3>Score</h3>
+							<ul>
+					  	{% for s in c.gamelog.scores %}
+					    	<li>{{s.name}} - {{s.points}} {% if s.winner %}&nbsp;&nbsp;<strong>WINNER!</strong>{% endif %}</li>
+					  	{% endfor %}
+							</ul>
+						</div>
+						<div class="note">
+							<h3>Note</h3>
+							<p>{{c.gamelog.note}}</p>
+						</div>	
+					</div><!-- /log -->	
+					{% else %}
+					  {% ifequal current_user.fb_id c.player.fb_id %}
+					<div class="log">  
+						<a href="/game-log/{{c.id}}"><img src="/static/images/add-score-button.png"></a>
+					</div>
+						{% endifequal %}
+					{% endif %}					
+				</div><!-- /checkin -->
+			</div><!-- /checkin-wrapper -->	
+			{% endfor %}			
+		{% else %}
+			{% ifequal current_user.fb_id c.player.fb_id %}
+			<p>You don't have any Checkins yet.</p>
+			{% else %}
+			<p>{{profile_user.name|escape}} doesn't have any Checkins yet.</p>
+			{% endifequal %}
+			<div class="tip">
+				<p>Search for your Game and Checkin.  Game Checkins allow you to:</p>
+				<ul>
+					<li>Earn Badges</li>
+					<li>Score you and your friends in each Game</li>
+					<li>Get ranked</li>
+					<li>Find other players in your area</li>
+				</ul>	
+			</div>
+		{% endif %}
+		</div><!-- /checkin-list -->	
+	</div><!-- /main -->	   			
+	{% endblock %}		
+	
+	{% block sidebar %}	
+	<div id="sidebar">
+		<div class="block">			
+  		<div id="search">
+   			<form name="input" action="/game" method="post">
+       		<input class="search-box" type="text" id="game-search"/>
+       		<input type="hidden" name="game_id" id="game-id" />
+       		<input type="hidden" name="game_name" id="game-name" />
+       		<input class="button" value="Go" type="submit"/>
+     		</form>
+				<p>search for more games</p>
+   		</div>
+		</div><!-- /block  -->
+		<!-- BADGES -->
+		<div class="block">			
+  		<div id="badges">
+				<h2>Badges</h2>
+				{% if badges %}
+					{% for b in badges %}
+					<img alt="{{b.image.name}}" title="{{b.image.name}}" class="badge" title src="{{b.image_url}}" />
+					{% endfor %}
+   			{% else %}
+					{% ifequal current_user.fb_id c.player.fb_id %}
+					<p>You don't have any Badges yet.</p>
+					{% else %}
+					<p>{{profile_user.name|escape}} doesn't have any Badges yet.</p>
+					{% endifequal %}
+				<div class="tip">
+					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
+					<ul>
+						<li>Check in to games</li>
+						<li>Share check ins on Facebook</li>
+						<li>Scoring check ins</li>
+						<li>Being first and winning also helps</li>
+					</ul>	
+				</div>
+				{% endif %}
+			</div>
+		</div><!-- /block  -->	
+		{% if scores %}
+		<!-- FRIEND SCORES -->
+		<div class="block">
+			<h2>Scored By Friends</h2>
+			<div id="scores-list">
+				{% for s in scores %}
+				<div class="tiny-friend-score">
+					<div class="player">
+						<p>
+							<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}">
+								<img alt="{{s.author.name}}" title="{{s.author.name}}" src="http://graph.facebook.com/{{s.author.fb_id}}/picture?type=square"/>
+							</a>
+							<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}">{{s.author.name}}</a>
+							awarded you <span class="points">{{s.points}}</span> points in a game of 
+							<a href="/game-log/{{s.gamelog_id}}">{{s.game.name}}</a> - {{s.created|timesince}} ago
+						</p>
+					</div>							
+				</div><!-- /tiny-friend-score -->	
+				{% endfor %}
+		  </div><!-- /scores-list -->	
+		</div><!-- /block -->		
+		{% endif %}
+	</div><!-- /sidebar -->	
+	{% endblock %}
+

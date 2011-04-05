@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="http://www.facebook.com/2008/fbml">
+
+  <head>
+  	<title>{% block title %}Board Games - SuperMeeple{% endblock %}</title>
+  	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+		{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+		<meta property="og:website" content="www.supermeeple.com"/>{% endblock %}
+	
+  	<link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+  	<link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
+	  {% block script %}
+		<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
+		<script type="text/javascript">
+		  google.load("jquery", "1.4.2");
+		  google.load("jqueryui", "1.8.10");
+		</script>
+  	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
+
+	  <!-- Freebase Jquery search -->
+		<script type="text/javascript">
+  		$(function() {
+    		$("#game-search").suggest({service_url:"http://api.freebase.com",
+				service_path:"/api/service/search",
+				flyout_service_url:"http://www.freebase.com"});
+				var inst = $("#game-search").data("suggest");
+				inst.options.ac_param.type = '/games/game';
+				inst.options.ac_param.mql_output = JSON.stringify([{id:null, mid:null,
+				name:null}]);
+        $("#game-search").bind("fb-select", function(e, data) {
+    			$("#game-id").val(data.id);
+    			$("#game-name").val(data.name);
+					$("#game-mid").val(data.mid);
+    		});
+  		});
+  	</script>
+		<!-- Checkin form -->
+		<script type="text/javascript">
+  		$(function() {  
+      	$('.error').hide();  
+      	$("#checkin-button").click(function() { 
+	      	var mid = $("input#mid").val();
+		    	var message = $("textarea#message").val();
+			  	var facebook = $('input#facebook').is(':checked');
+					var name = $("input#name").val();
+			  	var bgg_id = $("input#bgg-id").val();
+			  	var thumbnail = $("input#thumbnail").val();
+			 		$.ajax({  
+						type: "POST",  
+				  	url: "/game-checkin",  
+				  	data: {"mid": mid, "message": message, "facebook": facebook, "name": name, "bgg_id": bgg_id, "thumbnail": thumbnail},  
+				  	dataType: "json",
+          	beforeSend: function() {
+          		$('#spinner').addClass('loading');
+          		$('#checkin-form-inner').hide();
+          	},
+				  	success: function(badges) {  
+				  		$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
+				    	$('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
+							$.each(badges, function(i,badge) {
+				  	  	$('#badges').append("<h2>New Badge!</h2><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
+				    	});
+				  	},
+          	complete: function() {
+          		$('#spinner').removeClass('loading');
+						}				
+					});
+					return false;
+    		});  
+   		});
+		</script>
+		{% endblock %}
+		
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+	  	var _gaq = _gaq || [];
+	  	_gaq.push(['_setAccount', 'UA-21210851-1']);
+	  	_gaq.push(['_trackPageview']);
+	  	(function() {
+	    	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  		})();
+	  </script>	
+  </head> 
+  <body>
+  <div id="container">
+    <div id="header">
+     	<div id="title">
+         <a href="/">SuperMeeple</a>
+    	</div>
+			<div id="fb-login">
+    		{% if current_user %}
+      	<div id="fb-profile">
+					<p>Hello, <a href="/user/{{current_user.fb_id}}">{{current_user.name}}</a></p>
+				</div>
+    		{% endif %}
+				<div id="fb-button">
+					<fb:login-button autologoutlink="true" perms="publish_checkins,publish_stream" show-faces="false" width="200"></fb:login-button>
+				</div>
+			</div>
+    </div><!-- /header -->
+    <div id="content"> 
+    	{% block main %}
+    	{% endblock %} 
+
+			{% block main1 %}
+			{% endblock %}
+
+			{% block main2 %}
+			{% endblock %}
+			
+			{% block main3 %}
+			{% endblock %}
+			
+			{% block sidebar%}
+			{% endblock %}
+
+		</div><!-- /content -->
+	 	<div id="footer">
+			<div id="bottom-nav">
+				<ul>
+					<li><a href="/page/about">About</a></li>
+					<li>|</li>
+					<li><a href="/page/contact">Contact</a></li>							
+				</ul>
+			</div>
+		  <!--<div id="copyright"><p>Design by SuperKablamo</p></div>-->
+		  <div id="freebase-tag">
+				data by <a href="http://freebase.com"><span class="logo">Freebase</span></a> and <a href="http://boardgamegeek.com"><span class="logo">Board Game Geek</span></a>
+			</div>
+			<div id="plus">+</div>
+		  <div id="gae-tag">
+				powered by <a href="http://code.google.com/appengine/"><span class="logo">Google App Engine</span></a>
+			</div>
+		</div><!-- /footer -->
+	</div><!-- /container -->
+  <!-- Facebook Single Sign-on -->
+  <div id="fb-root"></div>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
+               xfbml: true});
+      FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
+        window.location.reload();
+      });
+    };
+    (function() {
+      var e = document.createElement('script');
+      e.type = 'text/javascript';
+      e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+      e.async = true;
+      document.getElementById('fb-root').appendChild(e);
+    }());
+  </script>
+  </body>
+</html>
