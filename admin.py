@@ -55,6 +55,7 @@ class Admin(webapp.RequestHandler):
         game_count = models.Game.all().count(5000) 
         game_xml_count = models.GameXML.all().count(5000)
         image_upload_url = blobstore.create_upload_url('/upload/image')
+        banner_upload_url = blobstore.create_upload_url('/upload/banner')
         checkin_counter = models.Game.all().filter('checkin_count >', 0).count()
         template_values = {
             'checkin_counter': checkin_counter,
@@ -64,6 +65,7 @@ class Admin(webapp.RequestHandler):
             'game_xml_count': game_xml_count,
             'badges': badges,
             'image_upload_url': image_upload_url,
+            'banner_upload_url': banner_upload_url,            
             'facebook_app_id': FACEBOOK_APP_ID
         }  
         generate(self, 'base_admin.html', template_values)

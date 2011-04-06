@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-	{% block title %}SuperMeeple{% endblock %}
+	{% block title %}SuperMeeple Admin{% endblock %}
 	
-	{% block main %}	
+	{% block leftcolumn %}	
 	<!-- FULLBAR --> 
 	<div id="fullbar">
 		<h1>Admin</h1>
@@ -48,6 +48,18 @@
 				<label>image</label><input type="file" name="file" size="50"><br/> 
 				<input type="submit" name="submit" value="Submit">
 			</form>
+			<h2>Upload Badge Banner</h2>
+			<form action="{{banner_upload_url}}" method="POST" enctype="multipart/form-data">
+				<label>name</label>
+				<select name="key_name">
+					{% for b in badges %}
+						<option value="{{b.key.name}}">{{b.name}}</option>
+					{% endfor %}
+					<option>
+				</select>	<br/>
+				<label>banner</label><input type="file" name="file" size="50"><br/> 
+				<input type="submit" name="submit" value="Submit">
+			</form>			
 			<div id="badges-list">
 			{% for b in badges %}
 				<div class="badge">
@@ -58,6 +70,7 @@
 					<div class="badge-image">
 						<img src="{{b.image_url}}"/>
 						<img class="thumb" src="{{b.image_url}}=s20"/>
+						<img src="{{b.banner_url}}"/>
 					</div>
 				</div>			
 			{% endfor %}
@@ -66,5 +79,6 @@
                          
   </div><!-- /fullbar -->
 	{% endblock %}	
-	{% block sidebar %}	
+	
+	{% block rightcolumn %}	
 	{% endblock %}

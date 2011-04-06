@@ -34,8 +34,8 @@ def createCheckin(user, game, message, share=False):
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
     #  'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #       [{'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #  'message': message,
     #  'game':
     #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url}
@@ -51,6 +51,7 @@ def createCheckin(user, game, message, share=False):
             logging.info(TRACE+'createCheckin():: badge.image_url= ' +str(b.image_url))
             badge = {'name':b.name, 
                      'image_url': b.image_url,
+                     'banner_url': b.banner_url,
                      'key_name':b.key().name()}
             badges.append(badge)   
     game_data = {'name': game.name, 
@@ -98,8 +99,8 @@ def getUserCheckins(user, count=10):
     #   'player': 
     #       {'name': name, 'fb_id': fb_id},
     #   'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #       [{'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
@@ -131,8 +132,8 @@ def getGameCheckins(game, count=10):
     #   'player': 
     #       {'name': name, 'fb_id': fb_id},
     #   'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #       [{'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago'
     #   'message': 'message    
     #  }]
@@ -155,8 +156,8 @@ def getLatestCheckins(count=10):
     #   'player':
     #       {'name': name, 'fb_id': fb_id},
     #  'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
+    #       [{'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
     #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},

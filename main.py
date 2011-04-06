@@ -90,6 +90,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     """Uploads files to Blobstore.
     """
     def post(self, form=None):
+        logging.info(TRACE+'UploadHandler:: post()')         
         upload_files = self.get_uploads('file') 
         blob_info = upload_files[0]
         key_name = self.request.get('key_name')
@@ -97,10 +98,13 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         if form == "image":
             badge.image = blob_info.key()
             badge.image_url = images.get_serving_url(blob_info.key())
+        if form == "banner":
+            badge.banner = blob_info.key()
+            badge.banner_url = images.get_serving_url(blob_info.key())            
         badge.put()   
         logging.info(TRACE+'UploadHandler:: badge.image = '+str(badge.image))    
         logging.info(TRACE+'UploadHandler:: badge.image.key = '+str(badge.image.key)) 
-        self.redirect('/admin/backyardchicken')  
+        self.redirect('/admin/')  
                                                 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
     """Serves Blobstore images.
@@ -206,10 +210,18 @@ class MainHandler(BaseHandler):
                                        value=meeples, 
                                        time=2592000) # expiration 30 days
                 meeples_cache = meeples                     
-                                       
-        checkins = checkinbase.getLatestCheckins()       
+        
+        checkins = checkinbase.getLatestCheckins()    
+
+        current_user = self.current_user  
+        if current_user is not None:
+            my_checkins = checkinbase.getUserCheckins(current_user, 4) 
+        else: 
+            my_checkins = None      
+        
         template_values = {
             'checkins': checkins,
+            'my_checkins': my_checkins,
             'spiels': spiels_cache,
             'meeples': meeples_cache,
             'current_user': self.current_user,

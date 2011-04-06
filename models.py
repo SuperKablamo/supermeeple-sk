@@ -113,7 +113,9 @@ class Badge(db.Model):
     description = db.TextProperty(required=True, default='description')
     points = db.IntegerProperty(required=True, default=0)   
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
-    image_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/yellow-1st.png")
+    banner = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
+    image_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/checkin1_100x100.png")
+    banner_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/firstcheck_banner.png")    
     @property
     def checkin_badges(self):
         return Checkin.all().filter('badges', self.key())    
