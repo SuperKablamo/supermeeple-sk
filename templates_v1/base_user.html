@@ -113,8 +113,8 @@
 		<div class="block">			
   		<div id="badges">
 				<h2>Badges</h2>
-				{% if badges %}
-					{% for b in badges %}
+				{% if badge_awards %}
+					{% for b in badge_awards %}
 					<img alt="{{b.image.name}}" title="{{b.image.name}}" class="badge" title src="{{b.image_url}}" />
 					{% endfor %}
    			{% else %}

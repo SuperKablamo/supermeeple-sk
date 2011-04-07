@@ -286,14 +286,14 @@ class UserProfile(BaseHandler):
         profile_user = getFBUser(user_fb_id)
         checkins = checkinbase.getUserCheckins(profile_user, 10)
         scores = checkinbase.getScoresFromFriends(profile_user, 10)
-        badges = db.get(profile_user.badges)
         host = self.request.host # used for Facebook Like url 
+        badge_log = checkinbase.getBadgeLog(profile_user)
         template_values = {
             'host': host,
-            'badges': badges,
             'checkins': checkins,
             'scores': scores,
             'profile_user': profile_user,
+            'badge_log': badge_log,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -442,7 +442,7 @@ def createUser(graph, cookie):
         loc_name = profile["location"]["name"]
     except KeyError:
         loc_id = "000000000000001"
-        loc_name = "Earth"    
+        loc_name = "Earth" 
     user = models.User(key_name=str(profile["id"]),
                        fb_id=str(profile["id"]),
                        name=profile["name"],

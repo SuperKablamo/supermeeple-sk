@@ -3,9 +3,6 @@
 # All rights reserved.
 # info@supermeeple.com
 #
-# api.py defines Handlers and Methods for providing API access to 
-# SuperMeeple.com.
-#
 # ============================================================================
 
 ############################# IMPORTS ########################################
@@ -29,7 +26,8 @@ from google.appengine.ext import deferred
 ############################# METHODS ########################################
 ##############################################################################
 def createCheckin(user, game, message, share=False):
-    logging.info(TRACE+'createCheckin()')
+    _trace = TRACE + 'createCheckin():: '
+    logging.info(_trace)
     # Create initial json data:
     # {'player': 
     #     {'name':name,'fb_id':fb_id},
@@ -43,38 +41,50 @@ def createCheckin(user, game, message, share=False):
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
     game.checkin_count += 1
-    badge_entities = awardbase.awardCheckinBadges(user, game.key())  
+    badge_keys = awardbase.awardCheckinBadges(user, game.key()) 
+    badge_entities = db.Model.get(badge_keys)     
     badges=[]
-    if badge_entities is not None:
-        for b in badge_entities:
-            logging.info(TRACE+'createCheckin():: badge.name = ' +str(b.name))
-            logging.info(TRACE+'createCheckin():: badge.image_url= ' +str(b.image_url))
-            badge = {'name':b.name, 
-                     'image_url': b.image_url,
-                     'banner_url': b.banner_url,
-                     'key_name':b.key().name()}
-            badges.append(badge)   
+    updates = [] # List for batch put()
     game_data = {'name': game.name, 
                  'mid': game.mid, 
                  'bgg_id': game.bgg_id, 
-                 'bgg_thumbnail_url': game.bgg_thumbnail_url}          
+                 'bgg_thumbnail_url': game.bgg_thumbnail_url}
+                 
+    if badge_entities is not None:
+        for b in badge_entities:
+            logging.info(_trace+'badge.name = ' +str(b.name))
+            logging.info(_trace+'badge.image_url= ' +str(b.image_url))
+            badge = {'name': b.name, 
+                     'image_url': b.image_url,
+                     'banner_url': b.banner_url,
+                     'key_name': b.key().name()}
+            badges.append(badge)  
+            user.badges.append(b.key())
+            if user.badge_log is None:
+                user.badge_log = {}
+            if b.key().name() in user.badge_log:
+                user.badge_log[b.key().name()]['games'].append(game_data) 
+            else:
+                data = {'badge': badge, 'games': [game_data]}
+                user.badge_log[b.key().name()] = data
+        
     json_dict = {'player': player, 
                  'badges': badges, 
                  'message': message, 
-                 'game':game_data}
+                 'game': game_data}
     json = simplejson.dumps(json_dict)  
     checkin = models.Checkin(player=user, 
                              game=game.key(), 
                              message=message,
                              json=db.Text(json))    
     
-    # TODO: either batch put, and run in Transaction or Task.
-    checkin.put()   
+    user.last_checkin_time = datetime.datetime.now()
+    updates.append(user)
+    updates.append(game)
+    updates.append(checkin)
+    db.put(updates)
     json_dict['id'] = checkin.key().id()
     json_dict['created'] = str(checkin.created)
-    user.last_checkin_time = datetime.datetime.now()
-    user.put()
-    game.put()
     return json_dict
 
 def isCheckedIn(user):
@@ -314,4 +324,19 @@ def getScoresFromFriends(profile_user, count=10):
     deref_scores = utils.prefetch_refprops(ref_scores,
                                            models.Score.author,
                                            models.Score.game)
-    return deref_scores    
+    return deref_scores   
+
+def getBadgeLog(profile_user):
+    """Returns a Template friendly badge_log.
+    """    
+    _trace = TRACE + 'getBadgeLog():: '
+    logging.info(_trace)    
+    keys = profile_user.badge_log.keys()
+    badge_log = []
+    for k in keys:
+        log_entry = profile_user.badge_log[k]
+        data = {'badge': log_entry['badge'], 'games': log_entry['games']}
+        badge_log.append(data)
+    
+    return badge_log
+

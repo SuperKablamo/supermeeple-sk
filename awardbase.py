@@ -26,8 +26,8 @@ from google.appengine.ext import db
 ############################# METHODS ########################################
 ##############################################################################
 def awardCheckinBadges(user, game_key):
-    """Returns any badges earned by a User.  Checks Checkins for badge
-    triggers.  If any triggers are met, the Badges are awarded/saved.
+    """Returns any badges (as Keys) earned by a User.  Checks Checkins for 
+    badge triggers.  If any triggers are met, the Badges are awarded.
     """
     keys = []
     ######## AWARD 1ST CHECKIN ###############################################
@@ -87,7 +87,4 @@ def awardCheckinBadges(user, game_key):
     # TODO: other badge awards go here . . .
     
     if not keys: return None
-    else:
-        user.badges.extend(keys)
-        user.put() 
-        return db.Model.get(keys)
+    else: return keys

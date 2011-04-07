@@ -175,6 +175,8 @@
             
 					<!--STEPS-->     
 					<div id="content"><br clear="all">
+						
+						{% block top %}
         		<div id="steps">
           		<form name="input" action="/game" method="post">
             		<input class="search-box" id="game-search" size="16" type="text">
@@ -184,7 +186,8 @@
               	<div><a href="#"><img src="/static/images/close_x.png" alt="Close" style="padding: 0pt 100px 0px 0pt;" align="right" border="0" height="15" width="16"></a></div>
 							</form>
 						</div><!-- /steps -->
-                
+            {% endblock %}  
+  
 						<br clear="all">		
                 
 						<div id="house">   
@@ -195,18 +198,20 @@
      				  {% block rightcolumn %}
 						  {% endblock %}
 
+							{% block footer %}
 							<!-- FOOTER -->
           		<div id="footer" class="text11w">
           			© Copyright 2011 SuperMeeple  |  <a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/aboutus.html">About Us</a>  |  <a href="http://www.tiffanyjessup.com/testing/SuperMeeple_Website/contact.html">Contact Us</a><br>
             		Powered by <a href="http://code.google.com/appengine/" target="_blank">Google App Engine</a> + Data by <a href="http://www.freebase.com/" target="_blank">Freebase</a> &amp; <a href="http://boardgamegeek.com/" target="_blank">Board Game Geek</a>
 							</div><!-- /footer -->
-        
+        			{% endblock %}
 						</div><!-- /house -->   
       		</div><!-- /content -->
     		</div><!-- /top --> 
   		</div><!-- /inner-wrapper -->
 		</div><!-- /outer-wrapper -->
-	
+	  
+	  {% block facebookscript %}
   	<!-- Facebook Single Sign-on -->
   	<div id="fb-root"></div>
   	<script>
@@ -225,5 +230,7 @@
       	document.getElementById('fb-root').appendChild(e);
     	}());
   	</script>
+		{% endblock %}
+		
 	</body>
 </html>

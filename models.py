@@ -8,8 +8,29 @@
 ############################# GAE IMPORTS ####################################
 ##############################################################################
 import logging
+
+from django.utils import simplejson
 from google.appengine.ext import db
 from google.appengine.ext import blobstore
+
+############################# CUSTOM PROPERTIES ##############################
+##############################################################################   
+class JSONProperty(db.TextProperty):
+    def validate(self, value):
+        return value
+ 
+    def get_value_for_datastore(self, model_instance):
+        result = super(JSONProperty, self).get_value_for_datastore(model_instance)
+        result = simplejson.dumps(result)
+        return db.Text(result)
+	 
+    def make_value_from_datastore(self, value):
+        try:
+            value = simplejson.loads(str(value))
+        except:
+            pass
+
+        return super(JSONProperty, self).make_value_from_datastore(value)
 
 ############################# MODELS  ########################################
 ##############################################################################
@@ -22,11 +43,12 @@ class User(db.Model): # fb_id is key_name
     fb_location_id = db.StringProperty(required=False)
     fb_location_name = db.StringProperty(required=False)
     access_token = db.StringProperty(required=True, default='0')
-    badges = db.ListProperty(db.Key, required=True, default=None)   
     last_checkin_time = db.DateTimeProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
     share_count = db.IntegerProperty(required=True, default=0)
     score_count = db.IntegerProperty(required=True, default=0)
+    badges = db.ListProperty(db.Key, required=True, default=None)
+    badge_log = JSONProperty(required=True, default=None)
     @property
     def gamelog_players(self):
         return GameLog.all().filter('players', self.key())    
@@ -122,7 +144,13 @@ class Badge(db.Model):
     @property
     def player_badges(self):
         return User.all().filter('badges', self.key())
-    
+
+class BadgeAward(db.Model):
+    badge = db.ReferenceProperty(Badge, required=True, collection_name='badge_awards')
+    user = db.ReferenceProperty(User, required=True, collection_name='badge_awards')
+    games = db.ListProperty(db.Key, required=True, default=None)  
+    created = db.DateTimeProperty(required=True, auto_now=True)
+        
 class GameRating(db.Model):
     game = db.ReferenceProperty(Game, required=True)  
     rating = db.IntegerProperty(required=True) 

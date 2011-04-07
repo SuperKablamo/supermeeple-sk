@@ -10,6 +10,12 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: BadgeAward
+  properties:
+  - name: user
+  - name: created
+    direction: desc
+
 - kind: Checkin
   properties:
   - name: fb_id
