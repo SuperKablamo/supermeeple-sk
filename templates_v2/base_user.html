@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+	{% block title %}{{profile_user.name}} - Board Game Geek - SuperMeeple{% endblock %}
+
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
+  <meta property="og:title" content="{{current_user.name}}"/>
+  <meta property="og:type" content="geek"/>
+  <meta property="og:url" content="http://{{host}}//user/{{profile_user.fb_id}}"/>
+  <meta property="og:image" content="http://graph.facebook.com/{{ profile_user.fb_id }}/picture?type=square"/>
+  <meta property="og:site_name" content="SuperMeeple"/>	
+	{% endblock %}
+						
+						{% block top %}
+						<br/>
+            <div id="profile-image2"><a href="http://www.facebook.com/tiffanyjessup"><img src="http://graph.facebook.com/{{profile_user.fb_id}}/picture?type=square" height="50" width="50" border="0" alt="Profile Image"/></a></div> 
+            <div class="header2" style="width:400px; text-align:left; float:left;">{{profile_user.name|escape }}</div><br />
+
+            <div style="padding-top:8px;text-align:left; float:left;">
+                <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+                <fb:like href="http://{{host}}//user/{{profile_user.fb_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+            </div>
+            {% endblock %}  
+
+						<br clear="all">		
+                
+						<div id="house">   
+							
+						{% block leftcolumn %}
+							<div id="leftcolumn"> 
+								<!--<div class="text11g" style="padding:0 0 10px 100px; float:left; text-align:left;">View recent checkins | <a href="mygames_list.html">View entire list >></a>
+                </div><br />-->
+								<div id="headerleft" class="subheader3b" style="background-image:url(/static/images/header_fade.png);"><h2>RECENT CHECKINS</h2></div>
+		            {% for c in checkins %}
+								<!--GAME MODULE -->
+								<div id="gamemod">
+                	<div id="gameheader">
+							    	<div id="gametitle">
+							      	<span class="subheader"><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></span><a href="mygames_edit.html"><img src="/static/images/edit_butt.png" border="0" alt="edit" /></a><br>
+							        <span class="text11w">{{c.created|timesince}} ago</span>                                
+							      </div>
+                    <div id="badgecontainer">
+											{% for b in c.badges %}
+						    			<div class="banner">
+												<img alt="{{b.name}}" title="{{b.name}}" src="{{b.banner_url}}" />
+											</div>
+						 					{% endfor %}
+							      </div>
+							    </div> 
+
+                  <div id="gamedets" class="text11g">
+                    <div style="width:300px; float:left;">
+						      		<div id="modmessage">
+						        		<span class="text11g">{% if c.message %} "{{c.message}}" {% endif %}</span>
+											</div>
+										  {% if c.gamelog %}
+						      		<div style="width: 300px; float: left;">
+						       			<div id="players">
+						         			<div id="headercol2" class="text11g">Player</div>
+											  	{% for s in c.gamelog.scores %}	
+						          		<div id="playercol" class="text11g">{{s.name}}</div>
+											  	{% endfor %}
+						        		</div><!-- /players -->
+						        		<div id="scores">
+						         			<div id="headercol" class="text11g">Score</div>
+											  	{% for s in c.gamelog.scores %}	
+						          		<div id="scorecol" class="text11g">{{s.points}}</div>
+											  	{% endfor %}
+						        		</div><!-- /scores -->  
+						        		<div id="winner">
+						         			<div id="headercol" class="text11g">Winner</div>
+											  	{% for s in c.gamelog.scores %}	
+						          		<div id="scorecol" class="text11g">
+														{% if s.winner %}
+															<img src="/static/images/winner.png" vspace="3">
+														{% else %}
+															0
+														{% endif %}
+													</div>
+											  	{% endfor %}
+						        		</div><!-- /winner -->  
+						      		</div>
+											{% else %}
+												{% ifequal current_user.fb_id c.player.fb_id %}
+					 					  	<a href="#"><img src="/static/images/scoreit_butt2.png" alt="Score Game" align="left" vspace="26" hspace="2" border="0" /></a>   
+												{% endifequal %}
+											{% endif %}
+                    </div>
+                    <div style="width:200px; float:left;"> 
+                      <div id="gameimg">
+						       			{% if c.game.bgg_thumbnail_url %}
+												<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+													<img class="img" border="0" title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+												</a>
+												{% else %}
+												<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+													<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+												</a>
+												{% endif %}
+							        </div>
+							      </div> 
+									</div><!-- /gamedets -->     
+									{% if c.gamelog %}   
+						  		<div id="gamenotes" class="text11g">
+						   			<strong>Notes:</strong><br>
+						    		No one should ever play RA against me, because I will always win and kick your butt. I am the RA master.       
+						  		</div><!-- /gamenotes -->
+									{% else %}
+						  		<div id="gamenotes3">      
+						  		</div><!-- /gamenotes -->									
+									{% endif %}
+						    </div><!-- /gamemod -->
+								{% endfor %}
+							</div><!-- /leftcolumn -->
+
+							{% endblock %}
+							
+     				  {% block rightcolumn %}
+							<div id="rightcolumn">    				
+								<div id="mygames2">
+									<div id="headerright" class="subheader3"><h2>{% ifequal current_user.fb_id profile_user.fb_id %}MY{% endifequal %} BADGES</h2></div>   
+									{% for b in badge_log %}
+                  <div style="width:100px; float:left;">
+                    <img src="{{b.badge.image_url}}" height="50" width="50" border="0" alt="High Score" style="padding:10px 0 10px 50px;" />
+			            </div>     
+  								<div id="mybadgeheader">
+                    <span class="text15b">{{b.badge.name}}</span><br />
+			              <span class="text10g">
+										{% for g in b.games %}
+			              <a title="{{g.name}}" href="/game{{g.mid}}/{{g.bgg_id|default_if_none:"0"}}">{{g.name}}</a><br />   
+			      				{% endfor %}
+			            </div>
+									<div id="liner"></div>
+									{% endfor %}
+									<div id="bottomlink" class="text11g">
+                    <a href="badges.html"><strong>About Badges >></strong></a>
+                  </div>                     
+								</div><!-- /mygames2 -->
+							</div><!-- /rightcolumn -->                    
+							<br clear="all" />
+              {% endblock %}
+        
+						</div><!-- /house -->   
+      		</div><!-- /content -->
+    		</div><!-- /top --> 
+  		</div><!-- /inner-wrapper -->
+		</div><!-- /outer-wrapper -->
+	</body>
+</html>

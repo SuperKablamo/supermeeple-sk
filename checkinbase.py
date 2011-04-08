@@ -42,7 +42,9 @@ def createCheckin(user, game, message, share=False):
     user.checkin_count += 1
     game.checkin_count += 1
     badge_keys = awardbase.awardCheckinBadges(user, game.key()) 
-    badge_entities = db.Model.get(badge_keys)     
+    badge_entities = None
+    if badge_keys is not None:
+        badge_entities = db.Model.get(badge_keys)     
     badges=[]
     updates = [] # List for batch put()
     game_data = {'name': game.name, 

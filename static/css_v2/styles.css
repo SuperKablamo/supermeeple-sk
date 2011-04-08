@@ -1,0 +1,510 @@
+/* 
+  ------------------------------------
+  SuperMeeple Style Sheet
+  ------------------------------------
+*/
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, small, fieldset, form, label, legend { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
+
+/* MAIN DIVS */
+
+body {
+	margin:0;
+	padding:0;
+	background-color:#4a4a4a;	
+}
+
+
+#house {
+	width:1057px;
+	padding:0 0 0 0px;
+}
+
+
+#content {
+	width:1057px;
+	background-image:url(/static/images/bg_body2.png); 
+	background-repeat:repeat-y;
+	float:left;
+}
+
+
+
+#leftcolumn {
+	width:630px;
+ 	margin:0px; 
+	padding:2px 0 0 0px; 
+	float:left; 
+}
+
+
+
+#rightcolumn {
+	width:320px;
+	height:50px;
+ 	padding:2px 0 0 20px; 
+	float:left; 
+	vertical-align:top;
+}
+.rightblock p {padding:0 8px;}
+
+#headerleft {
+	background-repeat:no-repeat;
+	height:19px;
+	width:530px;
+	margin:0 0 0 96px;
+	padding:10px 0 0 0;
+	text-align:center;
+	float:left; 
+	
+}
+
+#headerright {
+	background-color:#bb652f;
+	height:26px; 
+	width:300px; 
+	text-align:center;
+	padding:10px 0 0 0;
+	float:left;
+}
+
+#headerright2 {
+	background-color:#5d5d5d;
+	height:26px; 
+	width:300px; 
+	text-align:center;
+	padding:10px 0 0 0;
+	margin:16px 0 5px 0;	
+	float:left;
+}
+
+#top {
+	width:1057px;
+	height:189px;
+	background-image:url(/static/images/bg_header.png);
+	background-repeat:no-repeat;	
+	color:#4a4a4a;
+}
+
+
+#liner {
+	background-image:url(/static/images/liner.png); 
+	width:300px; 
+	height:2px; 
+	padding:0px; 
+	float:left;
+
+}
+
+#footer {
+	background-image:url(/static/images/bg_footer.png); 
+	background-repeat:no-repeat;
+	height:60px; 
+	width:1057px; 
+	padding:30px 0 0 0; 
+
+}
+
+
+#bottomlink {
+	background-color:#e8e8e8;
+	padding:15px 0px;
+	height:10px; 
+	width:300px; 
+	text-align:center;
+	float:left; 
+}
+
+
+#space {
+	height:40px; 
+	width:380px; 
+	float:left; 
+}
+
+
+
+
+
+
+/* LOGIN & PROFILE */
+
+#login {
+	width:375px;
+	margin:12px 0 0 590px;
+	float:left;
+	display:inline;
+}
+
+
+#profile-image {
+	margin-right:5px;
+	border:1px solid #ff9c55;
+	width:25px;
+	height:25px;
+	float:left;
+}
+
+#profile-image2 {
+	margin:0 10px 10px 100px;
+	border:1px solid #ff9c55;
+	width:50px;
+	height:50px;
+	float:left;
+}
+
+#profile-image3 {
+	margin:0 10px 0px 20px;
+	height:25px;
+	float:left;
+	width:45rpx;
+}
+
+#fb-profile {
+	margin:6px 12px 0 0;
+	float:left;
+}
+
+
+#fb-logout {
+	margin:3px 0 0 0px;
+	float:right;
+	border:0;
+}
+
+
+
+
+
+
+/* LOGO & NAVIGATION */
+
+
+#logo {
+	width:1057px;
+	height:130px;
+	background-image:url(/static/images/logo.png);
+	background-repeat:no-repeat;	
+
+}
+
+#navigation {
+	width:1057px;
+	height:50px;
+	padding:54px 0 0 186px;
+
+}
+
+
+#search {
+	width:1000px;
+	padding:0px 0 0 680px;
+	float:left;
+
+}
+
+
+
+
+
+
+/* 3 STEPS */
+
+
+#steps {
+	background-image:url(/static/images/3steps.png); 
+	background-repeat:no-repeat; 
+	height:60px; 
+	width:1057px; 
+	padding:34px 0 0 4px;
+	float:left; 
+	
+}
+
+
+
+
+
+
+/* MY GAMES */
+
+#mygames {
+ 	width:200px;
+	float:left;
+	
+}
+
+#mygames2 {
+	width:300px; 
+	background-color:#f0f0f0; 
+	text-align:left; 
+	margin:0px;
+	float:left;
+
+}
+
+#mygamesheader {
+	padding:15px 15px; 
+	width:135px; 
+	float:left;
+
+}
+
+#friendsgames {
+	padding:10px 10px; 
+	width:165px; 
+	text-align:left;
+	float:left;
+	
+
+}
+
+#mybadgeheader {
+	padding:15px 15px; 
+	width:155px; 
+	float:left;
+
+}
+
+#badgecontainer2 {
+	padding:10px 15px; 
+	float:right;
+
+}
+
+
+#gamedetscontainer2 {
+	padding:10px 15px; 
+	width:135px; 
+	float:left;
+
+}
+
+
+#addplayers {
+	width:155px; 
+	text-align:left; 
+	padding:0 0 0 10px;
+	float:left; 
+}
+
+#addplayers2 {
+	width:170px; 
+	text-align:left; 
+	padding:0 0 0 10px;
+	float:left; 
+}
+
+#playerfield { 
+	height:24px; 
+	text-align:left;
+	float:left; 
+}
+
+#scorefield {
+	height:24px; 
+	text-align:left;
+	float:left; 
+}
+
+#winnerfield {
+	height:24px; 
+	text-align:left;
+	vertical-align:top;
+	float:left; 
+}
+
+
+
+#addpoints {
+	width:55px;
+	text-align:left; 
+	float:left; 
+}
+
+
+#addpoints2 {
+	width:65px;
+	text-align:left; 
+	float:left; 
+}
+
+
+
+#addwinner {
+	width:50px;
+	text-align:left; 
+	float:left; 
+}
+
+
+
+
+/* RIGHT HAND GAME LISTS */
+
+
+#headertopright {
+	padding:10px 0px; 
+	width:300px;  
+	text-align:center;
+	float:left;
+}
+
+
+#spieldesjahre {
+	width:300px; 
+	margin:15px 0 0px 0;
+	float:left;
+}
+
+
+#columnrightg {
+	width:300px; 
+	background-color:#f0f0f0; 
+	margin:30px 0 0 0;  
+	text-align:left;
+	float:left;
+	padding:2px 2px 20px 2px;
+}
+
+#columnrightg2 {
+	width:260px; 
+	background-color:#f0f0f0; 
+	margin:0px;  
+	text-align:left;
+	float:left;
+	padding:5px 20px;
+}
+
+
+#gamedetsright {
+	padding:5px 5px 0 15px; 
+	width:215px; 
+	height:10px;
+	vertical-align:top;
+}
+
+#gamedetsright2 {
+	padding:0px 5px 0 10px; 
+	width:50px; 
+	height:10px;
+	vertical-align:top;
+}
+
+#thumbnail {
+	padding:5px 5px 0 0; 
+	width:45px; 
+	text-align:right;
+	float: left;
+}
+
+
+
+
+
+
+
+/* FONTS */
+.copyright {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:9px; line-height:11px;}
+.copyright A,.copyright A:link, .copyright A:active, .copyright A:hover, .copyright A:visited {color:#ffffff; text-decoration:none;}
+
+.text11w {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:14px; letter-spacing:0px;}
+.text11 A,.text11w A:link, .text11w A:active, .text11w A:hover, .text11w A:visited {color:#ff9c55; text-decoration:none;}
+
+.text10g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px; letter-spacing:0px;}
+.text10g A,.text10g A:link, .text10g A:active, .text10g A:hover, .text10g A:visited {color:#c36931; text-decoration:none;}
+
+.text11g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:11px; line-height:12px; letter-spacing:0px;}
+.text11g A,.text11g A:link, .text11g A:active, .text11g A:hover, .text11g A:visited {color:#c36931; text-decoration:none;}
+
+.text15g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px;}
+.text15g A,.text15g A:link, .text15g A:active, .text15g A:hover, .text15g A:visited {color:#c36931; text-decoration:none;}
+
+.text13g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:12px; line-height:13px; letter-spacing:0px;}
+.text13g A,.text13g A:link, .text13g A:active, .text13g A:hover, .text13g A:visited {color:#c36931; text-decoration:none;}
+
+.text15b {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:19px; letter-spacing:0px; text-decoration:underline;}
+.text15b A,.text15b A:link, .text15b A:active, .text15b A:hover, .text15b A:visited {color:#c36931; text-decoration:underline;}
+
+.headerg {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:underline;}
+.headerg A,.headerg A:link, .headerg A:active, .headerg A:hover, .headerg A:visited {color:#c36931; text-decoration:underline;}
+
+.headerg2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:none;}
+.headerg2 A,.headerg2 A:link, .headerg2 A:active, .headerg2 A:hover, .headerg2 A:visited {color:#c36931; text-decoration:none;}
+
+.name {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:13px; line-height:14px; letter-spacing:0px;}
+.name A,.name A:link, .name A:active, .name A:hover, .name A:visited {color:#b5561c; text-decoration:none;}
+
+.header h1 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:20px; line-height:22px; text-decoration:none; letter-spacing:0px;}
+.header A,.header A:link, .header A:active, .header A:hover, .header A:visited {color:#444242; text-decoration:none;}
+
+.header2 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.header2 A,.header2 A:link, .header2 A:active, .header2 A:hover, .header2 A:visited {color:#444242; text-decoration:none;}
+
+.subheader {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.subheader A,.subheader A:link, .subheader A:active, .subheader A:hover, .subheader A:visited {color:#ff9c55; text-decoration:none;}
+
+.subheader2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.subheader2 A,.subheader2 A:link, .subheader2 A:active, .subheader2 A:hover, .subheader2 A:visited {color:#c36931; text-decoration:none;}
+
+.subheader3 {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:14px; line-height:18px; text-decoration:none; letter-spacing:1px;}
+.subheader3 A,.subheader3 A:link, .subheader3 A:active, .subheader3 A:hover, .subheader3 A:visited {color:#ffffff; text-decoration:none;}
+
+.subheader3b {color:#414040; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:14px; line-height:18px; text-decoration:none; letter-spacing:1px;}
+.subheader3b A,.subheader3b A:link, .subheader3b A:active, .subheader3b A:hover, .subheader3b A:visited {color:#414040; text-decoration:none;}
+
+.liner {color:#939191; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px;}
+.liner A,.liner A:link, .liner A:active, .liner A:hover, .liner A:visited {color:#939191; text-decoration:none;}
+
+
+
+/* IMAGES */
+
+.img: {
+	opacity:.2;
+}
+
+
+
+.img:hover {
+	-moz-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	-webkit-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+
+}
+
+
+.img2 {
+	-moz-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	-webkit-box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+	box-shadow:3px 3px 3px rgba(0,0,0,0.4);
+}
+
+
+.img3 {
+	border-style:none;
+	outline: 0;
+}
+
+.img3:hover {
+	border-style:none;
+	outline: 0;
+
+}
+
+
+a:focus {
+    outline: 0px;
+}
+
+
+
+.img4 {
+    border:1px solid #ff9c55;
+}
+
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+	{% block title %}SuperMeeple Admin{% endblock %}
+	
+	{% block leftcolumn %}	
+	<!-- FULLBAR --> 
+	<div id="fullbar">
+		<h1>Admin</h1>
+		<div class="admin-block">
+			<h2>Flush Games Cache</h2>
+			<form action="/admin/flush-cache" method="POST">
+					<label>Flush</label><input type="submit" name="submit" value="Submit">
+			</form>			
+			<h2>Seed Games</h2>
+			<form action="/admin/seed-games" method="POST">
+					<label>Seed</label><input type="submit" name="submit" value="Submit">
+			</form>	
+			<p>GameSeed count = {{game_seed_count}}</p>
+			<p>Processed GameSeed count = {{processed_count}}</p>			
+			<p>Game count = {{game_count}}</p>	
+			<p>GameXML count = {{game_xml_count}}</p>	
+			<h2>Reset Counts</h2>
+			<form action="/admin/reset" method="POST">
+					<label>Reset</label><input type="submit" name="submit" value="Submit">
+			</form>		
+			<p>Games with checkin_count > 0 = {{checkin_counter}}</p>	
+			<h2>Flush Seed Games</h2>
+			<form action="/admin/flush-seed-games" method="POST">
+					<label>Flush Seed</label><input type="submit" name="submit" value="Submit">
+			</form>			
+			<h2>Build Games</h2>
+			<form action="/admin/build-games" method="POST">
+					<label>Build</label><input type="submit" name="submit" value="Submit">
+			</form>				
+			<h2>Create Badges</h2>
+			<form action="/admin/create-badges" method="POST">
+					<label>Create</label><input type="submit" name="submit" value="Submit">
+			</form>			
+			<h2>Upload Badge Image</h2>
+			<form action="{{image_upload_url}}" method="POST" enctype="multipart/form-data">
+				<label>name</label>
+				<select name="key_name">
+					{% for b in badges %}
+						<option value="{{b.key.name}}">{{b.name}}</option>
+					{% endfor %}
+					<option>
+				</select>	<br/>
+				<label>image</label><input type="file" name="file" size="50"><br/> 
+				<input type="submit" name="submit" value="Submit">
+			</form>
+			<h2>Upload Badge Banner</h2>
+			<form action="{{banner_upload_url}}" method="POST" enctype="multipart/form-data">
+				<label>name</label>
+				<select name="key_name">
+					{% for b in badges %}
+						<option value="{{b.key.name}}">{{b.name}}</option>
+					{% endfor %}
+					<option>
+				</select>	<br/>
+				<label>banner</label><input type="file" name="file" size="50"><br/> 
+				<input type="submit" name="submit" value="Submit">
+			</form>			
+			<div id="badges-list">
+			{% for b in badges %}
+				<div class="badge">
+					<h3>Name: {{b.name}}</h3>
+					<p>Key Name: {{b.key_name }}</p>
+					<p>Description: {{b.description}}</p>
+					<p>Points: {{b.points}}</p>
+					<div class="badge-image">
+						<img src="{{b.image_url}}"/>
+						<img class="thumb" src="{{b.image_url}}=s20"/>
+						<img src="{{b.banner_url}}"/>
+					</div>
+				</div>			
+			{% endfor %}
+			</div>	
+		</div>	
+                         
+  </div><!-- /fullbar -->
+	{% endblock %}	
+	
+	{% block rightcolumn %}	
+	{% endblock %}
