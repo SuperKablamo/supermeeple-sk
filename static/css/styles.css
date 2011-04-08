@@ -3,7 +3,7 @@
   SuperMeeple Style Sheet
   ------------------------------------
 */
-
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, small, fieldset, form, label, legend { margin: 0; padding: 0; border: 0; outline: 0; font-size: 100%; vertical-align: baseline; background: transparent; }
 
 /* MAIN DIVS */
 
@@ -31,9 +31,11 @@ body {
 
 #leftcolumn {
 	width:630px;
- 	margin:0 0 0px 0px; 
+ 	margin:0px; 
+	padding:2px 0 0 0px; 
 	float:left; 
 }
+
 
 
 #rightcolumn {
@@ -41,28 +43,38 @@ body {
 	height:50px;
  	padding:2px 0 0 20px; 
 	float:left; 
-	vertical_align:top;
+	vertical-align:top;
+}
+.rightblock p {padding:0 8px;}
+
+#headerleft {
+	background-repeat:no-repeat;
+	height:19px;
+	width:530px;
+	margin:0 0 0 96px;
+	padding:10px 0 0 0;
+	text-align:center;
+	float:left; 
 	
 }
 
-#headerleft {
-	background-image:url(i/header_float.png);
-	background-repeat:no-repeat;
-	height:21px;
-	width:630px;
-	margin:0px;
-	padding:0 0 0 96px;
+#headerright {
+	background-color:#bb652f;
+	height:26px; 
+	width:300px; 
 	text-align:center;
-	float:left; 
+	padding:10px 0 0 0;
+	float:left;
 }
 
-#headerright {
-	width:300px;
-	height:29px;
-	text-align:left;
- 	padding:0px; 
+#headerright2 {
+	background-color:#5d5d5d;
+	height:26px; 
+	width:300px; 
 	text-align:center;
-	float:left; 
+	padding:10px 0 0 0;
+	margin:16px 0 5px 0;	
+	float:left;
 }
 
 #top {
@@ -169,7 +181,7 @@ body {
 
 #logo {
 	width:1057px;
-	height:142px;
+	height:130px;
 	background-image:url(/static/images/logo.png);
 	background-repeat:no-repeat;	
 
@@ -379,7 +391,7 @@ body {
 }
 
 #thumbnail {
-	padding:5px 5px 0 9px; 
+	padding:5px 5px 0 0; 
 	width:45px; 
 	text-align:right;
 	float: left;
@@ -395,33 +407,53 @@ body {
 .copyright {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:9px; line-height:11px;}
 .copyright A,.copyright A:link, .copyright A:active, .copyright A:hover, .copyright A:visited {color:#ffffff; text-decoration:none;}
 
-.text11w {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:14px; letter-spacing:0px;}.text11 A,.text11w A:link, .text11w A:active, .text11w A:hover, .text11w A:visited {color:#ff9c55; text-decoration:none;}
+.text11w {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:14px; letter-spacing:0px;}
+.text11 A,.text11w A:link, .text11w A:active, .text11w A:hover, .text11w A:visited {color:#ff9c55; text-decoration:none;}
 
-.text10g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px; letter-spacing:0px;}.text10g A,.text10g A:link, .text10g A:active, .text10g A:hover, .text10g A:visited {color:#c36931; text-decoration:none;}
+.text10g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px; letter-spacing:0px;}
+.text10g A,.text10g A:link, .text10g A:active, .text10g A:hover, .text10g A:visited {color:#c36931; text-decoration:none;}
 
-.text11g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:11px; line-height:12px; letter-spacing:0px;}.text11g A,.text11g A:link, .text11g A:active, .text11g A:hover, .text11g A:visited {color:#c36931; text-decoration:none;}
+.text11g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:11px; line-height:12px; letter-spacing:0px;}
+.text11g A,.text11g A:link, .text11g A:active, .text11g A:hover, .text11g A:visited {color:#c36931; text-decoration:none;}
 
-.text15g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px;}.text15g A,.text15g A:link, .text15g A:active, .text15g A:hover, .text15g A:visited {color:#c36931; text-decoration:none;}
+.text15g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px;}
+.text15g A,.text15g A:link, .text15g A:active, .text15g A:hover, .text15g A:visited {color:#c36931; text-decoration:none;}
 
-.text13g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:12px; line-height:13px; letter-spacing:0px;}.text13g A,.text13g A:link, .text13g A:active, .text13g A:hover, .text13g A:visited {color:#c36931; text-decoration:none;}
+.text13g {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:12px; line-height:13px; letter-spacing:0px;}
+.text13g A,.text13g A:link, .text13g A:active, .text13g A:hover, .text13g A:visited {color:#c36931; text-decoration:none;}
 
-.text15b {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:19px; letter-spacing:0px; text-decoration:underline;}.text15b A,.text15b A:link, .text15b A:active, .text15b A:hover, .text15b A:visited {color:#c36931; text-decoration:underline;}
+.text15b {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:19px; letter-spacing:0px; text-decoration:underline;}
+.text15b A,.text15b A:link, .text15b A:active, .text15b A:hover, .text15b A:visited {color:#c36931; text-decoration:underline;}
 
-.headerg {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:underline;}.headerg A,.headerg A:link, .headerg A:active, .headerg A:hover, .headerg A:visited {color:#c36931; text-decoration:underline;}
+.headerg {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:underline;}
+.headerg A,.headerg A:link, .headerg A:active, .headerg A:hover, .headerg A:visited {color:#c36931; text-decoration:underline;}
 
-.headerg2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:none;}.headerg2 A,.headerg2 A:link, .headerg2 A:active, .headerg2 A:hover, .headerg2 A:visited {color:#c36931; text-decoration:none;}
+.headerg2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:17px; letter-spacing:0px; text-decoration:none;}
+.headerg2 A,.headerg2 A:link, .headerg2 A:active, .headerg2 A:hover, .headerg2 A:visited {color:#c36931; text-decoration:none;}
 
-.name {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:13px; line-height:14px; letter-spacing:0px;}.name A,.name A:link, .name A:active, .name A:hover, .name A:visited {color:#b5561c; text-decoration:none;}
+.name {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:13px; line-height:14px; letter-spacing:0px;}
+.name A,.name A:link, .name A:active, .name A:hover, .name A:visited {color:#b5561c; text-decoration:none;}
 
-.header {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:20px; line-height:22px; text-decoration:none; letter-spacing:0px;}.header A,.header A:link, .header A:active, .header A:hover, .header A:visited {color:#444242; text-decoration:none;}
+.header h1 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:20px; line-height:22px; text-decoration:none; letter-spacing:0px;}
+.header A,.header A:link, .header A:active, .header A:hover, .header A:visited {color:#444242; text-decoration:none;}
 
-.header2 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}.header2 A,.header2 A:link, .header2 A:active, .header2 A:hover, .header2 A:visited {color:#444242; text-decoration:none;}
+.header2 {color:#444242; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.header2 A,.header2 A:link, .header2 A:active, .header2 A:hover, .header2 A:visited {color:#444242; text-decoration:none;}
 
-.subheader {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:18px; text-decoration:none; letter-spacing:0px;}.subheader A,.subheader A:link, .subheader A:active, .subheader A:hover, .subheader A:visited {color:#ff9c55; text-decoration:none;}
+.subheader {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:15px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.subheader A,.subheader A:link, .subheader A:active, .subheader A:hover, .subheader A:visited {color:#ff9c55; text-decoration:none;}
 
-.subheader2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}.subheader2 A,.subheader2 A:link, .subheader2 A:active, .subheader2 A:hover, .subheader2 A:visited {color:#c36931; text-decoration:none;}
+.subheader2 {color:#515151; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:18px; line-height:18px; text-decoration:none; letter-spacing:0px;}
+.subheader2 A,.subheader2 A:link, .subheader2 A:active, .subheader2 A:hover, .subheader2 A:visited {color:#c36931; text-decoration:none;}
 
-.liner {color:#939191; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px;}.liner A,.liner A:link, .liner A:active, .liner A:hover, .liner A:visited {color:#939191; text-decoration:none;}
+.subheader3 {color:#ffffff; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:14px; line-height:18px; text-decoration:none; letter-spacing:1px;}
+.subheader3 A,.subheader3 A:link, .subheader3 A:active, .subheader3 A:hover, .subheader3 A:visited {color:#ffffff; text-decoration:none;}
+
+.subheader3b {color:#414040; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:14px; line-height:18px; text-decoration:none; letter-spacing:1px;}
+.subheader3b A,.subheader3b A:link, .subheader3b A:active, .subheader3b A:hover, .subheader3b A:visited {color:#414040; text-decoration:none;}
+
+.liner {color:#939191; font-family:Verdana, Helvetica, Tahoma, Arial, sans-serif; font-size:10px; line-height:12px;}
+.liner A,.liner A:link, .liner A:active, .liner A:hover, .liner A:visited {color:#939191; text-decoration:none;}
 
 
 

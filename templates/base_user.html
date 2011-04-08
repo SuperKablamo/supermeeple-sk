@@ -11,7 +11,7 @@
 	{% endblock %}
 						
 						{% block top %}
-
+						<br/>
             <div id="profile-image2"><a href="http://www.facebook.com/tiffanyjessup"><img src="http://graph.facebook.com/{{profile_user.fb_id}}/picture?type=square" height="50" width="50" border="0" alt="Profile Image"/></a></div> 
             <div class="header2" style="width:400px; text-align:left; float:left;">{{profile_user.name|escape }}</div><br />
 
@@ -29,7 +29,7 @@
 							<div id="leftcolumn"> 
 								<!--<div class="text11g" style="padding:0 0 10px 100px; float:left; text-align:left;">View recent checkins | <a href="mygames_list.html">View entire list >></a>
                 </div><br />-->
-                <div id="headerleft" class="header" style="background-image:url(/static/images/header_mycheckinsg.png); margin:0 0 0 96px;"></div>
+								<div id="headerleft" class="subheader3b" style="background-image:url(/static/images/header_fade.png);"><h2>RECENT CHECKINS</h2></div>
 		            {% for c in checkins %}
 								<!--GAME MODULE -->
 								<div id="gamemod">
@@ -79,6 +79,10 @@
 											  	{% endfor %}
 						        		</div><!-- /winner -->  
 						      		</div>
+											{% else %}
+												{% ifequal current_user.fb_id c.player.fb_id %}
+					 					  	<a href="#"><img src="/static/images/scoreit_butt2.png" alt="Score Game" align="left" vspace="26" hspace="2" border="0" /></a>   
+												{% endifequal %}
 											{% endif %}
                     </div>
                     <div style="width:200px; float:left;"> 
@@ -100,6 +104,9 @@
 						   			<strong>Notes:</strong><br>
 						    		No one should ever play RA against me, because I will always win and kick your butt. I am the RA master.       
 						  		</div><!-- /gamenotes -->
+									{% else %}
+						  		<div id="gamenotes3">      
+						  		</div><!-- /gamenotes -->									
 									{% endif %}
 						    </div><!-- /gamemod -->
 								{% endfor %}
@@ -108,9 +115,9 @@
 							{% endblock %}
 							
      				  {% block rightcolumn %}
-							<div id="rightcolumn" style="padding-top:22px;">    				
+							<div id="rightcolumn">    				
 								<div id="mygames2">
-									<div style="background-image:url(/static/images/header_mybadges.png); height:29px; width:300px;"></div>  
+									<div id="headerright" class="subheader3"><h2>{% ifequal current_user.fb_id profile_user.fb_id %}MY{% endifequal %} BADGES</h2></div>   
 									{% for b in badge_log %}
                   <div style="width:100px; float:left;">
                     <img src="{{b.badge.image_url}}" height="50" width="50" border="0" alt="High Score" style="padding:10px 0 10px 50px;" />
