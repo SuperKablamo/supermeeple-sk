@@ -15,11 +15,12 @@ a { color: #FF8003; cursor: pointer; outline: medium none; text-decoration: none
 #container { text-align: left; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 #header, #footer {color: #eee;}
+h1, h2, h3, h4, h5 { font-weight: normal; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em;  line-height: 1em; }
 h1#error { font-size: 40px; color: red; }
-h2 { color: #6d6d6d; font-weight: normal; margin: 5px 0; font-size: 1.4em; }
+/*h2 { color: #6d6d6d; font-weight: normal; margin: 5px 0; font-size: 1.4em; }*/
 h3 { color: #6d6d6d; font-weight: normal; margin: 5px 0; font-size: 1.2em; }
-.game-name h3 { font-weight: normal; font-size: 1.6em; }
+.checkin .game-name h4 { font-weight: normal; font-size: 1.6em; }
 .checkin h4 { font-weight: normal; font-size: 1em; }
 #mainbar #page p { font-size: 1em; }
 #search p { font-size:.8em; text-transform: uppercase; }
@@ -67,14 +68,29 @@ body { background-color: #5a5a5a; }
 .admin-block .badge { padding: 4px 0 12px 0; border-top: dotted 2px #939393; }
 .admin-block .badge img.thumb { padding: 4px 20px; }
 
-/*MAINBAR*/
+/******************************* MAINBAR ************************************/
+/* layout and style */
 #mainbar { margin: 4px 26px 4px 14px; width: 440px; float: left; clear: both; }
 #mainbar #page p { padding: 8px 0; }
+#mainbar .block {}
+#mainbar .block-header { background-color:#E4E5E5; float:left; height:26px; padding:10px 0 0; text-align:center; width:100%; }
+#mainbar .block-header h2 { font-size:1.4em; }
+
+
+/* user profile */
+#mainbar #user-profile { height: 60px; padding-bottom: 12px; }
+#mainbar #user-profile #user-image { border:1px solid #FF9C55; float:left; height:50px; margin:0 10px 10px 0; width:50px; }
+#mainbar #user-profile #user-name { float:left; text-align:left; }
+#mainbar #user-profile #user-name h1 { margin:0; }
+#mainbar #user-profile #fb-like { padding-top:32px; }
+
+
+
 #game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
 #game-header { float: left; margin: 0 0 10px 0; }
 #game-header-wrap #facebook-like .fb_ltr { padding: 0 0 3px 6px; }
 #game-header-wrap #edit { margin: 0 0 0 8px; }
-#user-profile #facebook-like { float: right; margin-top: 8px; }
+
 table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #game-list caption { padding: 10px 0 5px; }
 #game-list td, #game-list th { border-top: 1px dotted #939393; padding: 6px 4px 6px; vertical-align: top; }
@@ -85,14 +101,13 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #game-image { padding-top: 10px; }
 #game-image img, #profile-image img, .checkin .game-image img, #comments { border: 3px solid #939393; }
 #game-image img { max-width: 200px; }
-#profile-image { float: left; padding: 0 12px 0 0; } 
-#profile-image img { max-width: 50px; }
+
 .checkin .game-image img { max-width: 80px; }
-#profile-name { float: left; }
+
 #description { height: 10em; overflow: hidden; }
 #more-less-container { text-align: right; } 
 
-#user-profile { height: 60px; padding-bottom: 12px; }
+
 .checkin .game-image { float: right; padding: 10px 10px 0 0; }
 .checkin .game-name { margin: 4px 0 0 0; }
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
@@ -121,22 +136,49 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 
 #comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 
-/*SIDEBAR*/
-#sidebar { margin: 8px 0px 4px 10px; width: 300px; float: left; }
-#sidebar .block { padding-bottom: 12px; width: 256px; }
+/************************* SIDEBAR ******************************************/
+/* block layout and style */
+#sidebar { margin:4px 0px 4px 10px; width:300px; float:left; }
+#sidebar .block { padding-bottom:0; width:256px; }
+#sidebar .block-header { background-color:#BB652F; height:26px; padding:10px 0 0; text-align:center; width:100%; }
+#sidebar .block-header h2 { color:#fff; font-size:1.4em; }
+#sidebar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
+#sidebar .block-footer { }
+#sidebar h3 { font-size:1.2em; } 
+#sidebar h4 { font-size:1em; font-weight:bold; }
+
+
+/* search */
 #search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }
+
+/* checkin form */
 #checkin-form { width: 256px; }
 #checkin-button { padding: 4px 0 10px 0; }
 #checkmark { float: left; }
 img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
 .tip { border: dotted 2px #939393; padding: 6px; margin: 0 0 12px 0; }
-#badges p, .tip p, #checkin-list p { padding: 0 0 12px 0; }
-#badges ul, #badges li, .tip ul, .tip li { list-style: disc inside none; }
-h2 img.check-mark, #badges img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
+
+/* my badges */
+#badges-block {background-color: #F0F0F0; float: left; margin: 0; text-align:left; width:300px; background-color:#f0f0f0;}
+#badges-block .badge-log { float:left; clear:both; width:100%; }
+#badges-block .badge-log .badge, #badges-block .badge-log .awards { float:left; }
+#badges-block .badge-log .awards { padding: 14px 10px 14px 14px; }
+#badges-block .badge-log .awards li { list-style:none inside; padding-left: 6px; }
+#badges-block .badge-log .badge img { float:right; padding:10px 0 10px 30px; }
+
+#badges-block p, .tip p, #checkin-list p { padding: 0 0 12px 0; }
+#badges-block ul, #badges-block li, .tip ul, .tip li { list-style: disc inside none; }
+h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
+
+
+/* checkin lists */
+
 .player img { width: 20px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
 img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
-#badges, #message { width: 100%; padding: 0 0 10px 0; }
+#badges-block { width: 100%; }
+#message { width: 100%; padding: 0 0 10px 0; }
+
 .tiny-checkin .game-badges { margin: 0 0 0 16px; }
 .tiny-checkin .player, .tiny-checkin .game { float: left; }
 .tiny-checkin .time, .tiny-score .time { margin: 4px 0 0 0; }
