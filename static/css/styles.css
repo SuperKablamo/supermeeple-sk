@@ -75,7 +75,7 @@ body { background-color: #5a5a5a; }
 #mainbar .block {}
 #mainbar .block-header { background-color:#E4E5E5; float:left; height:26px; padding:10px 0 0; text-align:center; width:100%; }
 #mainbar .block-header h2 { font-size:1.4em; }
-
+#mainbar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
 
 /* user profile */
 #mainbar #user-profile { height: 60px; padding-bottom: 12px; }
@@ -84,48 +84,39 @@ body { background-color: #5a5a5a; }
 #mainbar #user-profile #user-name h1 { margin:0; }
 #mainbar #user-profile #fb-like { padding-top:32px; }
 
-
-
-#game-header-wrap { margin: 0 0 12px 0; /*overflow: hidden;*/ }
-#game-header { float: left; margin: 0 0 10px 0; }
-#game-header-wrap #facebook-like .fb_ltr { padding: 0 0 3px 6px; }
-#game-header-wrap #edit { margin: 0 0 0 8px; }
-
-table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
-#game-list caption { padding: 10px 0 5px; }
-#game-list td, #game-list th { border-top: 1px dotted #939393; padding: 6px 4px 6px; vertical-align: top; }
+/* game profile */
+#game-header-wrap { margin: 0 0 12px 0; }
+#game-header { float:left; margin:0 0 10px 0; }
+#game-header-wrap #facebook-like .fb_ltr { padding:0 0 3px 6px; }
+#game-header-wrap #edit { margin:0 0 0 8px; }
 #game-detail { margin: 12px 0; clear: both; }
+#description { height: 10em; overflow: hidden; }
+#more-less-container { text-align: right; } 
 #game-detail dl { margin: 6px 0; }
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
-#game-image { padding-top: 10px; }
-#game-image img, #profile-image img, .checkin .game-image img, #comments { border: 3px solid #939393; }
-#game-image img { max-width: 200px; }
 
-.checkin .game-image img { max-width: 80px; }
-
-#description { height: 10em; overflow: hidden; }
-#more-less-container { text-align: right; } 
-
-
+/* checkin list */
+#mainbar #checkin-list { width: 100%; }
+.checkin .game-image img { border: 3px solid #939393; max-width: 80px; }
 .checkin .game-image { float: right; padding: 10px 10px 0 0; }
 .checkin .game-name { margin: 4px 0 0 0; }
+.checkin .game-name h3 { font-size:1.4em; }
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
-
-#checkin-list { width: 100%; }
-.checkin, .tiny-checkin, .tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; border-top: 1px dotted #939393; }
-.checkin .message {padding: 6px 0 0 28px;}
-.checkin .game-name p, .checkin h4 .description { padding: 4px 0 0 4px; }
+.checkin .message { padding: 6px 0 0 28px; }
 .checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
 .checkin .log .scores { float: left; width: 100%; }
 .checkin .log .scores ul { padding: 0 20px 0 0; }
 .checkin .log .note { float: left; width: 50%; }
 .checkin .log table, .checkin .log th, .checkin .log td {border: 1px solid #e5e5e5;}
-.checkin td, .checkin th {padding: 2px 6px;}
-.checkin caption {text-align: left; padding:2px 6px; background-color:#e4e5e5;}
+.checkin .log td, .checkin .log th {padding: 2px 6px;}
+.checkin div.score-data caption, .checkin div.score-note caption {text-align: left; padding:2px 6px; background-color:#e4e5e5;}
 .checkin div.score-data {float: left; padding-right: 10px;}
 .checkin div.score-note {float: left;}
 
+.checkin, .tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; }
+
+/* game log */
 #game-log-form-wrapper { margin: 12px 0 0 0; }
 #game-log-form input { margin: 4px 0 4px 0; }
 #game-log-form fieldset#player { float: left; }
@@ -133,7 +124,7 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #game-log-form fieldset#winner { float: left; }
 #game-log-form fieldset#note { clear: both; }
 
-
+/* comments */
 #comments { background-color: #EEE; padding: 8px 12px; margin-top: 20px; }
 
 /************************* SIDEBAR ******************************************/
@@ -147,10 +138,18 @@ table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; 
 #sidebar h3 { font-size:1.2em; } 
 #sidebar h4 { font-size:1em; font-weight:bold; }
 
-
 /* search */
 #search { margin: 0 0 0 3px; }
 #search p { padding: 4px 0 4px 4px; }
+
+/* award winners */
+#sidebar table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
+#sidebar #game-list td, #sidebar #game-list th { border-bottom: 1px solid #E4E5E5; padding: 6px 4px 6px; vertical-align: top; }
+
+/* game image */
+#sidebar #game-image { padding-top: 10px; }
+#sidebar #game-image img { max-width: 200px; }
+#sidebar #game-image img { border: 3px solid #939393; }
 
 /* checkin form */
 #checkin-form { width: 256px; }
@@ -160,20 +159,20 @@ img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-
 .tip { border: dotted 2px #939393; padding: 6px; margin: 0 0 12px 0; }
 
 /* my badges */
-#badges-block {background-color: #F0F0F0; float: left; margin: 0; text-align:left; width:300px; background-color:#f0f0f0;}
+#badges-block { background-color:#F0F0F0; float:left; margin:0; text-align:left; width:300px; background-color:#f0f0f0; }
 #badges-block .badge-log { float:left; clear:both; width:100%; }
 #badges-block .badge-log .badge, #badges-block .badge-log .awards { float:left; }
 #badges-block .badge-log .awards { padding: 14px 10px 14px 14px; }
+#badges-block .badge-log .awards h3 { font-size:1em; }
 #badges-block .badge-log .awards li { list-style:none inside; padding-left: 6px; }
 #badges-block .badge-log .badge img { float:right; padding:10px 0 10px 30px; }
-
 #badges-block p, .tip p, #checkin-list p { padding: 0 0 12px 0; }
 #badges-block ul, #badges-block li, .tip ul, .tip li { list-style: disc inside none; }
 h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 
-
 /* checkin lists */
-
+#checkin-block { background-color:#F0F0F0; }
+#checkin-block .tiny-checkin { margin:0; padding:0 0 10px 6px; clear:both; overflow:hidden; }
 .player img { width: 20px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
 img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
 #badges-block { width: 100%; }

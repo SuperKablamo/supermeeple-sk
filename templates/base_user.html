@@ -51,7 +51,7 @@
 							{% endif %}					
 						</div><!-- /game-image -->
 						<div class="game-name">
-							<h4><a href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">{{c.game.name}}</a></h4>
+							<h3><a href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">{{c.game.name}}</a></h3>
 							<p>{{c.created|timesince}} ago </p>
 							{% for b in c.badges %}
 							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
@@ -110,6 +110,7 @@
 						{% endif %}					
 					</div><!-- /checkin -->
 				</div><!-- /checkin-wrapper -->	
+				<div class="liner"></div>
 				{% endfor %}			
 			{% else %}
 				{% ifequal current_user.fb_id c.player.fb_id %}
@@ -159,7 +160,7 @@
 							<img src="{{b.badge.image_url}}" height="50" width="50" border="0" alt="High Score" />
 						</div><!-- /badge -->
 						<div class="awards">
-            	<h4>{{b.badge.name}}</h4>
+            	<h3>{{b.badge.name}}</h3>
 							<ul>
 							{% for g in b.games %}
               	<li>

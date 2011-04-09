@@ -215,13 +215,17 @@
 				</div>
 				{% endif %}
 				{% endif %}
-			</div><!-- /block -->		
-			<!-- CHECKIN LIST -->	
+			</div><!-- /block -->	
+			
+			<br/>	
+			<!-- CHECKINS -->	
 			<div class="block">
 				<div class="checkin-list">
-					<h2>Recent checkins</h2>
-					{% if checkins %}
-						{% for c in checkins %}
+					<div class="block-header">
+						<h2>Recent checkins</h2>
+					</div>
+				{% if checkins %}
+					{% for c in checkins %}
 					<div class="tiny-checkin">
 						<div class="player-wrap">
 							<div class="player">
@@ -237,16 +241,21 @@
 							<p>{{c.created|timesince}} ago</p>
 						</div>	
 					</div><!-- /tiny-checkin -->
-						{% endfor %}
-					{% else %}
+					<div class="liner"></div>
+					{% endfor %}
+				{% else %}
 					<p>No one has checked into {{game.name}} yet. Be the first!</p>
-					{% endif %}	
+				{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
+			
+			<br/>
 			<!-- HIGH SCORES -->
 			<div class="block">
 				<div class="high-scores-list">
-					<h2>High Scores</h2>
+					<div class="block-header">
+						<h2>High Scores</h2>
+					</div>			
 			    {% if high_scores %}
 						{% for s in high_scores %}
 						<div class="tiny-score">
@@ -265,6 +274,7 @@
 								<p>{{s.created|timesince}} ago</p>
 							</div>
 						</div>	
+						<div class="liner"></div>
 					  {% endfor %}
 			    {% else %}
 					<p>No one has logged a score for {{game.name}} yet. Be the first!  Checkin and then add a score.</p>			

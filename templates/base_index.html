@@ -88,6 +88,7 @@
 						{% endif %}
 					</div><!-- /checkin -->
 				</div><!-- /checkin-wrapper -->
+				<div class="liner"></div>
 				{% endfor %}
 			</div><!-- /checkin-list -->
 		</div><!-- /block -->
@@ -96,6 +97,7 @@
 	
 	{% block sidebar %}
 	<div id="sidebar">
+		
 		<!-- SEARCH -->
 		<div class="block">			
   		<div id="search">
@@ -109,35 +111,37 @@
 				<p>search for more games</p>
    		</div>
 		</div><!-- /block -->	
+		
 		<br/><br/>
 		<!-- MY CHECKINS -->
 		{% if current_user.fb_id %}
 		<div class="block">
-			<div class="checkin-list">
+			<div id="checkin-block">
 				<div class="block-header">
 					<h2>My Checkins</h2>
 				</div>	
-				{% if my_checkins %}
-					{% for c in my_checkins %}
+			{% if my_checkins %}
+				{% for c in my_checkins %}
 				<div class="tiny-checkin">
 					<div class="game-wrap">
 						<div class="game">
 				  		<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></h3>
 						</div>
 						<div class="game-badges">
-						{% for b in c.badges %}
+					{% for b in c.badges %}
 							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
-					  {% endfor %}
+				  {% endfor %}
 						</div>
 					</div><!-- /player-wrap -->						
 					<div class="time">
 						<p>{{c.created|timesince}} ago</p>
 					</div>	
 				</div><!-- /tiny-checkin -->
-					{% endfor %}
-				{% else %}
+				<div class="liner"></div>
+				{% endfor %}
+			{% else %}
 				<p>You have not checked into and games yet.</p>
-				{% endif %}	
+			{% endif %}	
 			</div><!-- /checkin-list -->	
 		</div><!-- /block -->			
 		{% endif %}
