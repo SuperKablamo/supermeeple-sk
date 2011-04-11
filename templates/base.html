@@ -37,6 +37,7 @@
     		});
   		});
   	</script>
+
 		<!-- Checkin form -->
 		<script type="text/javascript">
   		$(function() {  
@@ -73,7 +74,25 @@
    		});
 		</script>
 		{% endblock %}
-		
+
+		<!-- welcome message -->
+		<script type="text/javascript">
+  		$(function() {  
+      	$('#close-it').click(function() { 
+			 		$.ajax({  
+						type: 'POST',  
+				  	url: '/user/{{current_user.fb_id}}',  
+				  	data: {'method': 'welcomed'},  
+				  	dataType: 'json',
+          	complete: function() {
+          		$('#content-steps').hide();
+						}				
+					});
+					return false;
+    		});  
+   		});
+		</script>
+				
 		<!-- Google Analytics -->
 		<script type="text/javascript">
 	  	var _gaq = _gaq || [];
@@ -119,6 +138,21 @@
 			</div>-->
     </div><!-- /header -->
 		<div id="content-top"></div>
+		{% if not current_user.welcomed %}
+		<div id="content-steps">
+			<form id="step-2"method="post" action="/game" name="input">
+				<input type="text" size="18" id="game-search" class="search-box">
+			  <input type="hidden" id="game-id" name="game_id">
+			  <input type="hidden" id="game-name" name="game_name">                   
+			  <input type="submit" value="Go" class="button">
+			</form>			
+			<div id="close">
+				<a id="close-it" href="#">
+					<img width="16" height="15" border="0" align="right" alt="Close" src="/static/images/close_x.png">	
+				</a>
+			</div>
+		</div><!-- /content-steps -->
+		{% endif %}		
     <div id="content"> 
     	{% block main %}
     	{% endblock %} 

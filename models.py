@@ -49,6 +49,8 @@ class User(db.Model): # fb_id is key_name
     score_count = db.IntegerProperty(required=True, default=0)
     badges = db.ListProperty(db.Key, required=True, default=None)
     badge_log = JSONProperty(required=True, default=None)
+    welcomed = db.BooleanProperty(required=True, default=False)
+    alerted = db.BooleanProperty(required=True, default=False)
     @property
     def gamelog_players(self):
         return GameLog.all().filter('players', self.key())    

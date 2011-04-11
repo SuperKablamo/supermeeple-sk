@@ -298,6 +298,14 @@ class UserProfile(BaseHandler):
             'facebook_app_id': FACEBOOK_APP_ID
         }  
         self.generate('base_user.html', template_values)
+        
+    def post(self, user_fb_id=None):
+        logging.info(TRACE+'UserProfile:: post()')
+        user = self.current_user # this is the logged in User
+        profile_user = getFBUser(user_fb_id)
+        profile_user.welcomed = True
+        db.put(profile_user)
+        return None     
 
 class Checkin(BaseHandler):
     """Accepts Checkin POSTs.

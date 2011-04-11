@@ -43,6 +43,7 @@ body { background-color: #5a5a5a; }
 #content { width: 840px; clear: both; min-height: 800px; background: url("/static/images/content-background.png") repeat-y; padding: 0 26px; overflow:hidden; }
 #content-top { width: 840px; height: 10px; clear: both; background: url("/static/images/content-top.png") no-repeat; padding: 10px 26px 0 26px; }
 #content-bottom { width: 840px; height: 32px; clear: both;  background: url("/static/images/content-bottom.png") no-repeat; padding: 0px 26px 0 26px; }
+#content-steps { width: 840px; height: 90px; clear: both;  background: url("/static/images/content-background-steps.png") no-repeat; padding: 0px 26px 0 26px; }
 
 /*HEADER*/
 #header { width: 840px; height: 60px; margin: 0; clear: both; }
@@ -76,6 +77,10 @@ body { background-color: #5a5a5a; }
 #mainbar .block-header { background-color:#E4E5E5; float:left; height:26px; padding:10px 0 0; text-align:center; width:100%; }
 #mainbar .block-header h2 { font-size:1.4em; }
 #mainbar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
+
+/* steps */
+#step-2 { padding:34px 0 0 324px; }
+#close { padding:0 52px 0 0; }
 
 /* user profile */
 #mainbar #user-profile { height: 60px; padding-bottom: 12px; }
@@ -173,10 +178,11 @@ h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; paddin
 /* checkin lists */
 #checkin-block { background-color:#F0F0F0; }
 #checkin-block .tiny-checkin { margin:0; padding:0 0 10px 6px; clear:both; overflow:hidden; }
-.player img { width: 20px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
+.player img { width: 25px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
 img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
 #badges-block { width: 100%; }
 #message { width: 100%; padding: 0 0 10px 0; }
+#checkin-block p { padding: 6px;}
 
 .tiny-checkin .game-badges { margin: 0 0 0 16px; }
 .tiny-checkin .player, .tiny-checkin .game { float: left; }
@@ -184,6 +190,9 @@ img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; bord
 .tiny-score .points { padding: 0 0 0 6px; }
 .player-wrap { padding: 4px 0 0 0; overflow: hidden; }
 .game-wrap { padding: 4px 0 0 0; overflow: hidden; }
+
+/* high score list */
+#score-block p { padding: 6px;}
 
 /*FOOTER*/
 #footer { height: 40px; margin: 10px 0 0 0; clear: both; padding:0 0 10px 0; text-align:center; width:840px;}

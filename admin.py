@@ -75,6 +75,8 @@ class Admin(webapp.RequestHandler):
         logging.info('################## method = ' +method+' ##############')
         if method == "create-badges":
             createBadges()
+        if method == "add-badge":
+            addBadge(self)            
         if method == "flush-seed-games":
             result = deferred.defer(meeple_tasks.flushSeedGames)          
         if method == "seed-games":
@@ -164,6 +166,13 @@ def createBadges():
 def getBadges():
     """Returns all Badge Entities in the Datastore"""
     return models.Badge.all().fetch(500)
+
+def addBadge(self):
+    """Creates a single Badge Entity in the Datastore"""
+    name = self.request.get('name')
+    badge = models.Badge(key_name=name, name=name, description=name)
+    db.put(badge)
+    return badge
     
 def buildGames(fetch_size=20):
     logging.info('#################### buildGames() ########################')
