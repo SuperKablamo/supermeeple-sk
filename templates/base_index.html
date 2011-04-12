@@ -115,8 +115,8 @@
 		<!-- MY CHECKINS -->
 		{% if current_user.fb_id %}
 		<div class="block">
-			<div id="checkin-block">
-				<div class="block-header">
+			<div id="my-checkin-block">
+				<div class="block-header-orange">
 					<h2>My Checkins</h2>
 				</div>	
 			{% if my_checkins %}
@@ -128,12 +128,21 @@
 						</div>
 						<div class="game-badges">
 					{% for b in c.badges %}
-							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s20" />
+							<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s25" />
 				  {% endfor %}
 						</div>
 					</div><!-- /player-wrap -->						
-					<div class="time">
-						<p>{{c.created|timesince}} ago</p>
+					<div class="details">
+						<div class="time">
+							<p>{{c.created|timesince}} ago</p>
+						</div>	
+						{% if not c.gamelog %}
+						<div class="score-it">
+							{% ifequal current_user.fb_id c.player.fb_id %}
+							<a href="/game-log/{{c.id}}"><img src="/static/images/scoreit-button-gray.png"></a>
+							{% endifequal %}
+						</div>
+						{% endif %}
 					</div>	
 				</div><!-- /tiny-checkin -->
 				<div class="liner"></div>
@@ -148,7 +157,7 @@
 		<br/>
 		<!-- SPIEL DES JAHRES -->
 		<div class="block">
-			<div class="block-header">
+			<div class="block-header-orange">
 				<h2>Spiel Des Jahres Winners</h2>
 			</div>
       <table id="game-list">
@@ -168,7 +177,7 @@
 		<br/>
 		<!-- MEEPLES CHOICE -->		
 		<div class="block">
-			<div class="block-header">
+			<div class="block-header-orange">
 				<h2>Meeples' Choice Awards</h2>
 			</div>			
     	<table id="game-list">

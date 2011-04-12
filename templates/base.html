@@ -59,10 +59,10 @@
           		$('#checkin-form-inner').hide();
           	},
 				  	success: function(badges) {  
-				  		$('#checkin-form').html("<div id='message'></div><div id='badges'></div>");  
-				    	$('#message').html("<h2><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h2>");  
+				  		$('#checkin-form').html("<div id='status'></div><div id='new-badges'></div>");  
+				    	$('#status').html("<h3><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h3>");  
 							$.each(badges, function(i,badge) {
-				  	  	$('#badges').append("<h2>New Badge!</h2><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
+				  	  	$('#new-badges').append("<h3>New Badge!</h3><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
 				    	});
 				  	},
           	complete: function() {
@@ -75,6 +75,7 @@
 		</script>
 		{% endblock %}
 
+		{% if not current_user.welcomed %}
 		<!-- Welcome message -->
 		<script type="text/javascript">
   		$(function() {  
@@ -92,7 +93,26 @@
     		});  
    		});
 		</script>
-				
+
+	  <!-- Freebase Jquery search inside welcome message -->
+		<script type="text/javascript">
+  		$(function() {
+    		$("#game-search2").suggest({service_url:"http://api.freebase.com",
+				service_path:"/api/service/search",
+				flyout_service_url:"http://www.freebase.com"});
+				var inst = $("#game-search2").data("suggest");
+				inst.options.ac_param.type = '/games/game';
+				inst.options.ac_param.mql_output = JSON.stringify([{id:null, mid:null,
+				name:null}]);
+        $("#game-search2").bind("fb-select", function(e, data) {
+    			$("#game-id").val(data.id);
+    			$("#game-name").val(data.name);
+					$("#game-mid").val(data.mid);
+    		});
+  		});
+  	</script><strong></strong>
+		{% endif %}				
+		
 		<!-- Google Analytics -->
 		<script type="text/javascript">
 	  	var _gaq = _gaq || [];
@@ -132,12 +152,13 @@
 		<!-- Welcome message -->
 		{% if not current_user.welcomed %}
 		<div id="content-steps">
-			<form id="step-2"method="post" action="/game" name="input">
-				<input type="text" size="18" id="game-search" class="search-box">
-			  <input type="hidden" id="game-id" name="game_id">
-			  <input type="hidden" id="game-name" name="game_name">                   
-			  <input type="submit" value="Go" class="button">
-			</form>			
+ 			<form name="input" action="/game" method="post">
+     		<input class="search-box2" type="text" id="game-search"/>
+     		<input type="hidden" name="game_id" id="game-id" />
+     		<input type="hidden" name="game_name" id="game-name" />
+     		<input type="hidden" name="game_mid" id="game-mid" />
+     		<input class="button" value="Go" type="submit"/>
+   		</form>			
 			<div id="close">
 				<a id="close-it" href="#">
 					<img width="16" height="15" border="0" align="right" alt="Close" src="/static/images/close_x.png">	

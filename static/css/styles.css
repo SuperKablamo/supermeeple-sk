@@ -123,16 +123,9 @@ body { background-color: #5a5a5a; }
 #checkin-list .checkin .log table, #checkin-list .checkin .log th, #checkin-list .checkin .log td { border: 1px solid #e5e5e5; }
 #checkin-list .checkin .log td, #checkin-list .checkin .log th { padding: 2px 6px; }
 #checkin-list .checkin .log td.center { text-align:center; }
-
 #checkin-list .note { background-color: #e5e5e5; border:1px solid #CFCFCF;
   float:left; margin:0; padding:4px 10px; width:418px; border-top:none; }
-
-.checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
-.checkin .log .scores { float: left; width: 100%; }
-.checkin .log .scores ul { padding: 0 20px 0 0; }
-.checkin .log .note { float: left; width: 50%; }
-
-.tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; }
+#checkin-list .checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
 
 /* game log */
 #game-log-form-wrapper { margin: 12px 0 0 0; }
@@ -149,8 +142,10 @@ body { background-color: #5a5a5a; }
 /* block layout and style */
 #sidebar { margin:4px 0px 4px 10px; width:300px; float:left; }
 #sidebar .block { padding-bottom:0; width:256px; }
-#sidebar .block-header { background-color:#BB652F; height:26px; padding:10px 0 0; text-align:center; width:100%; }
-#sidebar .block-header h2 { color:#fff; font-size:1.4em; }
+#sidebar .block-header-orange, #sidebar .block-header-gray { height:26px; padding:10px 0 0; text-align:center; width:100%; }
+#sidebar .block-header-orange { background-color:#bb652f; }
+#sidebar .block-header-gray { background-color:#5d5d5d; }
+#sidebar .block-header-orange h2, #sidebar .block-header-gray h2 { color:#fff; font-size:1.4em; }
 #sidebar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
 #sidebar .block-footer { }
 #sidebar h3 { font-size:1.2em; } 
@@ -164,17 +159,16 @@ body { background-color: #5a5a5a; }
 #sidebar table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #sidebar #game-list td, #sidebar #game-list th { border-bottom: 1px solid #E4E5E5; padding: 6px 4px 6px; vertical-align: top; }
 
-/* game image */
-#sidebar #game-image { padding-top: 10px; }
-#sidebar #game-image img { max-width: 200px; }
-#sidebar #game-image img { border: 3px solid #939393; }
-
-/* checkin form */
-#checkin-form { width: 256px; }
-#checkin-button { padding: 4px 0 10px 0; }
+/* game checkin */
+#checkin-block, #my-checkin-block { background-color:#F0F0F0; text-align:center; }
+#checkin-block #game-image { padding:10px; }
+#checkin-block #game-image img { max-width:200px; border:3px solid #939393; }
+#checkin-block .tip { padding:6px; margin:0 0 12px 0; }
+#checkin-form { width: 100%; }
+#checkin-button { padding: 0 0 10px 0; }
 #checkmark { float: left; }
-img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
-.tip { border: dotted 2px #939393; padding: 6px; margin: 0 0 12px 0; }
+#checkin-form-submit { padding:6px 10px 4px 0; overflow:hidden; }
+#checkin-form-submit img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
 
 /* my badges */
 #badges-block { background-color:#F0F0F0; float:left; margin:0; text-align:left; width:300px; background-color:#f0f0f0; }
@@ -189,21 +183,34 @@ img.join-button, img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-
 h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 
 /* checkin lists */
-#checkin-block { background-color:#F0F0F0; }
-#checkin-block .tiny-checkin { margin:0; padding:0 0 0 6px; clear:both; overflow:hidden; }
-#checkin-block .player img { width: 25px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
-img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; border: none; } 
-#badges-block { width: 100%; }
-#message { width: 100%; padding: 0 0 10px 0; }
-#checkin-block p { padding: 6px;}
-#checkin-block .time p { padding: 0 6px;}
+#recent-checkin-block { text-align:center; }
+#my-checkin-block .tiny-checkin, #recent-checkin-block .tiny-checkin { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
+#recent-checkin-block .tiny-checkin .player-wrap, #my-checkin-block .tiny-checkin .game-wrap, #my-checkin-block .tiny-checkin .details { overflow:hidden; }
+#my-checkin-block .tiny-checkin .game-wrap .game, #recent-checkin-block .tiny-checkin .player-wrap .player { float:left; text-align:left; }
+#recent-checkin-block .tiny-checkin .player-wrap .badges { float:right; padding:0 4px; }
+#recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .player-wrap .player { width:160px; text-align:left; }
+#recent-checkin-block .tiny-checkin .player-wrap .player img { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px; }
+#my-checkin-block .tiny-checkin .game-wrap .game-badges { float:right; padding:0 4px 0 0;  }
+#my-checkin-block .tiny-checkin .details { padding:4px 0 0 0 ; }
+#my-checkin-block .tiny-checkin .details .time, #recent-checkin-block .tiny-checkin .time { float:left; padding:4px 0 0 0; }
+#my-checkin-block .tiny-checkin .details .time { width:148px; text-align:left; }
+#my-checkin-block .tiny-checkin .details .score-it { float:right; padding:0 4px 0 0; }
+#my-checkin-block .player img { width:25px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
+img.thumbnail-badge { width: 25px; margin:0px 4px; vertical-align:middle; border: none; }
+#my-checkin-block .time p { padding: 0 6px; }
+
+
+
+
+.tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; }
 
 .tiny-checkin .game-badges { margin: 0 0 0 16px; }
-.tiny-checkin .player, .tiny-checkin .game { float: left; }
-.tiny-checkin .time, .tiny-score .time { margin: 0; }
+.tiny-score .time { margin: 0; }
 .tiny-score .points { padding: 0 0 0 6px; }
-.player-wrap { padding: 4px 0 0 0; overflow: hidden; }
-.game-wrap { padding: 4px 0 0 0; overflow: hidden; }
+.player-wrap { padding: 4px 0 0 0; }
+.game-wrap { padding: 4px 0 0 0; }
+
+#message { padding:0 0 10px 0; }
 
 /* high score list */
 #score-block p { padding: 6px;}
@@ -213,3 +220,6 @@ img.thumbnail-badge { width: 20px; margin: 0px 4px; vertical-align: middle; bord
 
 /*AJAX*/
 #spinner.loading { background-image: url("/static/images/ajax-loader.gif"); width: 128px; height: 16px; }
+#status h3, #new-badges h3 { }
+#status {}
+#new-badges {}
