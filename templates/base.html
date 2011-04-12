@@ -75,7 +75,7 @@
 		</script>
 		{% endblock %}
 
-		<!-- welcome message -->
+		<!-- Welcome message -->
 		<script type="text/javascript">
   		$(function() {  
       	$('#close-it').click(function() { 
@@ -125,19 +125,11 @@
 				</div>
 			</div><!-- /login -->
       <br/>
-
-			<!--<div id="fb-login">
-    		{% if current_user %}
-      	<div id="fb-profile">
-					<p>Hello, <a href="/user/{{current_user.fb_id}}">{{current_user.name}}</a></p>
-				</div>
-    		{% endif %}
-				<div id="fb-button">
-					<fb:login-button autologoutlink="true" perms="publish_checkins,publish_stream" show-faces="false" width="200"></fb:login-button>
-				</div>
-			</div>-->
     </div><!-- /header -->
+
 		<div id="content-top"></div>
+		
+		<!-- Welcome message -->
 		{% if not current_user.welcomed %}
 		<div id="content-steps">
 			<form id="step-2"method="post" action="/game" name="input">
@@ -153,7 +145,8 @@
 			</div>
 		</div><!-- /content-steps -->
 		{% endif %}		
-    <div id="content"> 
+    
+		<div id="content"> 
     	{% block main %}
     	{% endblock %} 
 
