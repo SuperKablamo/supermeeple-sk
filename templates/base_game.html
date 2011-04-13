@@ -32,7 +32,7 @@
 					</h1>
 				</div>
 		  </div>
-			<div id="game-detail">	
+			<div id="game-detail" class="text12" >	
 				{% if game.description %}
   			<h2>Overview</h2>
 				<div id="description">
@@ -210,7 +210,7 @@
 					<div class="block-header-orange">
 						<h2>Game Checkin</h2>
 					</div>	
-					<div class="tip">
+					<div class="tip text12">
 						<p><strong>Playing {{game.name}}?</strong>  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
 					</div>
 					{% if current_user %}
@@ -234,7 +234,7 @@
 								{% endif %}
 								<textarea class="text-area" id="message" name="message" rows="3" cols="28">Joining a game of {{game.name}}.</textarea><br/>
 								<div id="checkin-form-submit">
-									<span id="share-text">Share on 
+									<span id="share-text text10">Share on 
 									<img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> 
 									<input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</span>
 									<input type="image" src="/static/images/checkin-button-blue.png" style="float:right" name="submit" class="button" id="checkin-button" value="Checkin" />
@@ -259,7 +259,9 @@
 					<div class="tiny-checkin">
 						<div class="player-wrap">
 							<div class="player">
-					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a>
+					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a>
+								<span class="text12"><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></span>
+								<p class="text10">{{c.created|timesince}} ago</p>
 							</div>
 							<div class="badges">
 							{% for b in c.badges %}
@@ -267,9 +269,6 @@
 						  {% endfor %}
 							</div>
 						</div><!-- /player-wrap -->						
-						<div class="time">
-							<p>{{c.created|timesince}} ago</p>
-						</div>	
 					</div><!-- /tiny-checkin -->
 					<div class="liner"></div>
 					{% endfor %}

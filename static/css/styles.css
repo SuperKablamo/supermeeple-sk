@@ -13,37 +13,17 @@ table { border-collapse: collapse; border-spacing: 0; }
 body { font-family:Verdana,Helvetica,Tahoma,Arial,sans-serif; font-size:62.5%; color:#515151; }
 a { color:#FF8003; cursor:pointer; outline:medium none; text-decoration:none; }
 h1, h2, h3, h4, h5 { font-weight:normal; }
-
-
-
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
-#header, #footer {color: #eee;}
+#header, #footer {color: #fff; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em;  line-height: 1em; }
 h1#error { font-size: 40px; color: red; }
-.checkin .game-name h4 { font-weight: normal; font-size: 1.6em; }
-.checkin h4 { font-weight: normal; font-size: 1em; }
-#mainbar #page p { font-size: 1em; }
-
-#game-list caption { color: #999; text-align: left; }
-#game-list .year { text-align: right; } 
-#game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
-#game-title span.name {   }
-#game-title span.year { font-size: 0.8em; color: #999; }
-.tip { color: #999; }
-#badges span.badge-title { font-size: 1.2em; color: #fff; }
-/*freebase-tag .logo { color: #3885C7; }
-gae-tag .logo { color: #3885C7;  }*/
-#footer #plus { font-size: 1.4em; font-weight: bold; }
-#game-header-wrap #edit { font-size: .4em; }
-.tiny-score .points, .tiny-friend-score .points { font-weight: bold; color: #299F25; font-size: 1.2em; }
 .text10 { line-height:1em; font-size:1em; } 
+.text1014 { line-height:1.4em; font-size:1em; } 
 .text11 { line-height:1.1em; font-size:1.1em; } 
 .text12 { line-height:1.2em; font-size:1.2em; }
+.text1216 { line-height:1.6em; font-size:1.2em; }
 .text13 { font-size:1.3em; font-size:1.3em; }
 .text14 { font-size:1.4em; font-size:1.4em; }
-
-
-
 
 /*LAYOUT*/
 body { background-color: #5a5a5a; }
@@ -99,21 +79,22 @@ body { background-color: #5a5a5a; }
 
 /* game profile */
 #game-header-wrap { margin: 0 0 12px 0; }
+#game-header-wrap #edit { font-size: .4em; }
 #game-header { float:left; margin:0 0 10px 0; }
 #game-header-wrap #facebook-like .fb_ltr { padding:0 0 3px 6px; }
 #game-header-wrap #edit { margin:0 0 0 8px; }
+#game-title span.year { font-size: 0.8em; color: #999; }
 #game-detail { margin: 12px 0; clear: both; }
-#description { height: 10em; overflow: hidden; }
+#game-detail h2 { padding:0 0 8px 0; font-size:1.2em; color:#999; }
+#description { height:10em; overflow:hidden; padding-left:12px; }
 #more-less-container { text-align: right; } 
 #game-detail dl { margin: 6px 0; }
-#game-detail dt { padding: 10px 0 6px; } 
+#game-detail dt { padding: 10px 0 6px; text-align: left; font-size: 1.2em; color: #999; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
-
 #game-detail-left { width:180px; padding:0pt 0pt 20px; float:left; text-align:left; }
 #game-detail-right { width:220px; float:right; text-align:right; padding:10px 0 0 10px; }
 #game-detail-right #game-image { padding:10px; }
-#game-detail-right #game-image img { max-width:200px; border:3px solid #939393; }
-
+#game-detail-right #game-image img { max-width:200px; border:3px solid #999; }
 
 /* checkin list */
 #checkin-list { width:100%; text-align:left; }
@@ -163,8 +144,8 @@ body { background-color: #5a5a5a; }
 #sidebar .block-header-orange h2, #sidebar .block-header-gray h2 { color:#fff; font-size:1.4em; letter-spacing:.1em; line-height:1em; text-decoration:none; text-transform:uppercase; }
 #sidebar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
 #sidebar .block-footer { }
-#sidebar h3 { font-size:1.2em; } 
-#sidebar h4 { font-size:1em; font-weight:bold; }
+#sidebar h3 { font-size:1.2em; line-height:1em; text-decoration:none; } 
+#sidebar h4 { font-size:1.2em; letter-spacing:.1em; line-height:1em; text-decoration:none; }
 
 /* search */
 #search { margin: 0 0 0 3px; }
@@ -179,6 +160,7 @@ body { background-color: #5a5a5a; }
 #sidebar .block-header-orange h2.award { text-transform:none; }
 #sidebar table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #sidebar #game-list td, #sidebar #game-list th { border-bottom: 1px solid #E4E5E5; padding: 6px 4px 6px; vertical-align: top; }
+#sidebar #game-list .year { text-align: right; } 
 
 /* game checkin */
 #checkin-block, #my-checkin-block { background-color:#F0F0F0; text-align:center; }
@@ -195,41 +177,28 @@ body { background-color: #5a5a5a; }
 #badge-block { background-color:#F0F0F0; text-align:center; }
 #badge-block .badge-log { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
 #badge-block .badge-log .badge, #badge-block .badge-log .awards { float:left; }
-#badge-block .badge-log .awards { padding:14px 10px 14px 14px; width:160px; text-align:left; }
-#badge-block .badge-log .awards h3 { font-size:1em; text-decoration:underline; padding-bottom:4px; }
+#badge-block .badge-log .awards { padding:14px 10px 14px 12px; width:160px; text-align:left; }
+#badge-block .badge-log .awards h3 { text-decoration:underline; padding-bottom:4px; font-size:1.4em; line-height:1.6em; }
 #badge-block .badge-log .awards li { list-style:none inside; padding-left:2px; }
 #badge-block .badge-log .badge img { float:right; padding:8px 0 8px 8px; }
 #badge-block p { padding:0 0 12px 0; }
 
-
-
-h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
-
 /* checkin lists */
 #recent-checkin-block { text-align:center; }
 #my-checkin-block .tiny-checkin, #recent-checkin-block .tiny-checkin { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
-#recent-checkin-block .tiny-checkin .player-wrap, #my-checkin-block .tiny-checkin .game-wrap, #my-checkin-block .tiny-checkin .details { overflow:hidden; }
+#recent-checkin-block .tiny-checkin .player-wrap, #my-checkin-block .tiny-checkin .game-wrap, #my-checkin-block .tiny-checkin .details { overflow:hidden; padding:4px 0 0 0; }
 #my-checkin-block .tiny-checkin .game-wrap .game, #recent-checkin-block .tiny-checkin .player-wrap .player { float:left; text-align:left; }
 #recent-checkin-block .tiny-checkin .player-wrap .badges { float:right; padding:0 4px; }
 #recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .player-wrap .player { width:160px; text-align:left; }
 #recent-checkin-block .tiny-checkin .player-wrap .player img { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px; }
-#my-checkin-block .tiny-checkin .game-wrap .game-badges { float:right; padding:0 4px 0 0;  }
+#my-checkin-block .tiny-checkin .game-wrap .game-badges { float:right; padding:0 4px 0 0; margin:0 0 0 16px;}
 #my-checkin-block .tiny-checkin .details { padding:4px 0 0 0 ; }
-#my-checkin-block .tiny-checkin .details .time, #recent-checkin-block .tiny-checkin .time { float:left; padding:4px 0 0 0; }
+#my-checkin-block .tiny-checkin .details .time { float:left; padding:4px 0 0 0; }
 #my-checkin-block .tiny-checkin .details .time { width:148px; text-align:left; }
 #my-checkin-block .tiny-checkin .details .score-it { float:right; padding:0 4px 0 0; }
 #my-checkin-block .player img { width:25px; margin-right: 4px; border: 1px solid #939393; vertical-align: middle; } 
 img.thumbnail-badge { width: 25px; margin:0px 4px; vertical-align:middle; border: none; }
 #my-checkin-block .time p { padding: 0 6px; }
-
-
-.tiny-checkin .game-badges { margin: 0 0 0 16px; }
-.tiny-score .time { margin: 0; }
-.tiny-score .points { padding: 0 0 0 6px; }
-.player-wrap { padding: 4px 0 0 0; }
-.game-wrap { padding: 4px 0 0 0; }
-
-#message { padding:0 0 10px 0; }
 
 /* high score list */
 #score-block p { padding: 6px;}
@@ -239,6 +208,7 @@ img.thumbnail-badge { width: 25px; margin:0px 4px; vertical-align:middle; border
 
 /*AJAX*/
 #spinner.loading { background-image: url("/static/images/ajax-loader.gif"); width: 128px; height: 16px; }
+h2 img.check-mark { vertical-align:text-bottom; padding:0 6px 4px 0; }
 #status h3, #new-badges h3 { }
 #status {}
 #new-badges {}

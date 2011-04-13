@@ -54,9 +54,9 @@
 					<div class="checkin">
 						<div class="player">
 							<div class="details">
-								<span class="message">{% if c.message %}"{{c.message}}"{% endif %}</span>							
+								<span class="message text12">{% if c.message %}"{{c.message}}"{% endif %}</span>							
 							</div><!-- /details -->	
-							<div class="log">
+							<div class="log text12">
 								{% if c.gamelog %}
 								<table>
 									<tbody>
@@ -104,8 +104,8 @@
 
 					</div><!-- /checkin -->
 					{% if c.gamelog %}				
-					<div class="note">
-						<strong>Score Comment:</strong>&nbsp;{{c.gamelog.note}}
+					<div class="note text12">
+						<strong>Notes:</strong>&nbsp;{{c.gamelog.note}}
 					</div><!-- /note -->
 						{% endif %}
 				</div><!-- /checkin-wrapper -->	
@@ -145,7 +145,7 @@
             	<h3>{{b.badge.name}}</h3>
 							<ul>
 							{% for g in b.games %}
-              	<li>
+              	<li class="text1014">
 									<a title="{{g.name}}" href="/game{{g.mid}}/{{g.bgg_id|default_if_none:"0"}}">{{g.name}}</a>
 								</li>
     					{% endfor %}
