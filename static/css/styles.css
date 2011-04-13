@@ -9,21 +9,21 @@ ins { text-decoration: none; }
 del { text-decoration: line-through; }
 table { border-collapse: collapse; border-spacing: 0; }
 
-/*TEXT STYLES*/
-body { font-family: Verdana,Helvetica,Tahoma,Arial,sans-serif; line-height: 1.4em; font-size: .8em; color: #515151; }
-a { color: #FF8003; cursor: pointer; outline: medium none; text-decoration: none; }
-#container { text-align: left; }
+/* COMMON STYLES*/
+body { font-family:Verdana,Helvetica,Tahoma,Arial,sans-serif; font-size:62.5%; color:#515151; }
+a { color:#FF8003; cursor:pointer; outline:medium none; text-decoration:none; }
+h1, h2, h3, h4, h5 { font-weight:normal; }
+
+
+
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 #header, #footer {color: #eee;}
-h1, h2, h3, h4, h5 { font-weight: normal; }
 h1 { font-weight: normal; margin: 5px 0; font-size: 2em;  line-height: 1em; }
 h1#error { font-size: 40px; color: red; }
-/*h2 { color: #6d6d6d; font-weight: normal; margin: 5px 0; font-size: 1.4em; }*/
-h3 { color: #6d6d6d; font-weight: normal; font-size: 1.2em; }
 .checkin .game-name h4 { font-weight: normal; font-size: 1.6em; }
 .checkin h4 { font-weight: normal; font-size: 1em; }
 #mainbar #page p { font-size: 1em; }
-#search p { font-size:.8em; text-transform: uppercase; }
+
 #game-list caption { color: #999; text-align: left; }
 #game-list .year { text-align: right; } 
 #game-detail dt { text-align: left; font-size: 1.2em; color: #999; } 
@@ -36,6 +36,14 @@ gae-tag .logo { color: #3885C7;  }*/
 #footer #plus { font-size: 1.4em; font-weight: bold; }
 #game-header-wrap #edit { font-size: .4em; }
 .tiny-score .points, .tiny-friend-score .points { font-weight: bold; color: #299F25; font-size: 1.2em; }
+.text10 { line-height:1em; font-size:1em; } 
+.text11 { line-height:1.1em; font-size:1.1em; } 
+.text12 { line-height:1.2em; font-size:1.2em; }
+.text13 { font-size:1.3em; font-size:1.3em; }
+.text14 { font-size:1.4em; font-size:1.4em; }
+
+
+
 
 /*LAYOUT*/
 body { background-color: #5a5a5a; }
@@ -75,7 +83,7 @@ body { background-color: #5a5a5a; }
 #mainbar #page p { padding: 8px 0; }
 #mainbar .block {}
 #mainbar .block-header { background-color:#E4E5E5; float:left; height:26px; padding:10px 0 0; text-align:center; width:100%; }
-#mainbar .block-header h2 { font-size:1.4em; }
+#mainbar .block-header h2 { font-size:1.4em; color:#414040; letter-spacing:.1em; line-height:1em; text-decoration:none; text-transform:uppercase; }
 #mainbar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
 
 /* steps */
@@ -101,12 +109,19 @@ body { background-color: #5a5a5a; }
 #game-detail dt { padding: 10px 0 6px; } 
 #game-detail dd { line-height: 1.4em; margin-left: 12px; }
 
+#game-detail-left { width:180px; padding:0pt 0pt 20px; float:left; text-align:left; }
+#game-detail-right { width:220px; float:right; text-align:right; padding:10px 0 0 10px; }
+#game-detail-right #game-image { padding:10px; }
+#game-detail-right #game-image img { max-width:200px; border:3px solid #939393; }
+
+
 /* checkin list */
 #checkin-list { width:100%; text-align:left; }
 #checkin-list .checkin-wrapper { clear:both; margin-bottom:8px; overflow:hidden; }
 #checkin-list .checkin-header { background-image:url("/static/images/blank-header.png"); background-repeat:no-repeat; float:left; height:50px; width:440px; clear:both; }
 #checkin-list .checkin-header .game-title { float:left; padding:14px 0 0 10px; width:280px; }
-#checkin-list .checkin-header .game-title .time { color:#FFFFFF; line-height:1em; font-size:.8em; padding:2px 0 0 2px; }
+#checkin-list .checkin-header .game-title h3 { font-size:1.4em; line-height:1.4em; text-decoration:none; }
+#checkin-list .checkin-header .game-title .time { color:#FFFFFF; padding:2px 0 0 2px; }
 #checkin-list .checkin-header .badges { float:left; padding:5px 0 0; width:148px; }
 #checkin-list .checkin-header .badges .banner { float:right; height:44px; width:44px; }
 #checkin-list .checkin { float:left; padding:10px; width:418px; border:1px solid #e5e5e5; }
@@ -114,17 +129,17 @@ body { background-color: #5a5a5a; }
 #checkin-list .checkin .player .image { float:left; height:50px; padding:0 5px 5px 0; width:55px; }
 #checkin-list .checkin .player .image img { width:50px;  height:50px; border:1px solid #ff9c55; }
 #checkin-list .checkin .player .details { float:left; height:50px; padding:0 10px 0 0; width:230px; }
-#checkin-list .checkin .player .details .name { color: #515151; }
+#checkin-list .checkin .player .details .name { color: #515151; font-size:1.4em; line-height:1.4em; }
 #checkin-list .checkin .game-image { width:118px; float:left; }
 #checkin-list .checkin .game-image .thumb { padding:0; text-align:right; vertical-align:top; }
 #checkin-list .checkin .game-image .thumb img { border:3px solid #939393; max-width: 108px; }
 .checkin .game-badges { margin: 8px 0 0 12px; float: left; }
 #checkin-list .checkin .player .score { float:left; width:300px; }
 #checkin-list .checkin .log table, #checkin-list .checkin .log th, #checkin-list .checkin .log td { border: 1px solid #e5e5e5; }
-#checkin-list .checkin .log td, #checkin-list .checkin .log th { padding: 2px 6px; }
+#checkin-list .checkin .log td, #checkin-list .checkin .log th { padding:4px 6px; }
 #checkin-list .checkin .log td.center { text-align:center; }
 #checkin-list .note { background-color: #e5e5e5; border:1px solid #CFCFCF;
-  float:left; margin:0; padding:4px 10px; width:418px; border-top:none; }
+  float:left; margin:0; padding:8px 12px; width:418px; border-top:none; }
 #checkin-list .checkin .log { clear: both; padding: 10px 0 0 0; overflow: hidden; }
 
 /* game log */
@@ -145,7 +160,7 @@ body { background-color: #5a5a5a; }
 #sidebar .block-header-orange, #sidebar .block-header-gray { height:26px; padding:10px 0 0; text-align:center; width:100%; }
 #sidebar .block-header-orange { background-color:#bb652f; }
 #sidebar .block-header-gray { background-color:#5d5d5d; }
-#sidebar .block-header-orange h2, #sidebar .block-header-gray h2 { color:#fff; font-size:1.4em; }
+#sidebar .block-header-orange h2, #sidebar .block-header-gray h2 { color:#fff; font-size:1.4em; letter-spacing:.1em; line-height:1em; text-decoration:none; text-transform:uppercase; }
 #sidebar .liner { background-image: url("/static/images/liner.png"); float:left; height:2px; padding:0; width:100%; }
 #sidebar .block-footer { }
 #sidebar h3 { font-size:1.2em; } 
@@ -153,9 +168,15 @@ body { background-color: #5a5a5a; }
 
 /* search */
 #search { margin: 0 0 0 3px; }
-#search p { padding: 4px 0 4px 4px; }
+#search p { padding: 4px 0 4px 4px; text-transform:uppercase; }
+
+/* android app */
+#app-block { clear:both; overflow:hidden; }
+#android-logo { float:left; width:100px; height:100px; }
+#android-text { padding:10px 8px 10px 8px; }
 
 /* award winners */
+#sidebar .block-header-orange h2.award { text-transform:none; }
 #sidebar table#game-list { border-collapse: collapse; width: 240px; padding-right: 40px; }
 #sidebar #game-list td, #sidebar #game-list th { border-bottom: 1px solid #E4E5E5; padding: 6px 4px 6px; vertical-align: top; }
 
@@ -171,15 +192,17 @@ body { background-color: #5a5a5a; }
 #checkin-form-submit img.facebook-icon { padding: 0px 0 0 4px; vertical-align: text-bottom; }
 
 /* my badges */
-#badges-block { background-color:#F0F0F0; float:left; margin:0; text-align:left; width:300px; background-color:#f0f0f0; }
-#badges-block .badge-log { float:left; clear:both; width:100%; }
-#badges-block .badge-log .badge, #badges-block .badge-log .awards { float:left; }
-#badges-block .badge-log .awards { padding: 14px 10px 14px 14px; }
-#badges-block .badge-log .awards h3 { font-size:1em; }
-#badges-block .badge-log .awards li { list-style:none inside; padding-left: 6px; }
-#badges-block .badge-log .badge img { float:right; padding:10px 0 10px 30px; }
-#badges-block p, .tip p, #checkin-list p { padding: 0 0 12px 0; }
-#badges-block ul, #badges-block li, .tip ul, .tip li { list-style: disc inside none; }
+#badge-block { background-color:#F0F0F0; text-align:center; }
+#badge-block .badge-log { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
+#badge-block .badge-log .badge, #badge-block .badge-log .awards { float:left; }
+#badge-block .badge-log .awards { padding:14px 10px 14px 14px; width:160px; text-align:left; }
+#badge-block .badge-log .awards h3 { font-size:1em; text-decoration:underline; padding-bottom:4px; }
+#badge-block .badge-log .awards li { list-style:none inside; padding-left:2px; }
+#badge-block .badge-log .badge img { float:right; padding:8px 0 8px 8px; }
+#badge-block p { padding:0 0 12px 0; }
+
+
+
 h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; padding: 0 6px 4px 0; }
 
 /* checkin lists */
@@ -199,10 +222,6 @@ h2 img.check-mark, #badges-block img.badge { vertical-align: text-bottom; paddin
 img.thumbnail-badge { width: 25px; margin:0px 4px; vertical-align:middle; border: none; }
 #my-checkin-block .time p { padding: 0 6px; }
 
-
-
-
-.tiny-score, .tiny-friend-score { margin: 0 0 10px 0; padding: 4px 0 0 0; clear: both; overflow: hidden; }
 
 .tiny-checkin .game-badges { margin: 0 0 0 16px; }
 .tiny-score .time { margin: 0; }

@@ -12,83 +12,82 @@
 				</div>	
 				{% for c in checkins %}
 				<div class="checkin-wrapper">
-
-				<div class="checkin-header">
-					<div class="game-title">
-						<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></h3>
-						<p class="time">{{c.created|timesince}} ago </p>						
-					</div>	
-					<div class="badges">
-						{% for b in c.badges %}
-						<div class="banner">
-							<img alt="{{b.name}}" title="{{b.name}}" title src="{{b.banner_url}}" />
+					<div class="checkin-header">
+						<div class="game-title">
+							<h3><a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{ c.game.bgg_id|default_if_none:"0" }}">{{c.game.name}}</a></h3>
+							<p class="time text10">{{c.created|timesince}} ago </p>						
 						</div>	
-			  		{% endfor %}		
-					</div>	
-				</div><!-- checkin-header -->	
+						<div class="badges">
+							{% for b in c.badges %}
+							<div class="banner">
+								<img alt="{{b.name}}" title="{{b.name}}" title src="{{b.banner_url}}" />
+							</div>	
+			  			{% endfor %}		
+						</div>	
+					</div><!-- checkin-header -->	
 
-				<div class="checkin">
-					<div class="player">
-						<div class="image">
-			  			<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a>
-						</div><!-- /image -->
-						<div class="details">
-							<span class="name"><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></span><br>
-							<span class="message">{% if c.message %}"{{c.message}}"{% endif %}</span>							
-						</div><!-- /details -->	
-						<div class="log">
-							{% if c.gamelog %}
-							<table>
-								<tbody>
-									<tr>
-										<th>Player</th>
-										<th>Points</th>
-										<th>Winner</th>	
-									</tr>
-									{% for s in c.gamelog.scores %}								
-									<tr>									
-										<td>{{s.name}}</td>
-										<td class="center">{{s.points}}</td>
-										<td class="center">
-											{% if s.winner %}
-											<img src="/static/images/winner.png" vspace="3">
-									  	{% else %}
-											&nbsp;
-									  	{% endif %}
-										</td>
-									</tr>
-									{% endfor %}
-								</tbody>	
-							</table>	
-							{% else %}
-						  	{% ifequal current_user.fb_id c.player.fb_id %}
-								<a href="/game-log/{{c.id}}"><img src="/static/images/scoreit-button-orange.png"></a>
-								{% endifequal %}
-							{% endif %}						
-						</div><!-- /log -->					
-					</div><!-- /player -->
+					<div class="checkin">
+						<div class="player">
+							<div class="image">
+			  				<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}"><img title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a>
+							</div><!-- /image -->
+							<div class="details">
+								<span class="name"><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}">{{c.player.name}}</a></span><br>
+								<span class="message text12">{% if c.message %}"{{c.message}}"{% endif %}</span>							
+							</div><!-- /details -->	
+							<div class="log text12">
+								{% if c.gamelog %}
+								<table>
+									<tbody>
+										<tr>
+											<th>Player</th>
+											<th>Points</th>
+											<th>Winner</th>	
+										</tr>
+										{% for s in c.gamelog.scores %}								
+										<tr>									
+											<td>{{s.name}}</td>
+											<td class="center">{{s.points}}</td>
+											<td class="center">
+												{% if s.winner %}
+												<img src="/static/images/winner.png" vspace="3">
+									  		{% else %}
+												&nbsp;
+									  		{% endif %}
+											</td>
+										</tr>
+										{% endfor %}
+									</tbody>	
+								</table>	
+								{% else %}
+						  		{% ifequal current_user.fb_id c.player.fb_id %}
+									<a href="/game-log/{{c.id}}"><img src="/static/images/scoreit-button-orange.png"></a>
+									{% endifequal %}
+								{% endif %}						
+							</div><!-- /log -->					
+						</div><!-- /player -->
 						
- 					<div class="game-image">
-						<div class="thumb">
-							{% if c.game.bgg_thumbnail_url %}
-							<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-								<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
-							</a>
-							{% else %}
-							<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-								<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
-							</a>
-							{% endif %}
-						</div>
-					</div><!-- /game-image -->
+ 						<div class="game-image">
+							<div class="thumb">
+								{% if c.game.bgg_thumbnail_url %}
+								<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+									<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+								</a>
+								{% else %}
+								<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
+									<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>
+								</a>
+								{% endif %}
+							</div><!-- /thumb -->
+						</div><!-- /game-image -->
 
-				</div><!-- /checkin -->
+					</div><!-- /checkin -->
 					{% if c.gamelog %}				
-				<div class="note">
-					<strong>Score Comment:</strong>&nbsp;{{c.gamelog.note}}
-				</div><!-- /note -->
-					{% endif %}
-				</div>	
+					<div class="note text12">
+						<strong>Notes:</strong>&nbsp;{{c.gamelog.note}}
+					</div><!-- /note -->
+						{% endif %}
+				</div><!-- /checkin-wrapper -->	
 				{% endfor %}
 			</div><!-- /checkin-list -->
 		</div><!-- /block -->
@@ -155,10 +154,28 @@
 		{% endif %}
 		
 		<br/>
+		<!-- ANDROID APP -->
+		<div class="block">
+			<div class="block-header-orange">
+				<h2>Android App</h2>
+			</div>
+			<div id="app-block">
+				<div id="android-logo">	
+					<img src="/static/images/google-android-logo.png" />
+				</div>
+				<div id="android-text">
+					<p><strong>Coming Soon:</strong><br/>
+						Get the SuperMeeple Android app and checkin from your mobile phone!
+					</p>
+				</div>
+			</div>	
+		</div><!-- /block -->
+		
+		<br/>
 		<!-- SPIEL DES JAHRES -->
 		<div class="block">
 			<div class="block-header-orange">
-				<h2>Spiel Des Jahres Winners</h2>
+				<h2 class="award">Spiel Des Jahres Winners</h2>
 			</div>
       <table id="game-list">
         {% for s in spiels %}
@@ -178,7 +195,7 @@
 		<!-- MEEPLES CHOICE -->		
 		<div class="block">
 			<div class="block-header-orange">
-				<h2>Meeples' Choice Awards</h2>
+				<h2 class="award">Meeples' Choice Awards</h2>
 			</div>			
     	<table id="game-list">
       	{% for m in meeples %}

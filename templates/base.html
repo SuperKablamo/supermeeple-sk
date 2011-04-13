@@ -152,7 +152,7 @@
 		<!-- Welcome message -->
 		{% if not current_user.welcomed %}
 		<div id="content-steps">
- 			<form name="input" action="/game" method="post">
+ 			<form id="step-2" name="input" action="/game" method="post">
      		<input class="search-box2" type="text" id="game-search"/>
      		<input type="hidden" name="game_id" id="game-id" />
      		<input type="hidden" name="game_name" id="game-name" />
