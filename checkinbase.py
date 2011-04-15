@@ -36,7 +36,7 @@ def createCheckin(user, game, message, share=False):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #  'message': message,
     #  'game':
-    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url}
+    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url,'img_url':img_url}
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
@@ -50,7 +50,8 @@ def createCheckin(user, game, message, share=False):
     game_data = {'name': game.name, 
                  'mid': game.mid, 
                  'bgg_id': game.bgg_id, 
-                 'bgg_thumbnail_url': game.bgg_thumbnail_url}
+                 'bgg_thumbnail_url': game.bgg_thumbnail_url,
+                 'image_url':game.image_url}
                  
     if badge_entities is not None:
         for b in badge_entities:
@@ -115,7 +116,7 @@ def getUserCheckins(user, count=10):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
+    #     {'name': name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_url,'image_url':image_url},
     #   'message': 'message    
     #   'gamelog':
     #     {'note':note, 
@@ -172,7 +173,7 @@ def getLatestCheckins(count=10):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url},
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url, 'image_url':image_url},
     #    'message': 'message
     #  }]
     q = models.Checkin.all()
@@ -277,9 +278,9 @@ def shareGameLog(share, user, checkin_json):
         logging.info('#### posting to Facebook '+user.access_token+'####')
         # Build Game data ...
         game = models.Game.get_by_key_name(checkin_json['game']['mid'])
-        thumbnail = game.bgg_thumbnail_url
-        if thumbnail is None:
-            thumbnail = 'http://api.freebase.com/api/trans/image_thumb'+game.mid+'?maxwidth=80&maxheight=100'
+        thumbnail = 'http://api.freebase.com/api/trans/image_thumb'+game.mid+'?maxwidth=80&maxheight=100'
+        if game.image_url is not None:
+            thumbnail = game.image_url+'=s100'
         gamelog = checkin_json['gamelog']
         description = utils.smart_truncate(game.description, length=300)    
         

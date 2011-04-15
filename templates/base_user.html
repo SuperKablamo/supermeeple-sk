@@ -90,9 +90,9 @@
 						
  						<div class="game-image">
 							<div class="thumb">
-								{% if c.game.bgg_thumbnail_url %}
+								{% if c.game.image_url %}
 								<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">
-									<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.bgg_thumbnail_url}}"/>
+									<img title="{{c.game.name}}" alt="{{c.game.name}}"src="{{c.game.image_url}}=s108"/>
 								</a>
 								{% else %}
 								<a title="{{c.game.name}}" href="/game{{c.game.mid}}/{{c.game.bgg_id|default_if_none:"0"}}">

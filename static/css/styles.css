@@ -50,12 +50,14 @@ body { background-color: #5a5a5a; }
 
 /*FULLBAR*/
 #fullbar { width: 600px; float: left; padding: 0 0 0 28px; min-height: 600px; }
-.admin-block { border: dotted 2px #939393; padding: 0 6px; }
-.admin-block h2 { padding: 12px 0; }
-.admin-block label { position: absolute; text-align:right; width:60px; }
-.admin-block input, .admin-block textarea, .admin-block select { margin: 0 0 12px 70px; }
-.admin-block .badge { padding: 4px 0 12px 0; border-top: dotted 2px #939393; }
-.admin-block .badge img.thumb { padding: 4px 20px; }
+#admin-block { border: dotted 2px #939393; padding: 0 6px; }
+#admin-block h2 { padding: 12px 0; }
+#admin-block label { position:absolute; text-align:right; width:60px; }
+#admin-block .label { font-weight:bold; }
+#admin-block input, #admin-block textarea, #admin-block select { margin: 0 0 12px 70px; }
+#admin-block p { padding:0 0 4px 0; }
+#admin-block .badge { padding: 4px 0 12px 0; border-top: dotted 2px #939393; }
+#admin-block .badge img.thumb { padding: 4px 20px; }
 
 /******************************* MAINBAR ************************************/
 /* layout and style */

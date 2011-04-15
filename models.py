@@ -60,6 +60,8 @@ class Game(db.Model): # mid is key_name
     bgg_id = db.StringProperty(required=False, default='0') # BoardGameGeek id
     mid = db.StringProperty(required=False) # Freebase mid
     asin = db.StringProperty(required=False) # ASIN number
+    image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
+    image_url = db.LinkProperty(required=False)
     bgg_url = db.LinkProperty(required=False)
     bgg_img_url = db.LinkProperty(required=False)
     bgg_thumbnail_url = db.LinkProperty(required=False)

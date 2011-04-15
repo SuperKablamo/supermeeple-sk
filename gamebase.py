@@ -7,6 +7,8 @@
 
 ############################# IMPORTS ########################################
 ############################################################################## 
+from __future__ import with_statement
+
 import freebase
 import logging
 import main
@@ -19,6 +21,8 @@ from utils import buildDataList
 from utils import findPrimaryName
 from xml.etree import ElementTree 
 
+from google.appengine.api import files
+from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.ext import db
 
@@ -44,36 +48,7 @@ def getGame(mid, bgg_id='0'):
                     logging.info(TRACE+'getGame():: BGG error, using FB')
                     game = buildFBGame(mid)
                 else: # Build Game from BGG data
-                    game = models.Game(key_name=mid,
-                                 mid=mid,
-                                 bgg_id=bgg_id,
-                                 bgg_img_url=game_data['image_url'],
-                                 bgg_thumbnail_url=game_data['thumbnail_url'],
-                                 name=game_data['name'],
-                                 description=game_data['description'],
-                                 year_published = game_data['year_published'],
-                                 min_players = game_data['min_players'],
-                                 max_players = game_data['max_players'],
-                                 playing_time = game_data['playing_time'],
-                                 age = game_data['age'],
-                                 publishers = game_data['publishers'],
-                                 artists = game_data['artists'],
-                                 designers = game_data['designers'],
-                                 expansions = game_data['expansions'],
-                                 categories = game_data['categories'],
-                                 mechanics = game_data['mechanics'],
-                                 subdomains = game_data['subdomains'])
-                
-                    # Store BGG XML 
-                    game_xml = models.GameXML.get_by_key_name(bgg_id)
-                    if game_xml is None:
-                        game_xml = models.GameXML(key_name=bgg_id, 
-                                                  xml=game_data['xml_text'])  
-                    else:
-                        game_xml.xml = game_data['xml_text']                 
-                    # Save Game and GameXML, and then create Cached Game
-                    game.put()
-                    game_xml.put()       
+                    game = buildBGGGame(mid, bgg_id, game_data)
                     success = memcache.set(key=mid, 
                                            value=game, 
                                            time=432000) # expiration 5 days
@@ -126,16 +101,32 @@ def buildGame(mid, bgg_id):
     logging.info(TRACE+'buildGame('+str(bgg_id)+', '+str(mid)+')')
     game = models.Game.get_by_key_name(mid)
     if game is None: # Game has never been stored, so build and store it.
+    
         # Use BGG XML API to get Game data
         game_data = parseBGGXML(bgg_id)
         if game_data is None: 
             logging.info(TRACE+'buildGame() failed, unable to parse BGGXML')
             return None
+        
+        # Store image    
+        bgg_image_url = game_data['image_url']
+        if bgg_image_url is not None:
+            file_name = files.blobstore.create(mime_type='image/jpeg')
+            image = urllib2.urlopen(bgg_image_url)
+            with files.open(file_name, 'a') as f:
+                f.write(image.read())
+            
+            files.finalize(file_name)   
+            image_blob_key = files.blobstore.get_blob_key(file_name) 
+            image_url = images.get_serving_url(image_blob_key)   
+            
         # Build Game from BGG data
         game = models.Game(key_name=mid,
                            mid=mid,
                            bgg_id=bgg_id,
-                           bgg_img_url=game_data['image_url'],
+                           image=image_blob_key,
+                           image_url=image_url,
+                           bgg_img_url=bgg_image_url,
                            bgg_thumbnail_url=game_data['thumbnail_url'],
                            name=game_data['name'],
                            description=game_data['description'],
@@ -157,6 +148,55 @@ def buildGame(mid, bgg_id):
         game.put() # Save Game
         game_xml.put() # Save GameXML  
 
+def buildBGGGame(mid, bgg_id, game_data):
+    """Builds a Game from the BGG XML API.  Expects bgg_id is not None.
+    """ 
+    # Store image    
+    bgg_image_url = game_data['image_url']
+    if bgg_image_url is not None:
+        file_name = files.blobstore.create(mime_type='image/jpeg')
+        image = urllib2.urlopen(bgg_image_url)
+        with files.open(file_name, 'a') as f:
+            f.write(image.read())
+        
+        files.finalize(file_name)   
+        image_blob_key = files.blobstore.get_blob_key(file_name) 
+        image_url = images.get_serving_url(str(image_blob_key))    
+       
+    game = models.Game(key_name=mid,
+                       mid=mid,
+                       bgg_id=bgg_id,
+                       image=image_blob_key,
+                       image_url=image_url,                       
+                       bgg_img_url=game_data['image_url'],
+                       bgg_thumbnail_url=game_data['thumbnail_url'],
+                       name=game_data['name'],
+                       description=game_data['description'],
+                       year_published = game_data['year_published'],
+                       min_players = game_data['min_players'],
+                       max_players = game_data['max_players'],
+                       playing_time = game_data['playing_time'],
+                       age = game_data['age'],
+                       publishers = game_data['publishers'],
+                       artists = game_data['artists'],
+                       designers = game_data['designers'],
+                       expansions = game_data['expansions'],
+                       categories = game_data['categories'],
+                       mechanics = game_data['mechanics'],
+                       subdomains = game_data['subdomains'])
+
+    # Store BGG XML 
+    game_xml = models.GameXML.get_by_key_name(bgg_id)
+    if game_xml is None:
+        game_xml = models.GameXML(key_name=bgg_id, 
+                                  xml=game_data['xml_text'])  
+    else:
+        game_xml.xml = game_data['xml_text']                 
+    # Save Game and GameXML, and then create Cached Game
+    game.put()
+    game_xml.put()
+    return game
+
 def buildFBGame(mid):
     """Builds a Game from the Freebase API.  Expects mid is not None.
     """
@@ -168,17 +208,18 @@ def buildFBGame(mid):
     else:
         game_blurb_text = None      
     game = models.Game(key_name=mid,
-                     mid=mid,
-                     name=game_data['name'],
-                     year_published = game_data['year_published'],
-                     min_players = game_data['min_players'],
-                     max_players = game_data['max_players'],
-                     playing_time = game_data['playing_time'],
-                     age = game_data['age'],
-                     publishers = game_data['publishers'],
-                     designers = game_data['designers'],
-                     expansions = game_data['expansions'],
-                     description = game_blurb_text)
+                       mid=mid,
+                       name=game_data['name'],
+                       year_published = game_data['year_published'],
+                       min_players = game_data['min_players'],
+                       max_players = game_data['max_players'],
+                       playing_time = game_data['playing_time'],
+                       age = game_data['age'],
+                       publishers = game_data['publishers'],
+                       designers = game_data['designers'],
+                       expansions = game_data['expansions'],
+                       description = game_blurb_text)
+                       
     game.put()
     success = memcache.set(key=mid, 
                            value=game, 

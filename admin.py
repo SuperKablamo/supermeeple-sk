@@ -7,6 +7,8 @@
 
 ############################# IMPORTS ########################################
 ############################################################################## 
+from __future__ import with_statement
+
 import gamebase
 import meeple_tasks
 import models
@@ -28,6 +30,7 @@ import urllib2
 from urlparse import urlparse
 from xml.etree import ElementTree 
 from django.utils import simplejson
+from google.appengine.api import files
 from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
@@ -40,6 +43,7 @@ from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
+
 
 ############################# REQUEST HANDLERS ############################### 
 ##############################################################################
@@ -96,22 +100,27 @@ class GameEdit(webapp.RequestHandler):
     """
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
-        logging.info('################# GameEdit::get ######################')
+        _trace = TRACE+'GameEdit:: '
+        logging.info(_trace+'get(mid = '+mid+', bgg_id = '+bgg_id+')')
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
+        logging.info(_trace+'game.image = '+str(game.image))
+        logging.info(_trace+'game.image.key() = '+str(game.image.key()))
+        image_url = images.get_serving_url(str(game.image.key()))
         matches = gamebase.getBGGMatches(game.name, exact=False)
         template_values = {
             'game': game,
-            'matches': matches
+            'matches': matches,
+            'image_url': image_url
         }  
         generate(self, 'base_admin_game.html', template_values)
     
     # POST updated Game data.
     def post(self, mid=None, bgg_id=None):
-        logging.info('################# GameEdit::post #####################')        
+        logging.info(_trace+'post(mid = '+mid+', bgg_id = '+bgg_id+')')        
         bgg_id_new = self.request.get('bgg-id')
         asin = self.request.get('asin')
-        logging.info('################# bgg-id = '+bgg_id_new+' ############')   
-        logging.info('################# asin = '+asin+' ####################')                
+        logging.info(_trace+'bgg_id_new = '+bgg_id_new)   
+        logging.info(_trace+'asin = '+asin)                
         game = models.Game.get_by_key_name(mid)
         if asin != "None": game.asin = asin
         if bgg_id_new != "None": 
@@ -121,6 +130,28 @@ class GameEdit(webapp.RequestHandler):
         game.put()
         memcache.delete(mid) # Clear old data from cache
         self.redirect('/admin/game'+mid+'/'+bgg_id_new)
+
+class GameImageUpload(webapp.RequestHandler):
+    """Provides Admin access to upload Game image.
+    """    
+    # POST updated Game image.
+    def post(self, mid=None, bgg_id=None):
+        _trace = TRACE+'GameImageUpload:: '
+        logging.info(_trace+'post()')        
+        logging.info(_trace+'mid = '+mid)                
+        game = models.Game.get_by_key_name(mid)
+        if game:
+            file_name = files.blobstore.create(mime_type='image/jpeg')
+            image = urllib2.urlopen(game.bgg_img_url)
+            with files.open(file_name, 'a') as f:
+                f.write(image.read())
+                
+            files.finalize(file_name)   
+            blob_key = files.blobstore.get_blob_key(file_name) 
+            game.image = blob_key
+            game.put()
+            memcache.delete(mid) # Clear old data from cache
+        self.redirect('/admin/game'+mid+'/'+bgg_id)
 
 class BGGDelete(webapp.RequestHandler):
     """Removes BGG ID from Freebase.
@@ -233,6 +264,7 @@ def generate(self, template_name, template_values):
 ##############################################################################
 application = webapp.WSGIApplication([(r'/admin/game(/m/.*)/(.*)', GameEdit),
                                       (r'/admin/game-update(/m/.*)/(.*)', GameEdit),
+                                      (r'/admin/game-image-upload(/m/.*)/(.*)', GameImageUpload),
                                       (r'/admin/bgg-delete(/m/.*)/(.*)', BGGDelete),
                                       ('/admin/', Admin),
                                       ('/admin/unmatched', UnmatchedGames),
