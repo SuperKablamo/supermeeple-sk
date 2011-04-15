@@ -63,7 +63,7 @@ class Game(db.Model): # mid is key_name
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
     image_url = db.LinkProperty(required=False)
     bgg_url = db.LinkProperty(required=False)
-    bgg_img_url = db.LinkProperty(required=False)
+    bgg_image_url = db.LinkProperty(required=False)
     bgg_thumbnail_url = db.LinkProperty(required=False)
     description = db.TextProperty(required=False)
     year_published = db.IntegerProperty(required=False)

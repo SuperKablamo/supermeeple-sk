@@ -6,7 +6,7 @@
   <meta property="og:title" content="{{game.name}}"/>
   <meta property="og:type" content="game"/>
   <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}"/>
-  <meta property="og:image" content="{{ game.bgg_img_url }}"/>
+  <meta property="og:image" content="{{ game.image_url }}"/>
   <meta property="og:site_name" content="SuperMeeple"/>	
   <meta property="og:description"
         content="{{ game.description|truncatewords_html:40 }}"/>{% endblock %}	
@@ -184,6 +184,9 @@
             <input name="facebook" value="true" checked="checked" id="facebook" type="checkbox">&nbsp;
 					</form>-->
  				</div><!-- /game-detail-right -->
+				<div id="comments">
+					<fb:comments href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" num_posts="10" width="400"></fb:comments>
+				</div>	
 			</div><!-- /game-detail -->	
 		</div><!-- /main -->	   			
 		{% endblock %}		

@@ -36,7 +36,7 @@ def createCheckin(user, game, message, share=False):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #  'message': message,
     #  'game':
-    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_img_url,'img_url':img_url}
+    #     {'name':name,'mid':mid,'bgg_id':bgg_id,'bgg_image_url':bgg_image_url,'img_url':img_url}
     # }
     player = {'name' : user.name, 'fb_id': user.fb_id}
     user.checkin_count += 1
@@ -116,7 +116,7 @@ def getUserCheckins(user, count=10):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name,'mid':mid,'bgg_id':bgg_id,'bgg_img_url':bgg_url,'image_url':image_url},
+    #     {'name': name,'mid':mid,'bgg_id':bgg_id,'bgg_image_url':bgg_url,'image_url':image_url},
     #   'message': 'message    
     #   'gamelog':
     #     {'note':note, 
@@ -173,7 +173,7 @@ def getLatestCheckins(count=10):
     #        {'name':name,'key_name':key_name,'image_url':image_url,'banner_url':banner_url}],
     #   'created': '3 minutes ago',
     #   'game': 
-    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_img_url": url, 'image_url':image_url},
+    #     {'name': name, 'mid': mid, "bgg_id": bgg_id, "bgg_image_url": url, 'image_url':image_url},
     #    'message': 'message
     #  }]
     q = models.Checkin.all()
@@ -264,50 +264,70 @@ def createGameLog(self, checkin_id):
     # Save all entities
     db.put(entities)
   
-    # Share checkin on Facebook if requested ...
+    # Share gamelog on Facebook if requested ...
     share = self.request.get('facebook')
-    deferred.defer(shareGameLog, 
-                   share, 
-                   user, 
-                   simplejson.loads(checkin.json))
+    if share.upper() == 'TRUE':
+        deferred.defer(shareGameLog, user, simplejson.loads(checkin.json))
 
     return game_log_json
 
-def shareGameLog(share, user, checkin_json):
-    if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
-        logging.info('#### posting to Facebook '+user.access_token+'####')
-        # Build Game data ...
-        game = models.Game.get_by_key_name(checkin_json['game']['mid'])
-        thumbnail = 'http://api.freebase.com/api/trans/image_thumb'+game.mid+'?maxwidth=80&maxheight=100'
-        if game.image_url is not None:
-            thumbnail = game.image_url+'=s100'
-        gamelog = checkin_json['gamelog']
-        description = utils.smart_truncate(game.description, length=300)    
+def shareCheckin(user, game):
+    _trace = TRACE+'shareCheckin():: '
+    logging.info(_trace+'posting to Facebook '+user.access_token)
+    attachment = {}
+    description = utils.smart_truncate(game.description, length=300)
+    url = 'http://www.supermeeple.com' + game.mid + '/' + game.bgg_id
+    thumbnail = 'http://api.freebase.com/api/trans/image_thumb'+game.mid+'?maxwidth=80&maxheight=100'
+    if game.image_url is not None:
+        thumbnail = game.image_url+'=s100'    
+    caption = "SuperMeeple: Board Game Database, Tools and Apps"
+    attachment['caption'] = caption
+    attachment['name'] = name
+    attachment['link'] = url #url
+    attachment['description'] = description   
+    attachment['picture'] = thumbnail
+    action_link = 'http://www.supermeeple.com'+str(mid)+'/'+str(bgg_id)
+    action_name = "Check In!"
+    actions = {"name": action_name, "link": action_link}
+    attachment['actions'] = actions     
+    results = facebook.GraphAPI(
+       user.access_token).put_wall_post(message, attachment)    
+    return   
+
+def shareGameLog(user, checkin_json):
+    logging.info('#### posting to Facebook '+user.access_token+'####')
+    # Build Game data ...
+    game = models.Game.get_by_key_name(checkin_json['game']['mid'])
+    thumbnail = 'http://api.freebase.com/api/trans/image_thumb'+game.mid+'?maxwidth=80&maxheight=100'
+    if game.image_url is not None:
+        thumbnail = game.image_url+'=s100'
+    gamelog = checkin_json['gamelog']
+    description = utils.smart_truncate(game.description, length=300)    
         
-        # Build String of Player Scores ...
-        # TODO: It would be great if Facebook players could be tagged.
-        players = []
-        for s in gamelog['scores']:
-            player = s['name']+' - '+s['points']+' points.'
-            players.append(player)
-        s = ' '.join(players)
-        message = s + ' ' + gamelog['note']
+    # Build String of Player Scores ...
+    # TODO: It would be great if Facebook players could be tagged.
+    players = []
+    for s in gamelog['scores']:
+        player = s['name']+' - '+s['points']+' points.'
+        players.append(player)
+    s = ' '.join(players)
+    message = s + ' ' + gamelog['note']
         
-        # Build GraphAPI Request ...
-        url = 'http://www.supermeeple.com/user/' + user.fb_id
-        caption = "SuperMeeple: Board Game Database, Tools and Apps"
-        attachment = {}
-        attachment['caption'] = caption
-        attachment['name'] = 'Scored a game of ' + game.name 
-        attachment['link'] = url #url
-        attachment['description'] = description   
-        attachment['picture'] = thumbnail
-        action_link = 'http://www.supermeeple.com/game'+str(game.mid)+'/'+str(game.bgg_id)
-        action_name = "Check In!"
-        actions = {"name": action_name, "link": action_link}
-        attachment['actions'] = actions     
-        results = facebook.GraphAPI(
-           user.access_token).put_wall_post(message, attachment)    
+    # Build GraphAPI Request ...
+    url = 'http://www.supermeeple.com/user/' + user.fb_id
+    caption = "SuperMeeple: Board Game Database, Tools and Apps"
+    attachment = {}
+    attachment['caption'] = caption
+    attachment['name'] = 'Scored a game of ' + game.name 
+    attachment['link'] = url #url
+    attachment['description'] = description   
+    attachment['picture'] = thumbnail
+    action_link = 'http://www.supermeeple.com/game'+str(game.mid)+'/'+str(game.bgg_id)
+    action_name = "Check In!"
+    actions = {"name": action_name, "link": action_link}
+    attachment['actions'] = actions     
+    results = facebook.GraphAPI(
+       user.access_token).put_wall_post(message, attachment)    
     return
 
 def getGameHighScores(game, count=10):

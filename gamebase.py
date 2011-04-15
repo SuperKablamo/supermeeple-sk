@@ -25,6 +25,7 @@ from google.appengine.api import files
 from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.ext import db
+from google.appengine.runtime import apiproxy_errors
 
 ############################# METHODS ########################################
 ##############################################################################
@@ -48,11 +49,16 @@ def getGame(mid, bgg_id='0'):
                     logging.info(TRACE+'getGame():: BGG error, using FB')
                     game = buildFBGame(mid)
                 else: # Build Game from BGG data
-                    game = buildBGGGame(mid, bgg_id, game_data)
-                    success = memcache.set(key=mid, 
-                                           value=game, 
-                                           time=432000) # expiration 5 days
-        
+                    try:
+                        game = buildBGGGame(mid, bgg_id, game_data)
+                        success = memcache.set(key=mid, 
+                                               value=game, 
+                                               time=432000) # expiration 5 days
+                    
+                    # If anything goes wrong, use Freebase
+                    except Exception:
+                        game = buildFBGame(mid)
+                        
         else: # Game has been stored, get it, update data.
             logging.info(TRACE+'getGame() bgg_id = '+bgg_id)
             if bgg_id != '0': # There is a BGG connection . . . 
@@ -67,7 +73,7 @@ def getGame(mid, bgg_id='0'):
                     game.name = game_data['name']
                     game.bgg_id = bgg_id
                     game.bgg_thumbnail_url = game_data['thumbnail_url']            
-                    game.bgg_img_url = game_data['image_url']
+                    game.bgg_image_url = game_data['image_url']
                     game.description = game_data['description']
                     game.year_published = game_data['year_published']
                     game.min_players = game_data['min_players']
@@ -110,15 +116,10 @@ def buildGame(mid, bgg_id):
         
         # Store image    
         bgg_image_url = game_data['image_url']
-        if bgg_image_url is not None:
-            file_name = files.blobstore.create(mime_type='image/jpeg')
-            image = urllib2.urlopen(bgg_image_url)
-            with files.open(file_name, 'a') as f:
-                f.write(image.read())
-            
-            files.finalize(file_name)   
-            image_blob_key = files.blobstore.get_blob_key(file_name) 
-            image_url = images.get_serving_url(image_blob_key)   
+        image_blob_key = storeImageFromBGG(bgg_image_url)
+        image_url = None
+        if image_blob_key is not None:
+            image_url = images.get_serving_url(str(image_blob_key))
             
         # Build Game from BGG data
         game = models.Game(key_name=mid,
@@ -126,7 +127,7 @@ def buildGame(mid, bgg_id):
                            bgg_id=bgg_id,
                            image=image_blob_key,
                            image_url=image_url,
-                           bgg_img_url=bgg_image_url,
+                           bgg_image_url=bgg_image_url,
                            bgg_thumbnail_url=game_data['thumbnail_url'],
                            name=game_data['name'],
                            description=game_data['description'],
@@ -153,22 +154,17 @@ def buildBGGGame(mid, bgg_id, game_data):
     """ 
     # Store image    
     bgg_image_url = game_data['image_url']
-    if bgg_image_url is not None:
-        file_name = files.blobstore.create(mime_type='image/jpeg')
-        image = urllib2.urlopen(bgg_image_url)
-        with files.open(file_name, 'a') as f:
-            f.write(image.read())
-        
-        files.finalize(file_name)   
-        image_blob_key = files.blobstore.get_blob_key(file_name) 
+    image_blob_key = storeImageFromBGG(bgg_image_url)
+    image_url = None
+    if image_blob_key is not None:
         image_url = images.get_serving_url(str(image_blob_key))    
-       
+
     game = models.Game(key_name=mid,
                        mid=mid,
                        bgg_id=bgg_id,
                        image=image_blob_key,
                        image_url=image_url,                       
-                       bgg_img_url=game_data['image_url'],
+                       bgg_image_url=game_data['image_url'],
                        bgg_thumbnail_url=game_data['thumbnail_url'],
                        name=game_data['name'],
                        description=game_data['description'],
@@ -265,6 +261,33 @@ def parseBGGXML(bgg_id):
                 'xml_text': xml_text}
     
     return bgg_data
+
+def storeImageFromBGG(bgg_image_url):
+    '''Returns a blob_key for an image fetched from BGG and stored to the 
+    BlobStore.
+    '''
+    image_blob_key = None
+    if bgg_image_url is not None:
+        file_name = files.blobstore.create(mime_type='image/jpeg')
+    
+        # Sometimes the image from BGG is too large for GAE ...
+        try: 
+            image = urllib2.urlopen(bgg_image_url)
+            with files.open(file_name, 'a') as f:
+                f.write(image.read())
+                # Get a smaller version ...        
+        except apiproxy_errors.RequestTooLargeError:
+            bgg_md_image_url = bgg_image_url.replace('.jpg', '_md.jpg')
+            image = urllib2.urlopen(bgg_md_image_url)
+            with files.open(file_name, 'a') as f:
+                f.write(image.read())
+        finally:
+            files.finalize(file_name)   
+            image_blob_key = files.blobstore.get_blob_key(file_name)
+    else:
+        return None
+            
+    return image_blob_key
 
 def getBGGIDFromBGG(game_name):
     """Returns the Board Game Geek Game ID from Board Game Geek.    

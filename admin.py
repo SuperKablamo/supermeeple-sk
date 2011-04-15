@@ -103,14 +103,10 @@ class GameEdit(webapp.RequestHandler):
         _trace = TRACE+'GameEdit:: '
         logging.info(_trace+'get(mid = '+mid+', bgg_id = '+bgg_id+')')
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
-        logging.info(_trace+'game.image = '+str(game.image))
-        logging.info(_trace+'game.image.key() = '+str(game.image.key()))
-        image_url = images.get_serving_url(str(game.image.key()))
         matches = gamebase.getBGGMatches(game.name, exact=False)
         template_values = {
             'game': game,
-            'matches': matches,
-            'image_url': image_url
+            'matches': matches
         }  
         generate(self, 'base_admin_game.html', template_values)
     
@@ -141,14 +137,14 @@ class GameImageUpload(webapp.RequestHandler):
         logging.info(_trace+'mid = '+mid)                
         game = models.Game.get_by_key_name(mid)
         if game:
-            file_name = files.blobstore.create(mime_type='image/jpeg')
-            image = urllib2.urlopen(game.bgg_img_url)
-            with files.open(file_name, 'a') as f:
-                f.write(image.read())
-                
-            files.finalize(file_name)   
-            blob_key = files.blobstore.get_blob_key(file_name) 
-            game.image = blob_key
+            # Store image    
+            image_blob_key = storeImageFromBGG(game.bgg_image_url)
+            image_url = None
+            if image_blob_key is not None:
+                image_url = images.get_serving_url(str(image_blob_key))    
+
+            game.image = image_blob_key
+            game.image_url = image_url
             game.put()
             memcache.delete(mid) # Clear old data from cache
         self.redirect('/admin/game'+mid+'/'+bgg_id)

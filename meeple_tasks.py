@@ -68,30 +68,28 @@ def seedGames():
     return True  
 
 def processGameSeeds(keys, task_number):
-    logging.info('##########################################################')
-    logging.info('#################### processGameSeeds(keys, task_number) #')
-    logging.info('##########################################################')    
+    '''Iterates through GameSeed keys and builds a Game entity for each one
+    using BGG data if available.
+    '''
+    _trace = TRACE+'processGameSeeds():: '
+    logging.info(_trace)    
     game_seeds = models.GameSeed.get(keys)
     for gs in game_seeds:
-        logging.info('################ Processing game '+gs.name+' #########')
-        logging.info('################ Task number '+str(task_number)+' ####')
+        logging.info(_trace+' Processing game '+gs.name)
+        logging.info(_trace+' Task number '+str(task_number))
         # First, try to match any games that are missing a bgg_id
         bgg_id = gs.bgg_id
         mid = gs.mid
-        if bgg_id is None:
-            logging.info('################# bgg_id = None, find a match ####')
-            name = gs.name
-            bgg_id = gamebase.getBGGIDFromBGG(name)
         if bgg_id is not None: # Valid bgg_id, so build a game
-            logging.info('################# bgg_id = '+str(bgg_id)+' #######')            
-            gamebase.buildGame(mid, bgg_id)
-            gamebase.storeBGGIDtoFreebase(mid, bgg_id)  
-            time.sleep(10) 
-        else: # No bgg_id found, make a note
-            logging.info('################# bgg_id = None, make a note #####')  
-            gs.bgg_id = None        
-        gs.processed = True
-        gs.put()        
-    logging.info('######### exiting processGameSeeds(keys, task_number) ####')
+            logging.info(_trace+' bgg_id = '+str(bgg_id))            
+            # Use BGG XML API to get Game data
+            game_data = checkinbase.parseBGGXML(bgg_id)
+            if game_data is None: 
+                logging.info(_trace+' Unable to parse BGGXML!')
+            else: 
+                gamebase.buildGame(mid, bgg_id)
+                gs.processed = True
+                gs.put()        
+    logging.info(_trace+' exiting ...')
     return True     
  

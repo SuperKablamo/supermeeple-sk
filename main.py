@@ -331,24 +331,9 @@ class Checkin(BaseHandler):
         checkin = checkinbase.createCheckin(user=user, game=game, 
                                             message=message, share=share)
                                             
-        # Share checkin on Facebook if requested ...
-        if share.upper() == 'TRUE':# Announce checkin on Facebook Wall
-            logging.info(TRACE+'Checkin:: posting to Facebook '+user.access_token)
-            attachment = {}
-            description = utils.smart_truncate(game.description, length=300)
-            url = 'http://www.supermeeple.com' + mid + '/' + bgg_id
-            caption = "SuperMeeple: Board Game Database, Tools and Apps"
-            attachment['caption'] = caption
-            attachment['name'] = name
-            attachment['link'] = url #url
-            attachment['description'] = description   
-            attachment['picture'] = thumbnail
-            action_link = 'http://www.supermeeple.com'+str(mid)+'/'+str(bgg_id)
-            action_name = "Check In!"
-            actions = {"name": action_name, "link": action_link}
-            attachment['actions'] = actions     
-            results = facebook.GraphAPI(
-               user.access_token).put_wall_post(message, attachment)
+        # Share gamelog on Facebook if requested ...
+        if share.upper() == 'TRUE':
+            deferred.defer(checkinbase.shareCheckin, user, game)        
                
         badges = checkin['badges']
         return self.response.out.write(simplejson.dumps(badges))
