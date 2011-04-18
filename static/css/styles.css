@@ -215,7 +215,7 @@ img.thumbnail-badge { width:25px; margin:0px 4px; vertical-align:middle; border:
 #footer { height:40px; margin:10px 0 0 0; clear:both; padding:0 0 10px 0; text-align:center; width:840px;}
 
 /*AJAX*/
-#spinner.loading { background-image:url("/static/images/ajax-loader.gif"); width:128px; height: 6px; }
+#spinner.loading { margin:0 0 10px 64px; background-image:url("/static/images/ajax-loader.gif"); width:128px; height:16px; text-align:center; }
 h2 img.check-mark { vertical-align:text-bottom; padding:0 6px 4px 0; }
 #status h3, #new-badges h3 { font-size:1.8em; line-height:1.4em; text-decoration:none; padding:6px; }
 .check-mark { vertical-align:middle; padding-right:4px; margin-bottom:4px; }
