@@ -83,126 +83,149 @@
 	{% block main %}
 	<div id="mainbar">
 		<div id="game-log">
-			<h1>Game Log</h1>
-			<div class="checkin">
-  			<div class="game-image">
-					{% if checkin.game.bgg_thumbnail_url %}
-					<a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}">
-						<img title="{{checkin.game.name}}" alt="{{checkin.game.name}}"src="{{checkin.game.bgg_thumbnail_url}}"/>
-					</a>
-					{% else %}
-					<a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0"}}">
-						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{checkin.game.mid}}?maxwidth=80&maxheight=100"/>
-					</a>
-					{% endif %}
-				</div><!-- /game-image -->
-				<div class="game-name">
-					<h3><a title="{{checkin.game.name}}" href="/game{{checkin.game.mid}}/{{checkin.game.bgg_id|default_if_none:"0" }}">{{checkin.game.name}}</a></h3>
-					<p>{{checkin.created|timesince}} ago </p>
-					<div class="player">
-				  	<a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}"><img title="{{checkin.player.name}}" src="http://graph.facebook.com/{{checkin.player.fb_id}}/picture?type=square"/></a><a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}">{{checkin.player.name}}</a>
-						{% for b in checkin.badges %}
-						<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s28" />
-						{% endfor %}
-					</div>
-					<div class="message">
-						{% if checkin.message %}
-						<p>"{{checkin.message}}"</p>
-						{% endif %}
+			<h1>Game Log {{checkin.id}}</h1>
+
+			<!-- GAME-LOG -->
+			<div class="checkin-wrapper">
+				<div class="checkin-header">
+					<div class="game-title">
+						<h3><a title="{{game.name}}" href="/game{{game.mid}}/{{game.bgg_id|default_if_none:"0" }}">{{game.name}}</a></h3>
+						<p class="time text10">{{checkin.created|timesince}} ago </p>						
 					</div>	
-				</div><!-- /game-name -->				
-				<div id="game-log-form-wrapper" title="Create Game Log">
-					{% if checkin.gamelog %}
-					<div id="log">
-						<h2>Score</h2>
-						<div id="scores">
-							<ul>
-						  {% for s in checkin.gamelog.scores %}
-						    <li>{{s.name}} - {{s.points}}</li>
-						  {% endfor %}
-							</ul>
-						</div>
-						<div id="note">
-							{{checkin.gamelog.note}}
+					<div class="badges">
+						{% for b in checkin.badges %}
+						<div class="banner">
+							<img alt="{{b.name}}" title="{{b.name}}" title src="{{b.banner_url}}" />
 						</div>	
-					</div><!-- /log -->	
-					{% else %}
-					<div id="spinner"></div>
-					<form name="input" id="game-log-form" action="">
-        		<input type="hidden" name="checkin_id" id="checkin-id" value="{{checkin.id}}" />
-        		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />
-						<table>
-							<tr>
-								<th>Player</th>
-								<th>Points</th>
-								<th>Winner?</th>
-							</tr>	
-							<tr>
-								<td>
-									<input type="text" name="name1" id="player-name-1" value="{{current_user.name}}" />
-									<input type="hidden" name="fb_id1" id="player-id-1" value="{{current_user.fb_id}}" />
-								</td>
-								<td>
-									<input type="text" size="6" name="score1" id="points-1" />
-								</td>
-								<td>
-									<input type="checkbox" name="win1" value="True" />
-								</td>								
-							</tr>
-							<tr>
-								<td>
-									<input type="text" name="name2" id="player-name-2" class="player-name" />
-									<input type="hidden" name="fb_id2" id="player-id-2" class="player-id" value="" />
-								</td>
-								<td>
-									<input type="text" size="6" name="score2" id="points-2" />
-								</td>		
-								<td>
-									<input type="checkbox" name="win2" value="True" />
-								</td>						
-							</tr>	
-							<tr>
-								<td>
-									<input type="text" name="name3" id="player-name-3" class="player-name" />
-									<input type="hidden" name="fb_id3" id="player-id-3" class="player-id" value="" />
-								</td>
-								<td>
-									<input type="text" size="6" name="score3" id="points-3" />
-								</td>
-								<td>
-									<input type="checkbox" name="win3" value="True" />
-								</td>								
-							</tr>
-							<tr>
-								<td>
-									<input type="text" name="name4" id="player-name-4" class="player-name" />
-									<input type="hidden" name="fb_id4" id="player-id-4" class="player-id" value="" />
-								</td>
-								<td>
-									<input type="text" size="6" name="score4" id="points-4" />
-								</td>
-								<td>
-									<input type="checkbox" name="win4" value="True" />
-								</td>								
-							</tr>														
-						</table>	
-						<label>Note:</label><br/>
-						<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
-						<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
-						<input class="button" id="game-log-button" value="Save" type="submit"/>
-					</form>					
+		  			{% endfor %}		
+					</div>	
+				</div><!-- checkin-header -->	
+
+				<div class="checkin">
+					<div class="player">
+						<div class="image">
+		  				<a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}"><img title="{{checkin.player.name}}" src="http://graph.facebook.com/{{ checkin.player.fb_id }}/picture?type=square"/></a>
+						</div><!-- /image -->
+						<div class="details">
+							<span class="name"><a title="{{checkin.player.name}}" href="/user/{{checkin.player.fb_id}}">{{checkin.player.name}}</a></span><br>
+							<span class="message text12">{% if checkin.message %}"{{checkin.message}}"{% endif %}</span>							
+						</div><!-- /details -->	
+						<div class="log text12">
+							{% if checkin.gamelog %}
+							<table>
+								<tbody>
+									<tr>
+										<th>Player</th>
+										<th>Points</th>
+										<th>Winner</th>	
+									</tr>
+									{% for s in checkin.gamelog.scores %}								
+									<tr>									
+										<td>{{s.name}}</td>
+										<td class="center">{{s.points}}</td>
+										<td class="center">
+											{% if s.winner %}
+											<img src="/static/images/winner.png" vspace="3">
+								  		{% else %}
+											&nbsp;
+								  		{% endif %}
+										</td>
+									</tr>
+									{% endfor %}
+								</tbody>	
+							</table>	
+							{% endif %}
+						</div><!-- /log -->					
+					</div><!-- /player -->
+
+				</div><!-- /checkin -->
+				{% if checkin.gamelog %}				
+				<div class="note text12">
+					<strong>Notes:</strong>&nbsp;{{checkin.gamelog.note}}
+				</div><!-- /note -->
 					{% endif %}
-				</div><!-- /game-log-form-wrapper -->		
-			</div><!-- /checkin -->
+			</div><!-- /checkin-wrapper -->	
+
+		  <!-- GAME-LOG FORM -->
+			<div id="game-log-form-wrapper">
+				<div id="spinner"></div>
+				<form name="input" id="game-log-form" action="" title="Create Game Log">
+       		<input type="hidden" name="checkin_id" id="checkin-id" value="{{checkin.id}}" />
+       		<input type="hidden" name="mid" id="mid" value="{{checkin.game.mid}}" />
+					<table>
+						<tr>
+							<th>Player</th>
+							<th>Points</th>
+							<th>Winner?</th>
+						</tr>	
+						<tr>
+							<td>
+								<input type="text" name="name1" id="player-name-1" value="{{current_user.name}}" />
+								<input type="hidden" name="fb_id1" id="player-id-1" value="{{current_user.fb_id}}" />
+							</td>
+							<td>
+								<input type="text" size="6" name="score1" id="points-1" />
+							</td>
+							<td>
+								<input type="checkbox" name="win1" value="True" />
+							</td>								
+						</tr>
+						<tr>
+							<td>
+								<input type="text" name="name2" id="player-name-2" class="player-name" />
+								<input type="hidden" name="fb_id2" id="player-id-2" class="player-id" value="" />
+							</td>
+							<td>
+								<input type="text" size="6" name="score2" id="points-2" />
+							</td>		
+							<td>
+								<input type="checkbox" name="win2" value="True" />
+							</td>						
+						</tr>	
+						<tr>
+							<td>
+								<input type="text" name="name3" id="player-name-3" class="player-name" />
+								<input type="hidden" name="fb_id3" id="player-id-3" class="player-id" value="" />
+							</td>
+							<td>
+								<input type="text" size="6" name="score3" id="points-3" />
+							</td>
+							<td>
+								<input type="checkbox" name="win3" value="True" />
+							</td>								
+						</tr>
+						<tr>
+							<td>
+								<input type="text" name="name4" id="player-name-4" class="player-name" />
+								<input type="hidden" name="fb_id4" id="player-id-4" class="player-id" value="" />
+							</td>
+							<td>
+								<input type="text" size="6" name="score4" id="points-4" />
+							</td>
+							<td>
+								<input type="checkbox" name="win4" value="True" />
+							</td>								
+						</tr>														
+					</table>	
+					<label>Note:</label><br/>
+					<textarea class="text-area" id="note" name="note" rows="3" cols="30"></textarea><br/>
+					<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
+					<input class="button" id="game-log-button" value="Save" type="submit"/>
+				</form>					
+			</div><!-- /game-log-form-wrapper -->
+					
 		</div><!-- /game-log -->
+		
+		<!-- COMMENTS -->
 		<div id="comments">
-			<fb:comments href="http://{{host}}/game-log/{{checkin.id}}" num_posts="10" width="400"></fb:comments>
-		</div>
+			<fb:comments href="http://{{host}}/game-log/{{checkin.id}}" num_posts="10" width="440"></fb:comments>
+		</div><!-- /comments -->
 	</div><!-- /main -->	   			
 	{% endblock %}		
 	
 	{% block sidebar %}	
 	<div id="sidebar">
+		<!-- GAME SEARCH -->
 		<div class="block">			
   		<div id="search">
    			<form name="input" action="/game" method="post">
@@ -214,6 +237,110 @@
 				<p>search for more games</p>
    		</div>
 		</div><!-- /block  -->
+		
+		<br/>
+		<div class="block">
+			<div id="tiny-game-detail">
+				<div class="block-header-orange">
+					<h2>Game Data</h2>
+				</div>	
+				<div id="game-name">
+					<h3><a title="{{game.name}}" href="/game{{game.mid}}/{{game.bgg_id|default_if_none:"0" }}">{{game.name}}</a></h3>
+				</div>
+  			<div id="game-image">
+					{% if game.image_url %}
+					<a title="{{game.name}}" href="/game{{game.mid}}/{{game.bgg_id|default_if_none:"0"}}">
+						<img title="{{game.name}}" alt="{{game.name}}"src="{{game.image_url}}=s250"/>
+					</a>
+					{% else %}
+					<a title="{{checkin.game.name}}" href="/game{{game.mid}}/{{game.bgg_id|default_if_none:"0"}}">
+						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{game.mid}}?maxwidth=80&maxheight=100"/>
+					</a>
+					{% endif %}
+				</div><!-- /game-image -->
+				<div id="game-data" class="text12">
+			  	{% if game.designers %}
+    			<dl>
+    				<dt>Designed by</dt>
+						{% for x in game.designers|slice:":3" %}
+						<dd>{{ x }}</dd>
+						{% endfor %}
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.year_published %}
+    			<dl>
+    				<dt>Introduced</dt>
+						<dd>{{ game.year_published }}</dd>
+    			</dl>
+ 					{% endif %}
+
+     			{% if game.min_players and game.max_players %}
+    			<dl>
+    				<dt># of players</dt>
+						<dd>{{ game.min_players }} - {{ game.max_players }}</dd>
+    			</dl>
+					{% endif %}
+
+			  	{% if game.playing_time %}
+    			<dl>
+    				<dt>Playing time</dt>
+						<dd>{{ game.playing_time }} min</dd>
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.age %}
+    			<dl>
+    				<dt>Ages</dt>
+						<dd>{{ game.age }} and up</dd>
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.categories %}
+    			<dl>
+    				<dt>Tags</dt>
+						{% for x in game.categories %}
+						<dd>{{ x }}</dd>
+						{% endfor %}
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.subdomains %}
+    			<dl>
+    				<dt>Categories</dt>
+						{% for x in game.subdomains|slice:":3" %}
+						<dd>{{ x }}</dd>
+						{% endfor %}
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.mechanics %}
+    			<dl>
+    				<dt>Mechanics</dt>
+						{% for x in game.mechanics %}
+						<dd>{{ x }}</dd>
+						{% endfor %}
+    			</dl>
+ 					{% endif %}
+
+			  	{% if game.expansions %}
+    			<dl>
+    				<dt>Expansions</dt>
+						{% for x in game.expansions|slice:":3" %}
+						<dd>{{ x }}</dd>
+						{% endfor %}
+    			</dl>
+ 					{% endif %}
+
+					{% if game.bgg_id %}
+    			<dl>
+    				<dt>Weblinks</dt>
+						<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
+    			</dl>
+					{% endif %}		
+				</div>		
+			</div><!-- /game-info -->	
+		</div><!-- /block -->
 	</div><!-- /sidebar -->	
 	{% endblock %}
 

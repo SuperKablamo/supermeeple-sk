@@ -34,6 +34,7 @@ def getGame(mid, bgg_id='0'):
     """Returns a Game.  Looks for one in memcache, if not then creates one
     using the BGG XML API.
     """
+    _trace = TRACE+'getGame():: '
     logging.info(TRACE+'getGame('+bgg_id+', '+mid+')')
     if mid is None: return None
     game_cache = memcache.get(mid)
@@ -46,17 +47,18 @@ def getGame(mid, bgg_id='0'):
             else: # BGG ID, return BGG data 
                 game_data = parseBGGXML(bgg_id) # Refresh stored XML
                 if game_data is None: # If BGG is down, use FB
-                    logging.info(TRACE+'getGame():: BGG error, using FB')
+                    logging.info(_trace+'BGG error, using FB')
                     game = buildFBGame(mid)
                 else: # Build Game from BGG data
                     try:
                         game = buildBGGGame(mid, bgg_id, game_data)
                         success = memcache.set(key=mid, 
                                                value=game, 
-                                               time=432000) # expiration 5 days
+                                               time=432000) # Expire 5 days
                     
                     # If anything goes wrong, use Freebase
                     except Exception:
+                        logging.info(_trace+'Failed BGG Game build, using FB')
                         game = buildFBGame(mid)
                         
         else: # Game has been stored, get it, update data.
@@ -152,6 +154,8 @@ def buildGame(mid, bgg_id):
 def buildBGGGame(mid, bgg_id, game_data):
     """Builds a Game from the BGG XML API.  Expects bgg_id is not None.
     """ 
+    _trace = TRACE+'buildBGGGame():: '
+    logging.info(_trace)
     # Store image    
     bgg_image_url = game_data['image_url']
     image_blob_key = storeImageFromBGG(bgg_image_url)
@@ -266,9 +270,13 @@ def storeImageFromBGG(bgg_image_url):
     '''Returns a blob_key for an image fetched from BGG and stored to the 
     BlobStore.
     '''
+    _trace = TRACE+'storeImageFromBGG():: '
+    logging.info(_trace)
     image_blob_key = None
     if bgg_image_url is not None:
-        file_name = files.blobstore.create(mime_type='image/jpeg')
+        image_name = bgg_image_url.split('/')[-1]        
+        file_name = files.blobstore.create(mime_type='image/jpeg', 
+                                           _blobinfo_uploaded_filename=image_name)
     
         # Sometimes the image from BGG is too large for GAE ...
         try: 

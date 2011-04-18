@@ -57,7 +57,10 @@ class APICheckin(webapp.RequestHandler):
         return self.response.out.write(simplejson.dumps(r)) 
     
     def post(self, method):
-        logging.info(TRACE+'APICheckin:: post()')
+        _trace = TRACE+'APICheckin:: post() '
+        logging.info(_trace)
+        logging.info(_trace+'url = '+self.request.url)
+        logging.info(_trace+'query_string = '+self.request.query_string)
         if method == 'new': 
             r = createCheckin(self)
         else: r = API404
@@ -88,8 +91,11 @@ class APIGameLog(webapp.RequestHandler):
         return self.response.out.write(simplejson.dumps(r))         
 
     def post(self, method):
-        logging.info(TRACE+'APIGameLog:: post()')
-        if method == "new": 
+        _trace = TRACE+'APIGameLog:: post() '
+        logging.info(_trace)
+        logging.info(_trace+'request = '+self.request.url)
+        if method == 'new': 
+            logging.info(_trace+'method = new')
             r = createGameLog(self)
         else: r = API404        
         return self.response.out.write(simplejson.dumps(r))
@@ -214,13 +220,17 @@ def getGameLog(checkin_id):
     data = {'checkin': checkin}
     r = API200
     r['result'] = data 
+    logging.info(_trace+'result = '+r)
     return r 
 
 def createGameLog(self):
     """Creates a new GameLog and returns the new GameLog as a JSON formatted
     Response.
     """
+    _trace = TRACE+'createGameLog():: '
+    logging.info(_trace)
     checkin_id = self.request.get('checkin_id')
+    logging.info(_trace+'checkin_id = '+checkin_id)
     game_log_json = checkinbase.createGameLog(self, checkin_id)
     data = {'gamelog': game_log_json}
     r = API200

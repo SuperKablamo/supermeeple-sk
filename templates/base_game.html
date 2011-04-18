@@ -184,8 +184,10 @@
             <input name="facebook" value="true" checked="checked" id="facebook" type="checkbox">&nbsp;
 					</form>-->
  				</div><!-- /game-detail-right -->
+
+				<!-- COMMENTS -->
 				<div id="comments">
-					<fb:comments href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" num_posts="10" width="400"></fb:comments>
+					<fb:comments href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" num_posts="10" width="440"></fb:comments>
 				</div>	
 			</div><!-- /game-detail -->	
 		</div><!-- /main -->	   			
@@ -276,7 +278,7 @@
 					<div class="liner"></div>
 					{% endfor %}
 				{% else %}
-					<p>No one has checked into {{game.name}} yet. Be the first!</p>
+					<p class="text12 info">Be the <strong>first</strong> to checkin to {{game.name}}!</p>
 				{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	

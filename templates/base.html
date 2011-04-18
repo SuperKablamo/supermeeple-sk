@@ -62,7 +62,7 @@
 				  		$('#checkin-form').html("<div id='status'></div><div id='new-badges'></div>");  
 				    	$('#status').html("<h3><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h3>");  
 							$.each(badges, function(i,badge) {
-				  	  	$('#new-badges').append("<h3>New Badge!</h3><p><img class='badge' src='"+badge.image_url+"'><span class='badge-title'>"+badge.name+"</span></p>");  
+				  	  	$('#new-badges').append("<h3>New Badge:<br/>"+badge.name+"</h3><p><img class='badge' src='"+badge.image_url+"=s60'></p>");  
 				    	});
 				  	},
           	complete: function() {

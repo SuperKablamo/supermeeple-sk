@@ -44,6 +44,7 @@ def createCheckin(user, game, message, share=False):
     badge_keys = awardbase.awardCheckinBadges(user, game.key()) 
     badge_entities = None
     if badge_keys is not None:
+        logging.info(_trace+'getting badge entities for badge_keys ...')
         badge_entities = db.Model.get(badge_keys)     
     badges=[]
     updates = [] # List for batch put()
@@ -282,7 +283,7 @@ def shareCheckin(user, game):
         thumbnail = game.image_url+'=s100'    
     caption = "SuperMeeple: Board Game Database, Tools and Apps"
     attachment['caption'] = caption
-    attachment['name'] = name
+    attachment['name'] = game.name
     attachment['link'] = url #url
     attachment['description'] = description   
     attachment['picture'] = thumbnail
