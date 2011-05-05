@@ -45,13 +45,13 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 ############################# REQUEST HANDLERS ############################### 
 ##############################################################################   
 class BaseHandler(webapp.RequestHandler):
-    """Provides access to the active Facebook user in self.current_user
+    '''Provides access to the active Facebook user in self.current_user
 
     The property is lazy-loaded on first access, using the cookie saved
     by the Facebook JavaScript SDK to determine the user ID of the active
     user. See http://developers.facebook.com/docs/authentication/ for
     more information.
-    """
+    '''
     @property
     def current_user(self):
         logging.info(TRACE+' BaseHandler:: current_user()')
@@ -85,10 +85,18 @@ class BaseHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, 
                                                 template_values, 
                                                 debug=DEBUG))
+                                            
+    def error(self, code):
+        '''Overide RequestHandler.error to return custom error templates.
+        '''
+        self.response.clear()
+        self.response.set_status(code)
+        template_name = str(code)+'.html'
+        self.generate(template_name, None)     
 
 class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-    """Uploads files to Blobstore.
-    """
+    '''Uploads files to Blobstore.
+    '''
     def post(self, form=None):
         logging.info(TRACE+'UploadHandler:: post()')         
         upload_files = self.get_uploads('file') 
@@ -107,16 +115,16 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.redirect('/admin/')  
                                                 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
-    """Serves Blobstore images.
-    """
+    '''Serves Blobstore images.
+    '''
     def get(self, resource):
         resource = str(urllib2.unquote(resource))
         blob_info = blobstore.BlobInfo.get(resource)
         self.send_blob(blob_info)
 
 class MainHandler(BaseHandler):
-    """Return content for index.html.     
-    """
+    '''Return content for index.html.     
+    '''
     def get(self):
         logging.info(TRACE+'MainHandler:: get()')
         spiel_id = "/en/spiel_des_jahres"
@@ -230,7 +238,7 @@ class MainHandler(BaseHandler):
         self.generate('base_index.html', template_values) 
  
 class GameProfile(BaseHandler):
-    """Returns a Game data.
+    '''Returns a Game data.
     
     GET - uses FB and BGG ids to build Game data for display. FB and BGG are
     queried for data, persisted to the Datastore (if new or updated), and the
@@ -239,12 +247,15 @@ class GameProfile(BaseHandler):
     POST - uses gameID and gameName to look up a Game on Freebase.  Then
     redirects to GET in order to display Game Profile.  POSTs come in via
     Freebase Suggest, and therefore only contain the Freebase ID and Name.
-    """
+    '''
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
         logging.info(TRACE+'GameProfile:: get()')
         user = self.current_user
         game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
+        if game is None:
+            self.error(404)
+            return            
         checkins = checkinbase.getGameCheckins(game, 4)
         high_scores = checkinbase.getGameHighScores(game, 4)
         host = self.request.host # used for Facebook Like url 
@@ -278,12 +289,15 @@ class GameProfile(BaseHandler):
             self.error(500)
              
 class UserProfile(BaseHandler):
-    """Returns content for User Profile pages.
-    """
+    '''Returns content for User Profile pages.
+    '''
     def get(self, user_fb_id=None):
         logging.info(TRACE+'UserProfile:: get()')
         user = self.current_user # this is the logged in User
         profile_user = getFBUser(user_fb_id)
+        if profile_user is None:
+            self.error(404)
+            return
         checkins = checkinbase.getUserCheckins(profile_user, 10)
         scores = checkinbase.getScoresFromFriends(profile_user, 10)
         host = self.request.host # used for Facebook Like url 
@@ -308,8 +322,8 @@ class UserProfile(BaseHandler):
         return None     
 
 class Checkin(BaseHandler):
-    """Accepts Checkin POSTs.
-    """
+    '''Accepts Checkin POSTs.
+    '''
     def post(self):
         logging.info(TRACE+'Checkin:: post()')
         user = self.current_user
@@ -339,25 +353,36 @@ class Checkin(BaseHandler):
         return self.response.out.write(simplejson.dumps(badges))
 
 class GameLog(BaseHandler):
-    """Display and creates a GameLog.
-    """
+    '''Display and creates a GameLog.
+    '''
     def get(self, checkin_id):
         logging.info(TRACE+'GameLog:: get()')        
         checkin = models.Checkin.get_by_id(strToInt(checkin_id)) 
+        if checkin is None:
+            self.error(404)
+            return
         game = checkin.game
         checkin_json = simplejson.loads(checkin.json)
         checkin_json['created'] = checkin.created
         checkin_json['id'] = str(checkin.key().id())
         logging.info(TRACE+'GameLog:: '+str(checkin_json))            
         user = self.current_user # this is the logged in User 
-        result = facebook.GraphAPI(
-            user.access_token).get_connections('me', 'friends')
-        fb_data = result["data"]
-        friends = []
-        for f in fb_data:
-            friends.append({'value':f['id'], 'label':f['name']})
+        if user is not None:
+            result = facebook.GraphAPI(
+                user.access_token).get_connections('me', 'friends')
+            
+            fb_data = result["data"]
+            friends = []
+            for f in fb_data:
+                friends.append({'value':f['id'], 'label':f['name']})
+            
+            friends = simplejson.dumps(friends)
+        else:
+            user = None
+            friends = None
+            
         template_values = {
-            'friends': simplejson.dumps(friends),
+            'friends': friends,
             'checkin': checkin_json,
             'game': game,
             'current_user': user,
@@ -366,20 +391,20 @@ class GameLog(BaseHandler):
         self.generate('base_gamelog.html', template_values)
         
     def post(self, checkin_id):
-        """Builds GameLog and Scores for a corresponding Checkin.  The
+        '''Builds GameLog and Scores for a corresponding Checkin.  The
         Checkin 'id' is used as the GameLog 'key_name'.  Users can add any
         Players they want to their GameLog, but only Players with an fb_id
         will be used to create References to Users and Scores.  However,
         Players without an fb_id will be included in the list of Players
         updated to Checkin.json.     
-        """
+        '''
         logging.info(TRACE+'GameLog:: post('+checkin_id+')')
         game_log_json = checkinbase.createGameLog(self, checkin_id)
-        return self.response.out.write(simplejson.dumps(game_log_json))
+        self.redirect('/game-log/'+checkin_id)
 
 class Page(MainHandler):
-    """Returns content for meta pages.
-    """   
+    '''Returns content for meta pages.
+    '''   
     def get(self, page=None):
         path = ""
         if isFacebook(self.request.path):
@@ -395,7 +420,8 @@ class Page(MainHandler):
         elif page == "terms":
             template = path+"base_terms.html"        
         else:
-            template = path+"base_404.html"   
+            self.error(404)
+            return 
         logging.info(TRACE+'Page:: template = '+template)    
         self.generate(template, {
                       'host': self.request.host_url, 
@@ -403,31 +429,48 @@ class Page(MainHandler):
                       'facebook_app_id':FACEBOOK_APP_ID})        
 
 class TestHandler(BaseHandler):
-    """Testing.
-    """
+    '''Display and creates a GameLog.
+    '''
     def get(self, checkin_id):
-        logging.info(TRACE+'TestHandler:: get()')        
+        logging.info(TRACE+'GameLog:: get()')        
+        checkin = models.Checkin.get_by_id(strToInt(checkin_id)) 
+        if checkin is None:
+            self.error(404)
+            return
+        game = checkin.game
+        checkin_json = simplejson.loads(checkin.json)
+        checkin_json['created'] = checkin.created
+        checkin_json['id'] = str(checkin.key().id())
+        logging.info(TRACE+'GameLog:: '+str(checkin_json))            
         user = self.current_user # this is the logged in User 
-        access_token = user.access_token
-        result = facebook.GraphAPI(
-            user.access_token).get_connections('me', 'friends')
-        fb_data = result["data"]
-        friends = []
-        for f in fb_data:
-            friends.append({'value':f['id'], 'label':f['name']})
+        if user is not None:
+            result = facebook.GraphAPI(
+                user.access_token).get_connections('me', 'friends')
+            
+            fb_data = result["data"]
+            friends = []
+            for f in fb_data:
+                friends.append({'value':f['id'], 'label':f['name']})
+            
+            friends = simplejson.dumps(friends)
+        else:
+            user = None
+            friends = None
+            
         template_values = {
-            'friends': simplejson.dumps(friends),
+            'friends': friends,
+            'checkin': checkin_json,
+            'game': game,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
         self.generate('base_test.html', template_values)
 
-
 ######################## METHODS #############################################
 ##############################################################################
 def createUser(graph, cookie):
-    """Returns a User model, built from the Facebook Graph API data.  
-    """
+    '''Returns a User model, built from the Facebook Graph API data.  
+    '''
     # Build User from Facebook Graph API ...
     profile = graph.get_object("me")
     try: # If the user has no location set, make the default "Earth"
@@ -447,8 +490,8 @@ def createUser(graph, cookie):
     return user
   
 def updateUser(user, graph, cookie):
-    """Returns a User model, updated from the Facebook Graph API data.  
-    """
+    '''Returns a User model, updated from the Facebook Graph API data.  
+    '''
     logging.info(TRACE+' updateUser()')
     access_token = cookie[TOKEN]
     logging.info(TRACE+' access_token = '+access_token)    
@@ -566,6 +609,7 @@ def isFacebook(path):
 application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       ('/game', GameProfile),
                                       (r'/game(/m/.*)/(.*)', GameProfile),
+                                      (r'/user/(.*)/.*', UserProfile),
                                       (r'/user/(.*)', UserProfile),
                                       ('/game-checkin', Checkin),
                                       (r'/game-log/(.*)', GameLog),
@@ -573,7 +617,7 @@ application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       (r'/serve/([^/]+)?', ServeHandler),
                                       (r'/test/(.*)', TestHandler),
                                       (r'/.*', MainHandler)],
-                                       debug=True)
+                                       debug=False)
 
 def main():
     run_wsgi_app(application)

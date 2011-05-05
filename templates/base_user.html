@@ -5,7 +5,7 @@
 	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
   <meta property="og:title" content="{{current_user.name}}"/>
   <meta property="og:type" content="geek"/>
-  <meta property="og:url" content="http://{{host}}//user/{{profile_user.fb_id}}"/>
+  <meta property="og:url" content="http://{{host}}//user/{{profile_user.fb_id}}/{{profile_user.name|slugify}}"/>
   <meta property="og:image" content="http://graph.facebook.com/{{ profile_user.fb_id }}/picture?type=square"/>
   <meta property="og:site_name" content="SuperMeeple"/>	
 	{% endblock %}
@@ -24,7 +24,7 @@
       	</div>
 				<div id="fb-like">
 					<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
-					<fb:like href="http://{{host}}//user/{{profile_user.fb_id}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
+					<fb:like href="http://{{host}}//user/{{profile_user.fb_id}}/{{profile_user.name|slugify}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>				
 				</div>
     	</div><!-- /user-profile -->	
 		</div><!-- /block -->
@@ -139,65 +139,73 @@
 		<!-- BADGES -->
 		<div class="block">			
   		<div id="badge-block">
-				<div class="block-header-orange"><h2>{% ifequal current_user.fb_id profile_user.fb_id %}My {% endifequal %}Badges</h2></div>
+				<div class="block-header-orange">
+					<h2>{% ifequal current_user.fb_id profile_user.fb_id %}My {% endifequal %}Badges</h2>
+				</div>
 				{% if badge_log %}
 					{% for b in badge_log %}
-					<div class="badge-log">
-						<div class="badge">
-							<img src="{{b.badge.image_url}}" height="50" width="50" border="0" alt="High Score" />
-						</div><!-- /badge -->
-						<div class="awards">
-            	<h3>{{b.badge.name}}</h3>
-							<ul>
-							{% for g in b.games %}
-              	<li class="text1014">
-									<a title="{{g.name}}" href="/game{{g.mid}}/{{g.bgg_id|default_if_none:"0"}}">{{g.name}}</a>
-								</li>
-    					{% endfor %}
-							</ul>
-          	</div><!-- /awards -->
-					</div><!-- /badge-log -->	
-					<div class="liner"></div>
-					{% endfor %}
+				<div class="badge-log">
+					<div class="badge">
+						<img src="{{b.badge.image_url}}" height="50" width="50" border="0" alt="High Score" />
+					</div><!-- /badge -->
+					<div class="awards">
+           	<h3>{{b.badge.name}}</h3>
+						<ul>
+						{% for g in b.games %}
+             	<li class="text1014">
+								<a title="{{g.name}}" href="/game{{g.mid}}/{{g.bgg_id|default_if_none:"0"}}">{{g.name}}</a>
+							</li>
+    				{% endfor %}
+						</ul>
+         	</div><!-- /awards -->
+				</div><!-- /badge-log -->	
+				<div class="liner"></div>
+				 {% endfor %}
    			{% else %}
-					{% ifequal current_user.fb_id c.player.fb_id %}
-					<p>You don't have any Badges yet.</p>
-					{% else %}
-					<p>{{profile_user.name|escape}} doesn't have any Badges yet.</p>
-					{% endifequal %}
-				<div class="tip">
-					<p>Looking for badges? Players can earn a variety of badges based on activity:</p>
+				<div class="message">
+				{% ifequal current_user.fb_id c.player.fb_id %}
+					<p class="text12">You don't have any Badges yet.</p>
+				{% else %}
+					<p class="text12">{{profile_user.name|escape}} has not earned any Badges yet.</p>
+				{% endifequal %}
+				</div><!-- /message -->
+				<div class="tip text12">
+					<p >Looking for badges? Players can earn a variety of badges based on activity:</p>
 					<ul>
 						<li>Check in to games</li>
 						<li>Share check ins on Facebook</li>
 						<li>Scoring check ins</li>
 						<li>Being first and winning also helps</li>
 					</ul>	
-				</div>
+			  </div><!-- /tip -->
 				{% endif %}
-			</div>
+			</div><!-- /badge-block -->
 		</div><!-- /block  -->	
-		
+		<br />
 		{% if scores %}
 		<!-- FRIEND SCORES -->
 		<div class="block">
-			<h2>Scored By Friends</h2>
-			<div id="scores-list">
+			<div id="scores-block">
+				<div class="block-header-gray">
+					<h2>Scored By Friends</h2>
+				</div>
 				{% for s in scores %}
-				<div class="tiny-friend-score">
-					<div class="player">
-						<p>
-							<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}">
+				<div class="tiny-score">
+					<div class="player-wrap">
+						<div class="player">
+							<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}/{{s.author.name|slugify}}">
 								<img alt="{{s.author.name}}" title="{{s.author.name}}" src="http://graph.facebook.com/{{s.author.fb_id}}/picture?type=square"/>
 							</a>
-							<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}">{{s.author.name}}</a>
-							awarded you <span class="points">{{s.points}}</span> points in a game of 
-							<a href="/game-log/{{s.gamelog_id}}">{{s.game.name}}</a> - {{s.created|timesince}} ago
-						</p>
-					</div>							
-				</div><!-- /tiny-friend-score -->	
+							<span class="text1014">
+								<a title="{{s.author.name}}" href="/user/{{s.author.fb_id}}">{{s.author.name}}</a> 
+								scored you in a game of <a href="/game-log/{{s.gamelog_id}}">{{s.game.name}}</a> - {{s.created|timesince}} ago
+							</span>
+						</div>	
+					</div><!-- /player-wrap -->		
+				</div><!-- /tiny-score -->	
+				<div class="liner"></div>
 				{% endfor %}
-		  </div><!-- /scores-list -->	
+		  </div><!-- /scores-block -->	
 		</div><!-- /block -->		
 		{% endif %}
 	</div><!-- /sidebar -->	

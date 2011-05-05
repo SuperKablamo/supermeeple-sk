@@ -192,10 +192,11 @@ def getLatestCheckins(count=10):
     return checkins
 
 def createGameLog(self, checkin_id):
-    """Creates new GameLog and Returns JSON Response of Checkin, Scores,
+    '''Creates new GameLog and Returns JSON Response of Checkin, Scores,
     Badges and Game.
-    """
-    logging.info('############## createGameLog('+checkin_id+') #############')
+    '''
+    _trace = TRACE+'createGameLog('+checkin_id+') '
+    logging.info(_trace)
     game_log = models.GameLog.get_by_key_name(checkin_id)  
     if game_log: return # game_log already exists!
     checkin = models.Checkin.get_by_id(strToInt(checkin_id))
@@ -203,8 +204,8 @@ def createGameLog(self, checkin_id):
     # Read and organize data ...
     note = self.request.get('note')
     mid = self.request.get('mid')  
-    logging.info('############# note = '+note+' ##########')
-    logging.info('############# mid = '+mid+' ##########') 
+    logging.info(_trace+' note = '+note)
+    logging.info(_trace+' mid = '+mid) 
     game_key = db.Key.from_path('Game', mid)         
     scores = [] 
     player_keys = []
@@ -222,7 +223,7 @@ def createGameLog(self, checkin_id):
                      "fb_id":player_id,
                      "points":points,
                      "winner":win}
-            logging.info('#### score '+str(count)+' '+str(score)+' ###')
+            logging.info(_trace+'  score '+str(count)+' '+str(score))
             scores.append(score)                    
             if player_id: # Only Facebook Players ...
                 player_key = db.Key.from_path('User', player_id)
@@ -354,8 +355,11 @@ def getBadgeLog(profile_user):
     """Returns a Template friendly badge_log.
     """    
     _trace = TRACE + 'getBadgeLog():: '
-    logging.info(_trace)    
-    keys = profile_user.badge_log.keys()
+    logging.info(_trace) 
+    try:   
+        keys = profile_user.badge_log.keys()
+    except AttributeError:
+        return None        
     badge_log = []
     for k in keys:
         log_entry = profile_user.badge_log[k]

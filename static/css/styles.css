@@ -22,8 +22,9 @@ h1#error { font-size: 40px; color: red; }
 .text11 { line-height:1.1em; font-size:1.1em; } 
 .text12 { line-height:1.2em; font-size:1.2em; }
 .text1216 { line-height:1.6em; font-size:1.2em; }
-.text13 { font-size:1.3em; font-size:1.3em; }
-.text14 { font-size:1.4em; font-size:1.4em; }
+.text13 { line-height:1.3em; font-size:1.3em; }
+.text14 { line-height:1.4em; font-size:1.4em; }
+.text1416 { line-height:1.6em; font-size:1.4em; }
 p.info { padding:10px; }
 
 /*LAYOUT*/
@@ -36,7 +37,7 @@ body { background-color: #5a5a5a; }
 
 /*HEADER*/
 #header { width:840px; height:60px; margin:0; clear:both; }
-#title { width:318px; margin:8px 56px 0 28px; float:left; padding-top:10px; }
+#title { width:318px; margin:8px 56px 0 28px; float:left; }
 #fb-login { margin:0 0 4px 0; width:396px; height:54px; float:left; background:url("/static/images/login-background.png") no-repeat left top; padding:10px 0 0 20px; }
 #fb-profile { float:left; margin:6px 12px 0 0;}
 #fb-profile-image { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px;}
@@ -132,6 +133,11 @@ body { background-color: #5a5a5a; }
 /* comments */
 #comments { padding:0; margin-top:20px; clear:both; }
 
+/* error pages */
+.error h1 { font-size:3em; color:#ab1e23; }
+.error div { text-align:center; }
+.error div img { border:6px solid #939393; }
+
 /************************* SIDEBAR ******************************************/
 /* block layout and style */
 #sidebar { margin:4px 0px 4px 10px; width:300px; float:left; }
@@ -144,6 +150,9 @@ body { background-color: #5a5a5a; }
 #sidebar .block-footer { }
 #sidebar h3 { font-size:1.2em; line-height:1em; text-decoration:none; } 
 #sidebar h4 { font-size:1.2em; letter-spacing:.1em; line-height:1em; text-decoration:none; }
+.block .message { padding:10px; text-align:left; }
+.block .tip { padding:10px; text-align:left; }
+.tip ul { list-style: disc inside; } 
 
 /* search */
 #search { margin:0 0 0 3px; }
@@ -182,17 +191,19 @@ body { background-color: #5a5a5a; }
 #badge-block p { padding:0 0 12px 0; }
 
 /* checkin lists */
-#recent-checkin-block { text-align:center; }
-#my-checkin-block .tiny-checkin, #recent-checkin-block .tiny-checkin { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
-#recent-checkin-block .tiny-checkin .player-wrap, #my-checkin-block .tiny-checkin .game-wrap, #my-checkin-block .tiny-checkin .details { overflow:hidden; padding:4px 0 0 0; }
-#my-checkin-block .tiny-checkin .game-wrap .game, #recent-checkin-block .tiny-checkin .player-wrap .player { float:left; text-align:left; }
-#recent-checkin-block .tiny-checkin .player-wrap .badges { float:right; padding:0 4px; }
-#recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .player-wrap .player { width:160px; text-align:left; }
-#recent-checkin-block .tiny-checkin .player-wrap .player img { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px; }
+#recent-checkin-block, #scores-block { text-align:center; }
+#my-checkin-block .tiny-checkin, #recent-checkin-block .tiny-checkin, #scores-block .tiny-score { margin:0; padding:4px 0 6px 6px; clear:both; overflow:hidden; }
+#recent-checkin-block .tiny-checkin .player-wrap, #my-checkin-block .tiny-checkin .game-wrap, #my-checkin-block .tiny-checkin .details, #scores-block .tiny-score .player-wrap { overflow:hidden; padding:4px 0 0 0; }
+#recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .game-wrap .game { float:left; text-align:left; }
+#my-checkin-block .tiny-checkin .game-wrap .time { float:left; padding:4px 0 0 0; }
+#my-checkin-block .tiny-checkin .game-wrap .time { width:148px; text-align:left; }
+#recent-checkin-block .tiny-checkin .player-wrap .badges, #my-checkin-block .tiny-checkin .game-wrap .badges { float:right; padding:0 4px; }
+#recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .game-wrap .game { width:160px; text-align:left; }
+#scores-block .tiny-score .player-wrap .player { text-align:left; }
+#recent-checkin-block .tiny-checkin .player-wrap .player img, #scores-block .tiny-score .player-wrap .player img, #my-checkin-block .tiny-checkin .game-wrap .game img { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px; }
 #my-checkin-block .tiny-checkin .game-wrap .game-badges { float:right; padding:0 4px 0 0; margin:0 0 0 16px;}
 #my-checkin-block .tiny-checkin .details { padding:4px 0 0 0 ; }
-#my-checkin-block .tiny-checkin .details .time { float:left; padding:4px 0 0 0; }
-#my-checkin-block .tiny-checkin .details .time { width:148px; text-align:left; }
+
 #my-checkin-block .tiny-checkin .details .score-it { float:right; padding:0 4px 0 0; }
 #my-checkin-block .player img { width:25px; margin-right:4px; border:1px solid #939393; vertical-align:middle; } 
 img.thumbnail-badge { width:25px; margin:0px 4px; vertical-align:middle; border:none; }

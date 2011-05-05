@@ -7,15 +7,15 @@
 import freebase
 
 ## APPSPOT.COM - UNCOMMENT FOR PRODUCTION ####################################
-FACEBOOK_APP_ID = "149881721731503"
-FACEBOOK_APP_SECRET = "95d5f3afab330cdc970e120e519c36d6"
-SITE="SuperMeeple"
+#FACEBOOK_APP_ID = "149881721731503"
+#FACEBOOK_APP_SECRET = "95d5f3afab330cdc970e120e519c36d6"
+#SITE="SuperMeeple"
 ##############################################################################
 
 ## LOCALHOST:8080 - UNCOMMENT FOR LOCAL TESTING ##############################
-#FACEBOOK_APP_ID = "174331539272451"
-#FACEBOOK_APP_SECRET = "173988eedb97c654f3cfe2d60ce6129d"
-#SITE="localhosttest-sk"
+FACEBOOK_APP_ID = "174331539272451"
+FACEBOOK_APP_SECRET = "173988eedb97c654f3cfe2d60ce6129d"
+SITE="localhosttest-sk"
 ##############################################################################
 
 TOKEN = 'access_token'
@@ -40,7 +40,7 @@ FREEBASE = freebase
 ## FREEBASE SANDBOX ##########################################################
 #FREEBASE_USER = "wmerydith"
 #FREEBASE_PSWD = "free1945"
-#FREEBASE = freebase.sandbox
+#REEBASE = freebase.sandbox
 
 ##############################################################################
 ### !!! NOTE - THESE ARE KEY NAMES, CHANGING THEM WILL BREAK THE SITE !!! ####
