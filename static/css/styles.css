@@ -243,6 +243,7 @@ img.thumbnail-badge { width:25px; margin:0px 4px; vertical-align:middle; border:
 
 /*FOOTER*/
 #footer { height:40px; margin:10px 0 0 0; clear:both; padding:0 0 10px 0; text-align:center; width:840px;}
+#footer a { color:#FF9C55; }
 
 /*AJAX*/
 #spinner.loading { margin:0 0 10px 64px; background-image:url("/static/images/ajax-loader.gif"); width:128px; height:16px; text-align:center; }

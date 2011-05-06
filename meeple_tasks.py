@@ -9,6 +9,7 @@
 ############################################################################## 
 from __future__ import with_statement
 
+import awardbase
 import main
 import checkinbase
 import freebase
@@ -110,7 +111,7 @@ def createBadges():
     
     # Load Badges
     updated = []    
-    for b in checkinbase.BADGES:
+    for b in awardbase.BADGES:
         badge = models.Badge.get_by_key_name(b['key'])
         if badge is None:
             logging.info(_trace+'creating Badge '+b['key'])

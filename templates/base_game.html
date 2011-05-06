@@ -9,7 +9,10 @@
   <meta property="og:image" content="{{ game.image_url }}"/>
   <meta property="og:site_name" content="SuperMeeple"/>	
   <meta property="og:description"
-        content="{{ game.description|truncatewords_html:40 }}"/>{% endblock %}	
+        content="{{ game.description|truncatewords_html:40 }}"/>
+
+	<meta property="fb:admins" content="679874743" />
+  {% endblock %}	
 
   {% block script %}
 	<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
@@ -77,14 +80,13 @@
 						{% if game.year_published %}
 						<span class="year">({{ game.year_published}})</span>
 						{% endif %}
+						<span id="facebook-like">
+              <fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" layout="button_count" width="200" show_faces="false" font="arial"></fb:like>	
+						</span>
 						{% if admin %}
 						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}">EDIT</a>
 						</span>	
-						{% else %}
-						<span id="facebook-like">
-							<fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" layout="button_count" show_faces="true" width="100" font="arial"></fb:like>	
-						</span>
-						{% endif %}		
+						{% endif %}
 					</h1>
 				</div>
 		  </div>

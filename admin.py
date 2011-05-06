@@ -267,6 +267,7 @@ def reset(self):
         u.score_count = 0
         u.share_count = 0
         updated.append(u)
+    db.put(updated)
     
     # Delete GameLogs
     logging.info(_trace+' deleting all GameLogs.')        
