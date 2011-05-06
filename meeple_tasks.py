@@ -12,6 +12,7 @@ from __future__ import with_statement
 import main
 import freebase
 import gamebase
+import utils
 
 from settings import *
 
@@ -130,13 +131,16 @@ def createBadges():
             image_url = images.get_serving_url(str(image_blob_key))
             banner_url = images.get_serving_url(str(banner_blob_key))
                         
+            name = b['cat']+' '+b['lvl']            
             badge = models.Badge(key_name=b['key'], 
-                                 name=b['name'], 
-                                 description=b['name'],
+                                 name=name, 
+                                 description=b['description'],
                                  image=image_blob_key,
                                  image_url=image_url,
                                  banner=banner_blob_key,
-                                 banner_url=banner_url)
+                                 banner_url=banner_url,
+                                 level=utils.strToInt(b['lvl']),
+                                 category=b['cat'])
             
             updated.append(badge)
    

@@ -143,12 +143,14 @@ class Badge(db.Model):
     banner = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
     image_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/checkin1_100x100.png")
     banner_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/firstcheck_banner.png")    
+    level = db.IntegerProperty(required=True, default=1)
+    category = db.StringProperty(required=True)
     @property
     def checkin_badges(self):
         return Checkin.all().filter('badges', self.key())    
     @property
     def player_badges(self):
-        return User.all().filter('badges', self.key())
+        return User.all().filter('badges', self.key())      
 
 class BadgeAward(db.Model):
     badge = db.ReferenceProperty(Badge, required=True, collection_name='badge_awards')

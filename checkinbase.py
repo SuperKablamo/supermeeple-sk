@@ -61,7 +61,8 @@ def createCheckin(user, game, message, share=False):
             badge = {'name': b.name, 
                      'image_url': b.image_url,
                      'banner_url': b.banner_url,
-                     'key_name': b.key().name()}
+                     'key_name': b.key().name(),
+                     'description': b.description}
             badges.append(badge)  
             user.badges.append(b.key())
             if user.badge_log is None:

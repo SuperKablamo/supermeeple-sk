@@ -418,7 +418,9 @@ class Page(MainHandler):
         elif page == "rewards":
             template = path+"base_rewards.html"                           
         elif page == "terms":
-            template = path+"base_terms.html"        
+            template = path+"base_terms.html"  
+        #elif page == "badges":
+        #    template = path+"base_badges.html" 
         else:
             self.error(404)
             return 

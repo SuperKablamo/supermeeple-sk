@@ -51,9 +51,9 @@
 		          	},
 						  	success: function(badges) {  
 						  		$('#checkin-form').html("<div id='status'></div><div id='new-badges'></div>");  
-						    	$('#status').html("<h3><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>You are checked in!</h3>");  
+						    	$('#status').html("<h3><img class=\"check-mark\" src=\"/static/images/check-mark.png\"/>Checkin complete.</h3>");  
 									$.each(badges, function(i,badge) {
-						  	  	$('#new-badges').append("<h3>New Badge:<br/>"+badge.name+"</h3><p><img class='badge' src='"+badge.image_url+"=s60'></p>");  
+						  	  	$('#new-badges').append("<h3>Badge: "+badge.name+"</h3><p class='text1'>"+badge.description+"<br/><br/><img class='badge' src='"+badge.image_url+"=s60'></p>");  
 						    	});
 						  	},
 		          	complete: function() {
@@ -335,7 +335,7 @@
 					<div class="liner"></div>
 					{% endfor %}
 				{% else %}
-					<p class="text12 info">Be the <strong>first</strong> to checkin to {{game.name}}!</p>
+					<p class="text12 info">Be the <strong>first</strong> to checkin to <br/>{{game.name}}!</p>
 				{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
