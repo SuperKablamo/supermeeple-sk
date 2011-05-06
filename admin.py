@@ -91,6 +91,7 @@ class Admin(webapp.RequestHandler):
             memcache.flush_all() 
         if method == "flush-games":
             pass
+            # Very dangerous
             #flushGames()
         if method == "update-game":
             updateGame(self)  
@@ -182,49 +183,56 @@ class UnmatchedGames(webapp.RequestHandler):
 ######################## METHODS #############################################
 ##############################################################################
 def getBadges():
-    """Returns all Badge Entities in the Datastore"""
+    '''Returns all Badge Entities in the Datastore.
+    '''
     return models.Badge.all().fetch(500)
 
 def addBadge(self):
-    """Creates a single Badge Entity in the Datastore"""
+    '''Creates a single Badge Entity in the Datastore.
+    '''
     name = self.request.get('name')
     badge = models.Badge(key_name=name, name=name, description=name)
     db.put(badge)
     return badge
     
 def buildGames(fetch_size=20):
-    logging.info('#################### buildGames() ########################')
+    _trace = TRACE+'buildGames('+str(fetch_size)+') '
+    logging.info(_trace)
     q = models.GameSeed.all().filter('processed = ', False).order('mid')
     game_seeds = q.fetch(fetch_size) 
     cursor = None
     count = 0
     task_number = 0
     game_seed_count = q.count(5000)
-    logging.info('####### game_seed_count = '+str(game_seed_count)+' #######')
+    logging.info(_trace+' game_seed_count = '+str(game_seed_count))
     while True:
         if cursor is None:
-            logging.info('###### buildGames():: cursor = None  #############')
+            logging.info(_trace+' cursor = None')
             game_seeds = q.fetch(fetch_size) 
         else:    
-            logging.info('###### buildGames():: cursor = '+str(cursor)+ ' ##')
+            logging.info(_trace+' cursor = '+str(cursor))
             game_seeds = q.with_cursor(cursor).fetch(fetch_size)
         cursor = q.cursor()
         keys = []
         for gs in game_seeds:
             keys.append(gs.key())
             count += 1
-            logging.info('####### buildGames() :: count = '+str(count)+' ###')
+            logging.info(_trace+' count = '+str(count))
         task_number += 1
-        logging.info('################ buildGames() :: defer() #############')
+        logging.info(_trace+' defer() ')
         deferred.defer(meeple_tasks.processGameSeeds, 
                        keys, 
                        task_number, 
-                       _queue="tortoise")     
+                       _queue='tortoise')     
         
         if count >= game_seed_count:
             return               
 
 def flushGames():
+    '''Deletes all Games.
+    '''
+    _trace = TRACE+'reset() '
+    logging.info(_trace)    
     q = db.Query(models.Game, keys_only=True)
     keys = q.fetch(2000)
     db.delete(keys)
@@ -234,13 +242,50 @@ def updateGame(self):
     return
 
 def reset(self):
-    logging.info('####################### reset() ##########################')    
+    '''Deletes all Checkins, Badges and Scores and resets counts.
+    '''
+    _trace = TRACE+'reset() '
+    logging.info(_trace)
+    
+    # Reset counts on Games    
+    logging.info(_trace+' reseting counts on Games.')
     games = models.Game.all().filter('checkin_count >', 0).fetch(5000)
     updated = []
     for g in games:
         g.checkin_count = 0
         updated.append(g)
     db.put(updated)
+
+    # Clear earnings from Users
+    logging.info(_trace+' clearing earnings from Users.')    
+    users = models.User.all().fetch(1000)
+    updated = []
+    for u in users:
+        u.badge_log = None
+        u.badges = []
+        u.checkin_count = 0
+        u.score_count = 0
+        u.share_count = 0
+        updated.append(u)
+    
+    # Delete GameLogs
+    logging.info(_trace+' deleting all GameLogs.')        
+    q = db.Query(models.GameLog, keys_only=True)   
+    keys = q.fetch(2000)
+    db.delete(keys)
+         
+    # Delete Scores
+    logging.info(_trace+' deleting all Scores.')        
+    q = db.Query(models.Score, keys_only=True)   
+    keys = q.fetch(2000)
+    db.delete(keys)
+        
+    # Delete Checkins
+    logging.info(_trace+' deleting all Checkins.')        
+    q = db.Query(models.Checkin, keys_only=True)   
+    keys = q.fetch(2000)
+    db.delete(keys)    
+    
     return    
 
 def generate(self, template_name, template_values):

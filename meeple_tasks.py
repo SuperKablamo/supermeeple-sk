@@ -10,6 +10,7 @@
 from __future__ import with_statement
 
 import main
+import checkinbase
 import freebase
 import gamebase
 import utils
@@ -109,7 +110,7 @@ def createBadges():
     
     # Load Badges
     updated = []    
-    for b in BADGES:
+    for b in checkinbase.BADGES:
         badge = models.Badge.get_by_key_name(b['key'])
         if badge is None:
             logging.info(_trace+'creating Badge '+b['key'])
