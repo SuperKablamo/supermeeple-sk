@@ -38,8 +38,8 @@ API500 = {"status": "500 Internal Server Error", "code": "/api/status/error"}
 ############################# REQUEST HANDLERS ############################### 
 ##############################################################################
 class APICheckin(webapp.RequestHandler):
-    """Provides API access to Checkin data.  Responses are in JSON.
-    """
+    '''Provides API access to Checkin data.  Responses are in JSON.
+    '''
     def get(self, method):
         logging.info(TRACE+'APICheckin:: get()')
         if method == "latest": 
@@ -67,20 +67,39 @@ class APICheckin(webapp.RequestHandler):
         return self.response.out.write(simplejson.dumps(r)) 
         
 class APIGame(webapp.RequestHandler):
-    """Provides API access to Game data.  Responses are in JSON.
-    """
+    '''Provides API access to Game data.  Responses are in JSON.
+    '''
     def get(self, mid, bgg_id):
         logging.info(TRACE+'APIGame:: get()')
         r = getGame(mid, bgg_id)
         return self.response.out.write(simplejson.dumps(r))
                 
 class APIUser(webapp.RequestHandler):
-    """Provides API access to User data.  Responses are in JSON.
-    """
+    '''Provides API access to User data.  Responses are in JSON.
+    '''
     def get(self, fb_id):
         logging.info(TRACE+'APIUser:: get()')
         r = getUser(fb_id)
         return self.response.out.write(simplejson.dumps(r))         
+
+class APIUserDeauthorize(webapp.RequestHandler):
+    '''Provides API access to Deauthorize User. When a user of this app 
+    removes it in the App Dashboard or blocks the app in the News Feed, this 
+    app will be notified by a Deauthorize Callback URL in the Developer App. 
+    During app removal Facebook sends an HTTP POST request containing a 
+    single parameter, signed_request, which contains the user id (UID) of the 
+    user that just removed this app. All existing user access tokens will be 
+    automatically expired.
+    '''
+    def post(self):
+        logging.info(TRACE+'APIUserDeauthorize:: post() ')
+        fb_id = self.request.get('signed_request')
+        user = getUser(fb_id)
+        if user:
+            user.active = False
+            user.access_token = '0'
+            db.put(user)
+        return
                
 class APIGameLog(webapp.RequestHandler):
     """Provides API access to GameLog data.  Responses are in JSON.
@@ -295,6 +314,7 @@ def createCheckin(self):
 ##############################################################################
 application = webapp.WSGIApplication([(r'/api/checkin/(.*)', APICheckin),
                                       (r'/api/game(/m/.*)/(.*)', APIGame),
+                                      (r'/api/user/deauthorize', APIUserDeauthorize),
                                       (r'/api/user/badges/(.*)', APIUserBadges),
                                       (r'/api/user/(.*)', APIUser),
                                       ('/api/gamelog/(.*)', APIGameLog),

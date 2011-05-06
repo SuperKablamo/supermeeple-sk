@@ -69,8 +69,8 @@ class BaseHandler(webapp.RequestHandler):
                 if not user: # Build a User
                     user = createUser(graph, cookie)
                 # Update the user data if it has changed.
-                # TODO: if the access_token has changed, may need to
-                # re-solicit permissions.            
+                # If the user has deauthorized, and is active=False, then
+                # user will need to re-solicit permissions.            
                 else:
                     user = updateUser(user, graph, cookie)    
                 self._current_user = user
@@ -485,18 +485,27 @@ def createUser(graph, cookie):
                        fb_profile_url=profile["link"],
                        fb_location_id=loc_id,
                        fb_location_name=loc_name,
-                       access_token=cookie[TOKEN])
+                       access_token=cookie[TOKEN],
+                       active = True)
     user.put() 
     return user
   
 def updateUser(user, graph, cookie):
     '''Returns a User model, updated from the Facebook Graph API data.  
     '''
-    logging.info(TRACE+' updateUser()')
+    _trace = TRACE+' updateUser() '
+    logging.info(_trace)
+    # Check for deauthorized users.
+    #if user.active == False:
+    #    return None
     access_token = cookie[TOKEN]
-    logging.info(TRACE+' access_token = '+access_token)    
+    logging.info(_trace+'access_token = '+access_token)    
     props = user.properties() # This is what's in the Datastore
-    profile = graph.get_object("me") # This is what Facebook has
+    try:
+        profile = graph.get_object("me") # This is what Facebook has
+    except urllib2.HTTPError:
+        logging.info(_trace+'HTTPError')
+        return None
     new_profile_url = profile["link"]  
     try: # If the user has no location set, make the default "Earth"
         new_loc_id = profile["location"]["id"]
@@ -505,7 +514,11 @@ def updateUser(user, graph, cookie):
         new_loc_id = "000000000000001"
         new_loc_name = "Earth"    
     update = False
+    
     # Compare properties and only update if things have changed ...
+    if user.active == False:
+        user.active = True
+        update = True
     if new_profile_url != props['fb_profile_url']:
         user.fb_profile_url = new_profile_url
         update = True

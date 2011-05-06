@@ -115,6 +115,7 @@ class GameEdit(webapp.RequestHandler):
     
     # POST updated Game data.
     def post(self, mid=None, bgg_id=None):
+        _trace = TRACE+'GameEdit:: '
         logging.info(_trace+'post(mid = '+mid+', bgg_id = '+bgg_id+')')        
         bgg_id_new = self.request.get('bgg-id')
         asin = self.request.get('asin')

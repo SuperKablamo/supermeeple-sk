@@ -1,3 +1,17 @@
+/*****************************************************************************
+* Copyright (c) 2011, SuperMeeple, LLC.
+* All rights reserved.
+* info@supermeeple.com
+* 
+* White text:
+* font color:#ffffff
+* link color: #ff9c55
+* 
+* Dark Grey/Black text:
+* font color:#414040
+* link color:#c36931
+*****************************************************************************/
+
 /*RESET*/
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, small, fieldset, form, label, legend { margin: 0; padding: 0; border: 0; outline: 0; vertical-align: baseline; background: transparent; }
 body { line-height: 1; }
@@ -9,9 +23,9 @@ ins { text-decoration: none; }
 del { text-decoration: line-through; }
 table { border-collapse: collapse; border-spacing: 0; }
 
-/* COMMON STYLES*/
-body { font-family:Verdana,Helvetica,Tahoma,Arial,sans-serif; font-size:62.5%; color:#515151; }
-a { color:#FF8003; cursor:pointer; outline:medium none; text-decoration:none; }
+/*COMMON STYLES*/
+body { font-family:Verdana,Helvetica,Tahoma,Arial,sans-serif; font-size:62.5%; color:#414040; }
+a { color:#c36931; cursor:pointer; outline:medium none; text-decoration:none; }
 h1, h2, h3, h4, h5 { font-weight:normal; }
 #title a { font-weight: normal; margin: 5px 0; font-size: 3em; clear: both; }
 #header, #footer {color: #fff; }
@@ -39,8 +53,9 @@ body { background-color: #5a5a5a; }
 #header { width:840px; height:60px; margin:0; clear:both; }
 #title { width:318px; margin:8px 56px 0 28px; float:left; }
 #fb-login { margin:0 0 4px 0; width:396px; height:54px; float:left; background:url("/static/images/login-background.png") no-repeat left top; padding:10px 0 0 20px; }
-#fb-profile { float:left; margin:6px 12px 0 0;}
-#fb-profile-image { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px;}
+#fb-profile { float:left; margin:6px 12px 0 0; }
+#fb-profile a { color:#ff9c55; }
+#fb-profile-image { border:1px solid #c36931; float:left; height:25px; margin-right:5px; width:25px;}
 #fb-button { border:0 none; float:right; margin:3px 0 0 0; padding-right:42px; }    
 
 /*FULLBAR*/
@@ -69,7 +84,7 @@ body { background-color: #5a5a5a; }
 
 /* user profile */
 #mainbar #user-profile { height:60px; padding-bottom:12px; }
-#mainbar #user-profile #user-image { border:1px solid #FF9C55; float:left; height:50px; margin:0 10px 10px 0; width:50px; }
+#mainbar #user-profile #user-image { border:1px solid #c36931; float:left; height:50px; margin:0 10px 10px 0; width:50px; }
 #mainbar #user-profile #user-name { float:left; text-align:left; }
 #mainbar #user-profile #user-name h1 { margin:0; }
 #mainbar #user-profile #fb-like { padding-top:32px; }
@@ -97,6 +112,7 @@ body { background-color: #5a5a5a; }
 #checkin-list, #game-log { width:100%; text-align:left; }
 #checkin-list .checkin-wrapper, #game-log .checkin-wrapper { clear:both; margin-bottom:8px; overflow:hidden; }
 #checkin-list .checkin-header, #game-log .checkin-header { background-image:url("/static/images/blank-header.png"); background-repeat:no-repeat; float:left; height:50px; width:440px; clear:both; }
+#checkin-list .checkin-header a, #game-log .checkin-headera a { color:#ff9c55; }
 #checkin-list .checkin-header .game-title, #game-log .checkin-header .game-title { float:left; padding:14px 0 0 10px; width:280px; }
 #checkin-list .checkin-header .game-title h3, #game-log .checkin-header .game-title h3 { font-size:1.4em; line-height:1.4em; text-decoration:none; }
 #checkin-list .checkin-header .game-title .time, #game-log .checkin-header .game-title .time { color:#FFFFFF; padding:2px 0 0 2px; }
@@ -200,7 +216,7 @@ body { background-color: #5a5a5a; }
 #recent-checkin-block .tiny-checkin .player-wrap .badges, #my-checkin-block .tiny-checkin .game-wrap .badges { float:right; padding:0 4px; }
 #recent-checkin-block .tiny-checkin .player-wrap .player, #my-checkin-block .tiny-checkin .game-wrap .game { width:160px; text-align:left; }
 #scores-block .tiny-score .player-wrap .player { text-align:left; }
-#recent-checkin-block .tiny-checkin .player-wrap .player img, #scores-block .tiny-score .player-wrap .player img, #my-checkin-block .tiny-checkin .game-wrap .game img { border:1px solid #FF9C55; float:left; height:25px; margin-right:5px; width:25px; }
+#recent-checkin-block .tiny-checkin .player-wrap .player img, #scores-block .tiny-score .player-wrap .player img, #my-checkin-block .tiny-checkin .game-wrap .game img { border:1px solid #ff9c55; float:left; height:25px; margin-right:5px; width:25px; }
 #my-checkin-block .tiny-checkin .game-wrap .game-badges { float:right; padding:0 4px 0 0; margin:0 0 0 16px;}
 #my-checkin-block .tiny-checkin .details { padding:4px 0 0 0 ; }
 
@@ -220,6 +236,9 @@ img.thumbnail-badge { width:25px; margin:0px 4px; vertical-align:middle; border:
 #tiny-game-detail #game-data dl { margin:6px 0; }
 #tiny-game-detail #game-data dt { padding:6px 0 6px; color:#999; } 
 #tiny-game-detail #game-data dd { margin-left:12px; }
+
+/* Amazon links */
+.block #amazon { text-align:center; }
 
 
 /*FOOTER*/

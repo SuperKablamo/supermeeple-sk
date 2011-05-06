@@ -124,7 +124,10 @@
 			</div><!-- /checkin-wrapper -->	
 			
 			{% ifequal checkin.player.fb_id current_user.fb_id %}
-		  <!-- GAME-LOG FORM -->
+			{% if checkin.gamelog %}
+		  	<!-- TODO: PUT form for editing -->
+			{% else %}
+			<!-- GAME-LOG FORM -->
 			<div id="game-log-form-wrapper">
 				<div id="spinner"></div>
 				<form name="input" id="game-log-form" action="/game-log/{{checkin.id}}" title="Create Game Log" method="post" >
@@ -186,11 +189,12 @@
 						</tr>														
 					</table>	
 					<label>Note:</label><br/>
-					<textarea class="validate[maxSize[500]] text-area" id="note" name="note" rows="6" cols="50"></textarea><br/>
+					<textarea class="validate[maxSize[420]] text-area" id="note" name="note" rows="6" cols="50"></textarea><br/>
 					<p style="text-align:right">Share on <img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> <input type="checkbox" name="facebook" value="true" checked="checked" id="facebook"/>&nbsp;</p>
 					<input class="button" id="game-log-button" value="Save" type="submit"/>
 				</form>					
 			</div><!-- /game-log-form-wrapper -->
+			{% endif %}
 			{% endifequal %}		
 		</div><!-- /game-log -->
 		
