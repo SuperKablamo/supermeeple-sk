@@ -39,4 +39,6 @@ BGG_XML_URI = "http://www.boardgamegeek.com/xmlapi/boardgame/"
 BGG_XML_EXACT_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?exact=1&search="
 BGG_XML_SEARCH = "http://www.boardgamegeek.com/xmlapi/search?search="
 BGG_NAMESPACE = "/user/pak21/boardgamegeek/boardgame"
-        
+ 
+SPIEL_ID = "/m/0gxr36p"
+MEEPLES_ID = "/en/meeples_choice_award"        

@@ -45,6 +45,24 @@ indexes:
   - name: bgg_id
   - name: mid
 
+- kind: GameLog
+  properties:
+  - name: class
+  - name: created
+    direction: desc
+
+- kind: GameLog
+  properties:
+  - name: game
+  - name: created
+    direction: desc
+
+- kind: GameLog
+  properties:
+  - name: player
+  - name: created
+    direction: desc
+
 - kind: GameSeed
   properties:
   - name: processed

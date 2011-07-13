@@ -11,6 +11,7 @@ import logging
 
 from django.utils import simplejson
 from google.appengine.ext import db
+from google.appengine.ext.db import polymodel
 from google.appengine.ext import blobstore
 
 ############################# CUSTOM PROPERTIES ##############################
@@ -46,9 +47,8 @@ class User(db.Model): # fb_id is key_name
     last_checkin_time = db.DateTimeProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
     share_count = db.IntegerProperty(required=True, default=0)
-    score_count = db.IntegerProperty(required=True, default=0)
+    share_list = db.StringListProperty(required=True, default=None)
     badges = db.ListProperty(db.Key, required=True, default=None)
-    badge_log = JSONProperty(required=True, default=None)
     welcomed = db.BooleanProperty(required=True, default=False)
     alerted = db.BooleanProperty(required=True, default=False)
     active = db.BooleanProperty(required=True, default=False)
@@ -58,91 +58,45 @@ class User(db.Model): # fb_id is key_name
             
 class Game(db.Model): # mid is key_name
     name = db.StringProperty(required=True)
-    bgg_id = db.StringProperty(required=False, default='0') # BoardGameGeek id
-    mid = db.StringProperty(required=False) # Freebase mid
     asin = db.StringProperty(required=False) # ASIN number
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
     image_url = db.LinkProperty(required=False)
-    bgg_url = db.LinkProperty(required=False)
-    bgg_image_url = db.LinkProperty(required=False)
-    bgg_thumbnail_url = db.LinkProperty(required=False)
-    description = db.TextProperty(required=False)
-    year_published = db.IntegerProperty(required=False)
-    min_players = db.IntegerProperty(required=False)
-    max_players = db.IntegerProperty(required=False)
-    playing_time = db.IntegerProperty(required=False)
-    age = db.IntegerProperty(required=False)
-    publishers = db.StringListProperty(required=True, default=None) 
-    designers = db.StringListProperty(required=True, default=None) 
-    artists = db.StringListProperty(required=True, default=None) 
-    expansions = db.StringListProperty(required=True, default=None) 
-    mechanics = db.StringListProperty(required=True, default=None) 
-    awards = db.StringListProperty(required=True, default=None) 
-    categories = db.StringListProperty(required=True, default=None)  
-    subdomains = db.StringListProperty(required=True, default=None)     
+    youtube_url = db.LinkProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
 
-class GameXML(db.Model): # bgg_id is key_name
-    # BGG Game XML example: http://www.boardgamegeek.com/xmlapi/boardgame/13
-    xml = db.TextProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-
-class Checkin(db.Model):
+class GameLog(polymodel.PolyModel):
     game = db.ReferenceProperty(Game, required=True, collection_name='checkins')
     player = db.ReferenceProperty(User, required=True, collection_name='checkins')
     badges = db.ListProperty(db.Key, required=True, default=None)
-    winner = db.ReferenceProperty(User, required=False, collection_name='wins')
-    fb_location_id = db.StringProperty(required=False)
-    fb_location_name = db.StringProperty(required=False)
-    created = db.DateTimeProperty(required=True, auto_now=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+class Checkin(GameLog):
+    location = db.GeoPtProperty(required=False)
+    place = db.StringProperty(required=False)
     message = db.StringProperty(required=True, default="message")
     
-    # {'player': 
+    # {'game':
+    #     {'name':name,'image_url':image_url},
+    #  'player': 
     #     {'name':name,'fb_id':fb_id},
     #  'badges': 
-    #       [{'name':name,'key_name':key_name,'image_url':image_url}, 
-    #        {'name':name,'key_name':key_name,'image_url':image_url}],
-    #  'message': message,
-    #  'gamelog':
-    #     {'scores':
-    #       [{'name':name,'fb_id':fb_id,'point':points,'win':win},
-    #        {'name':name,'fb_id':fb_id,'point':points,'win':win}],
-    #      'note': note}    
+    #       [{'name':name,'key_name':key_name,'image_url':image_url,
+    #         'banner_image_url':banner_image_url}, 
+    #        {'name':name,'key_name':key_name,'image_url':image_url,
+    #         'banner_image_url':banner_image_url}],
+    #  'place':place,
+    #  'message': message
+    # }    
     json = db.TextProperty(required=False)    
-
-class Score(db.Model):
-    author = db.ReferenceProperty(User, required=True, collection_name='scored')
-    game = db.ReferenceProperty(Game, required=True, collection_name='scores')
-    player = db.ReferenceProperty(User, required=True, collection_name='scores')
-    gamelog_id = db.IntegerProperty(required=True)
-    points = db.IntegerProperty(required=True, default=0)
-    flags = db.IntegerProperty(required=True, default=0)
-    win = db.BooleanProperty(required=True, default=False)
-    created = db.DateTimeProperty(required=True, auto_now=True)
-    @property
-    def gamelog_scores(self):
-        return GameLog.all().filter('scores', self.key())    
-
-class GameLog(db.Model):
-    checkin = db.ReferenceProperty(Checkin, required=True)
-    game = db.ReferenceProperty(Game, required=True)
-    players = db.ListProperty(db.Key, required=True, default=None)
-    scores = db.ListProperty(db.Key, required=True, default=None)
-    note = db.StringProperty(required=False)
-  
-class GameAward(db.Model): # award id is key_name
-    json_dump = db.TextProperty(required=True)
 
 class Badge(db.Model):
     name = db.StringProperty(required=True)
     description = db.TextProperty(required=True, default='description')
     points = db.IntegerProperty(required=True, default=0)   
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
-    banner = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
-    image_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/checkin1_100x100.png")
-    banner_url = db.LinkProperty(required=True, default="http://supermeeple.com.s3.amazonaws.com/firstcheck_banner.png")    
+    banner_image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
     level = db.IntegerProperty(required=True, default=1)
     category = db.StringProperty(required=True)
     @property
@@ -157,19 +111,6 @@ class BadgeAward(db.Model):
     user = db.ReferenceProperty(User, required=True, collection_name='badge_awards')
     games = db.ListProperty(db.Key, required=True, default=None)  
     created = db.DateTimeProperty(required=True, auto_now=True)
-        
-class GameRating(db.Model):
-    game = db.ReferenceProperty(Game, required=True)  
-    rating = db.IntegerProperty(required=True) 
-    created = db.DateTimeProperty(required=True, auto_now=True)
     
-class GameSeed(db.Model): # mid is key_name
-    bgg_id = db.StringProperty(required=False, default=None) # BoardGameGeek id
-    mid = db.StringProperty(required=True) # Freebase mid
-    name = db.StringProperty(required=True)
-    processed = db.BooleanProperty(required=True, default=False)
-    created = db.DateTimeProperty(required=True, auto_now=True)
-
-class Config(db.Model):
-    game_seed_cursor = db.StringProperty(required=False)   
-    unmatched_games = db.ListProperty(db.Key, required=True, default=None)
+class GameAward(db.Model): # award id is key_name
+    json = db.TextProperty(required=True)

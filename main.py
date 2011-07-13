@@ -19,15 +19,16 @@ import operator
 import datetime
 import re
 import urllib2
-import utils
+
+from model import user
+from model import game
+from settings import *
 from utils import strToInt
 from utils import buildDataList
 from utils import findPrimaryName
 
-from settings import *
-from urlparse import urlparse
-from xml.etree import ElementTree 
 from django.utils import simplejson
+
 from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
@@ -42,6 +43,9 @@ from google.appengine.ext.webapp import util
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
+from urlparse import urlparse
+from xml.etree import ElementTree
+
 ############################# REQUEST HANDLERS ############################### 
 ##############################################################################   
 class BaseHandler(webapp.RequestHandler):
@@ -54,7 +58,8 @@ class BaseHandler(webapp.RequestHandler):
     '''
     @property
     def current_user(self):
-        logging.info(TRACE+' BaseHandler:: current_user()')
+        _trace = TRACE+'BaseHander:: current_user() '
+        logging.info(_trace)
         if not hasattr(self, "_current_user"):
             self._current_user = None
             cookie = facebook.get_user_from_cookie(
@@ -63,17 +68,17 @@ class BaseHandler(webapp.RequestHandler):
                 # Store a local instance of the user data so we don't need
                 # a round-trip to Facebook on every request
                 token = cookie[TOKEN]
-                logging.info(TRACE+' access_token = '+token)
-                user = models.User.get_by_key_name(cookie["uid"])
+                logging.info(_trace+'access_token = '+token)
+                _user = models.User.get_by_key_name(cookie["uid"])
                 graph = facebook.GraphAPI(token)                
                 if not user: # Build a User
-                    user = createUser(graph, cookie)
+                    _user = user.createUser(graph, cookie)
                 # Update the user data if it has changed.
                 # If the user has deauthorized, and is active=False, then
                 # user will need to re-solicit permissions.            
                 else:
-                    user = updateUser(user, graph, cookie)    
-                self._current_user = user
+                    _user = user.updateUser(_user, graph, cookie)    
+                self._current_user = _user
         return self._current_user
             
     def generate(self, template_name, template_values):
@@ -98,7 +103,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     '''Uploads files to Blobstore.
     '''
     def post(self, form=None):
-        logging.info(TRACE+'UploadHandler:: post()')         
+        _trace = TRACE+'UploadHandler:: post() '
+        logging.info(_trace)
         upload_files = self.get_uploads('file') 
         blob_info = upload_files[0]
         key_name = self.request.get('key_name')
@@ -110,8 +116,8 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             badge.banner = blob_info.key()
             badge.banner_url = images.get_serving_url(blob_info.key())            
         badge.put()   
-        logging.info(TRACE+'UploadHandler:: badge.image = '+str(badge.image))    
-        logging.info(TRACE+'UploadHandler:: badge.image.key = '+str(badge.image.key)) 
+        logging.info(_trace+'badge.image = '+str(badge.image))    
+        logging.info(_trace+'badge.image.key = '+str(badge.image.key)) 
         self.redirect('/admin/')  
                                                 
 class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
@@ -126,9 +132,10 @@ class MainHandler(BaseHandler):
     '''Return content for index.html.     
     '''
     def get(self):
-        logging.info(TRACE+'MainHandler:: get()')
-        spiel_id = "/en/spiel_des_jahres"
-        meeples_id = "/en/meeples_choice_award"
+        _trace = TRACE+'MainHandler:: get() '
+        logging.info(_trace)
+        spiel_id = SPIEL_ID
+        meeples_id = MEEPLES_ID
         spiels_cache = memcache.get(spiel_id)
         meeples_cache = memcache.get(meeples_id)
         # Freebases queries for award winners only occurs once - the first
@@ -163,7 +170,7 @@ class MainHandler(BaseHandler):
                 json_dump = simplejson.dumps(result)
                 json_dump_text = db.Text(json_dump)
                 spiel_game_award = models.GameAward(key_name=spiel_id, 
-                                                    json_dump=json_dump_text)
+                                                    json=json_dump_text)
                 spiel_game_award.put()
                 spiels = parseGameAwards(spiel_game_award) 
                 success = memcache.set(key=spiel_id, 
@@ -205,7 +212,7 @@ class MainHandler(BaseHandler):
                 json_dump = simplejson.dumps(result)
                 json_dump_text = db.Text(json_dump)
                 meeples_game_award = models.GameAward(key_name=meeples_id, 
-                                                      json_dump=json_dump_text)
+                                                      json=json_dump_text)
                 meeples_game_award.put()
                 meeples = parseGameAwards(meeples_game_award) 
                 success = memcache.set(key=meeples_id, 
@@ -244,20 +251,20 @@ class GameProfile(BaseHandler):
     queried for data, persisted to the Datastore (if new or updated), and the
     data is passed to HTML for display.
     
-    POST - uses gameID and gameName to look up a Game on Freebase.  Then
-    redirects to GET in order to display Game Profile.  POSTs come in via
-    Freebase Suggest, and therefore only contain the Freebase ID and Name.
+    POST - uses game_id to look up a Game on Freebase.  Then redirects to GET 
+    in order to display Game Profile.  
     '''
     # Direct linking to Game Profile
     def get(self, mid=None, bgg_id=None):
-        logging.info(TRACE+'GameProfile:: get()')
+        _trace = TRACE+'GameProfile:: get() '
+        logging.info(_trace)
         user = self.current_user
-        game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
-        if game is None:
+        _game = game.getGame(mid=mid, bgg_id=bgg_id)
+        if _game is None:
             self.error(404)
             return            
-        checkins = checkinbase.getGameCheckins(game, 4)
-        high_scores = checkinbase.getGameHighScores(game, 4)
+        checkins = checkinbase.getGameCheckins(_game, 4)
+        high_scores = checkinbase.getGameHighScores(_game, 4)
         host = self.request.host # used for Facebook Like url 
         checked_in = checkinbase.isCheckedIn(user)   
         admin = users.is_current_user_admin()  
@@ -265,7 +272,7 @@ class GameProfile(BaseHandler):
             'admin': admin,
             'checked_in': checked_in,
             'host': host,
-            'game': game,
+            'game': _game,
             'checkins': checkins,
             'high_scores': high_scores,
             'current_user': user,
@@ -275,7 +282,8 @@ class GameProfile(BaseHandler):
 
     # Game search POST
     def post(self):
-        logging.info(TRACE+'GameProfile:: post()')
+        _trace = TRACE+'GameProfile:: post() '
+        logging.info(_trace)
         user = self.current_user
         game_ids = getBGGIDFromFB(self.request.get('game_id'))
         mid = game_ids["mid"]
@@ -470,92 +478,11 @@ class TestHandler(BaseHandler):
 
 ######################## METHODS #############################################
 ##############################################################################
-def createUser(graph, cookie):
-    '''Returns a User model, built from the Facebook Graph API data.  
-    '''
-    # Build User from Facebook Graph API ...
-    profile = graph.get_object("me")
-    try: # If the user has no location set, make the default "Earth"
-        loc_id = profile["location"]["id"]
-        loc_name = profile["location"]["name"]
-    except KeyError:
-        loc_id = "000000000000001"
-        loc_name = "Earth" 
-    user = models.User(key_name=str(profile["id"]),
-                       fb_id=str(profile["id"]),
-                       name=profile["name"],
-                       fb_profile_url=profile["link"],
-                       fb_location_id=loc_id,
-                       fb_location_name=loc_name,
-                       access_token=cookie[TOKEN],
-                       active = True)
-    user.put() 
-    return user
-  
-def updateUser(user, graph, cookie):
-    '''Returns a User model, updated from the Facebook Graph API data.  
-    '''
-    _trace = TRACE+' updateUser() '
-    logging.info(_trace)
-    # Check for deauthorized users.
-    #if user.active == False:
-    #    return None
-    access_token = cookie[TOKEN]
-    logging.info(_trace+'access_token = '+access_token)    
-    props = user.properties() # This is what's in the Datastore
-    try:
-        profile = graph.get_object("me") # This is what Facebook has
-    except urllib2.HTTPError:
-        logging.info(_trace+'HTTPError')
-        return None
-    new_profile_url = profile["link"]  
-    try: # If the user has no location set, make the default "Earth"
-        new_loc_id = profile["location"]["id"]
-        new_loc_name = profile["location"]["name"]
-    except KeyError:
-        new_loc_id = "000000000000001"
-        new_loc_name = "Earth"    
-    update = False
-    
-    # Compare properties and only update if things have changed ...
-    if user.active == False:
-        user.active = True
-        update = True
-    if new_profile_url != props['fb_profile_url']:
-        user.fb_profile_url = new_profile_url
-        update = True
-    if new_loc_id != props['fb_location_id']:
-        user.fb_location_id = new_loc_id
-        update = True
-    if new_loc_name != props['fb_location_name']:
-        user.fb_location_name = new_loc_name
-        udpate = True
-    if access_token != props[TOKEN]:    
-        user.access_token = access_token
-        update = True
-    if update == True:
-        user.put() 
-    return user
-    
-def createLiteUser(name, fb_id):
-    """Returns a new User model, built using the minumum data requirements.
-    """
-    logging.info(TRACE+' createLiteUser('+name+', '+fb_id+')')
-    user = models.User(key_name=fb_id,
-                       fb_id=fb_id,
-                       name=name)    
-    return user
 
-def getFBUser(fb_id=None):
-    """Returns a User for the given fb_id.
-    """
-    logging.info(TRACE+' getFBUser()')        
-    user = models.User.get_by_key_name(fb_id)
-    return user
 
-def getBGGIDFromFB(game_id):
-    """Returns the Board Game Geek Game ID and Freebase MID from Freebase.    
-    """
+def getIDsFromFB(game_id):
+    '''Returns the Board Game Geek Game ID and Freebase MID from Freebase.    
+    '''
     # This query will return None if there is no BGG key/id.
     query = {
       "id":            str(game_id),
@@ -577,8 +504,8 @@ def getBGGIDFromFB(game_id):
         return game_ids   
         
 def getBGGIDFromBGG(game_name):
-    """Returns the Board Game Geek Game ID from Board Game Geek.    
-    """
+    '''Returns the Board Game Geek Game ID from Board Game Geek.    
+    '''
     logging.info(TRACE+'getBGGIDFromBGG():: finding bgg_id')
     logging.info(TRACE+'getBGGIDFromBGG():: game_name = ' + game_name)   
     game_url = BGG_XML_SEARCH + urllib2.quote(game_name)
@@ -590,10 +517,10 @@ def getBGGIDFromBGG(game_name):
     return bgg_id
 
 def parseGameAwards(game_award):
-    """Returns a template iteratible list of game award winners.  
-    """
+    '''Returns a template iteratible list of game award winners.  
+    '''
     logging.info(TRACE+'parseGameAwards()')       
-    json_game_award = simplejson.loads(game_award.json_dump)
+    json_game_award = simplejson.loads(game_award.json)
     games = []
     count = 0
     for r in json_game_award:
@@ -610,8 +537,8 @@ def parseGameAwards(game_award):
     return games
 
 def isFacebook(path):
-    """Returns True if request is from a Facebook iFrame, otherwise False.
-    """
+    '''Returns True if request is from a Facebook iFrame, otherwise False.
+    '''
     if re.search(r".facebook\.*", path): # match a Facebook apps uri
         logging.info(TRACE+'isFacebook():: facebook detected!')
         return True
