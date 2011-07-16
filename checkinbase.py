@@ -335,25 +335,6 @@ def shareGameLog(user, checkin_json):
        user.access_token).put_wall_post(message, attachment)    
     return
 
-def getGameHighScores(game, count=10):
-    """Returns high Scores for a Game.
-    """
-    logging.info('##################### getGameHighScores ##################')    
-    ref_scores = game.scores.order('-points').fetch(count)
-    deref_scores = utils.prefetch_refprops(ref_scores, models.Score.player)
-    return deref_scores   
-
-def getScoresFromFriends(profile_user, count=10):
-    """Returns Scores for a User that were added by their friends.
-    """
-    logging.info('##################### getScoresFromFriends ###############')    
-    query = profile_user.scores.filter('author !=', profile_user)
-    ref_scores = query.fetch(count)
-    deref_scores = utils.prefetch_refprops(ref_scores,
-                                           models.Score.author,
-                                           models.Score.game)
-    return deref_scores   
-
 def getBadgeLog(profile_user):
     """Returns a Template friendly badge_log.
     """    

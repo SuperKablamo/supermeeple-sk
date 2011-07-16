@@ -57,12 +57,11 @@ class User(db.Model): # fb_id is key_name
         return GameLog.all().filter('players', self.key())    
             
 class Game(db.Model): # mid is key_name
-    name = db.StringProperty(required=True)
     asin = db.StringProperty(required=False) # ASIN number
     image = blobstore.BlobReferenceProperty(blobstore.BlobKey, required=False)
-    image_url = db.LinkProperty(required=False)
     youtube_url = db.LinkProperty(required=False)
     checkin_count = db.IntegerProperty(required=True, default=0)
+    freebase_data = JSONProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(required=True, auto_now=True)
 

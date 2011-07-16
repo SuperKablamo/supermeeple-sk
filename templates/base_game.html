@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-	{% block title %}{{ game.name }} - Board Game - SuperMeeple{% endblock %}
+	{% block title %}{{ game.freebase_data.name }} - Board Game - SuperMeeple{% endblock %}
 
-	{% block facebook_meta %}<meta property="fb:app_id" content="{{facebook_app_id}}"/>
-  <meta property="og:title" content="{{game.name}}"/>
+	{% block facebook_meta %}<meta property="fb:app_id" content="{{ facebook_app_id }}"/>
+  <meta property="og:title" content="{{ game.freebase_data.name }}"/>
   <meta property="og:type" content="game"/>
-  <meta property="og:url" content="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}"/>
+  <meta property="og:url" content="http://{{ host }}/game{{ game.key.name }}"/>
   <meta property="og:image" content="{{ game.image_url }}"/>
   <meta property="og:site_name" content="SuperMeeple"/>	
   <meta property="og:description"
@@ -75,26 +75,26 @@
 			<div id="game-header-wrap">
 				<div id="game-header">
 					<h1 id="game-title">
-						<span class="name">{{ game.name }}</span>
+						<span class="name">{{ game.freebase_data.name }}</span>
 						<script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
-						{% if game.year_published %}
-						<span class="year">({{ game.year_published}})</span>
+						{% if game.freebase_data.year_published %}
+						<span class="year">({{ game.freebase_data.year_published}})</span>
 						{% endif %}
 						<span id="facebook-like">
-              <fb:like href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" layout="button_count" width="200" show_faces="false" font="arial"></fb:like>	
+              <fb:like href="http://{{host}}/game{{game.key.name}}" layout="button_count" width="200" show_faces="false" font="arial"></fb:like>	
 						</span>
 						{% if admin %}
-						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}">EDIT</a>
+						<span id="edit"><a href="http://{{host}}/admin/game{{game.key.name}}">EDIT</a>
 						</span>	
 						{% endif %}
 					</h1>
 				</div>
 		  </div>
 			<div id="game-detail" class="text12" >	
-				{% if game.description %}
+				{% if game.freebase_data.description %}
   			<h2>Overview</h2>
 				<div id="description">
-					{{ game.description }}
+					{{ game.freebase_data.description }}
 				</div>
 				<div id="more-less-container">
 					<a href="#" id="more-less">show more >></a>
@@ -116,58 +116,49 @@
 				{% endif %}
 				
 				<div id="game-detail-left">
-			  	{% if game.designers %}
+			  	{% if game.freebase_data.designers %}
     			<dl>
     				<dt>Designed by</dt>
-						{% for x in game.designers %}
+						{% for x in game.freebase_data.designers %}
 						<dd>{{ x }}</dd>
 						{% endfor %}
     			</dl>
  					{% endif %}
 
-			  	{% if game.artists %}
-    			<dl>
-    				<dt>Art by</dt>
-						{% for x in game.artists %}
-						<dd>{{ x }}</dd>
-						{% endfor %}
-    			</dl>
- 					{% endif %}
-
-			  	{% if game.publishers %}
+			  	{% if game.freebase_data.publishers %}
     			<dl>
     				<dt>Published by</dt>
-						{% for x in game.publishers %}
+						{% for x in game.freebase_data.publishers %}
 						<dd>{{ x }}</dd>
 						{% endfor %}
     			</dl>
  					{% endif %}
 
-			  	{% if game.year_published %}
+			  	{% if game.freebase_data.year_published %}
     			<dl>
     				<dt>Introduced</dt>
-						<dd>{{ game.year_published }}</dd>
+						<dd>{{ game.freebase_data.year_published }}</dd>
     			</dl>
  					{% endif %}
 
-     			{% if game.min_players and game.max_players %}
+     			{% if game.freebase_data.min_players and game.freebase_data.max_players %}
     			<dl>
     				<dt># of players</dt>
-						<dd>{{ game.min_players }} - {{ game.max_players }}</dd>
+						<dd>{{ game.freebase_data.min_players }} - {{ game.freebase_data.max_players }}</dd>
     			</dl>
 					{% endif %}
 
-			  	{% if game.playing_time %}
+			  	{% if game.freebase_data.playing_time %}
     			<dl>
     				<dt>Playing time</dt>
-						<dd>{{ game.playing_time }}</dd>
+						<dd>{{ game.freebase_data.playing_time }}</dd>
     			</dl>
  					{% endif %}
 
-			  	{% if game.age %}
+			  	{% if game.freebase_data.age %}
     			<dl>
     				<dt>Ages</dt>
-						<dd>{{ game.age }} and up</dd>
+						<dd>{{ game.freebase_data.age }} and up</dd>
     			</dl>
  					{% endif %}
 
@@ -180,72 +171,51 @@
     			</dl>
  					{% endif %}
 
-			  	{% if game.subdomains %}
+			  	{% if game.freebase_data.subjects %}
     			<dl>
-    				<dt>Categories</dt>
-						{% for x in game.subdomains %}
+    				<dt>Subjects</dt>
+						{% for x in freebase_data.subjects %}
 						<dd>{{ x }}</dd>
 						{% endfor %}
     			</dl>
  					{% endif %}
 
-			  	{% if game.mechanics %}
+			  	{% if game.freebase_data.genres %}
     			<dl>
-    				<dt>Mechanics</dt>
-						{% for x in game.mechanics %}
+    				<dt>Genre</dt>
+						{% for x in game.freebase_data.genres %}
 						<dd>{{ x }}</dd>
 						{% endfor %}
     			</dl>
  					{% endif %}
 
-			  	{% if game.expansions %}
+			  	{% if game.freebase_data.expansions %}
     			<dl>
     				<dt>Expansions</dt>
-						{% for x in game.expansions %}
+						{% for x in game.freebase_data.expansions %}
 						<dd>{{ x }}</dd>
 						{% endfor %}
     			</dl>
  					{% endif %}
 					
-					{% if game.bgg_id %}
+					{% if game.freebase_data.bgg_id %}
     			<dl>
     				<dt>Weblinks</dt>
-						<dd><a href="http://boardgamegeek.com/boardgame/{{game.bgg_id}}">Board Game Geek</a></dd>
+						<dd><a href="http://boardgamegeek.com/boardgame/{{ game.freebase_data.bgg_id }}">Board Game Geek</a></dd>
     			</dl>
 					{% endif %}
 				</div><!-- /game-detail-left -->	
 
 				<!--RECOMMEND GAME--> 
 				<div id="game-detail-right">
-					{% if game.image_url %}
-	  			<div id="game-image">
-						<img alt="{{game.name}}" title="{{game.name}}" src="{{game.image_url}}=s200"/>
+  				<div id="game-image">
+						<img alt="{{ game.freebase_data.name }}" title="{{ game.freebase_data.name }}" src="http://api.freebase.com/api/trans/image_thumb{{ game.key.name }}?maxwidth=150&maxheight=150"/>
 					</div>
-					{% else %}
-	  			<div id="game-image">
-						<img alt="{{game.name}}" title="{{game.name}}" src="http://api.freebase.com/api/trans/image_thumb{{game.mid}}?maxwidth=150&maxheight=150"/>
-					</div>
-					{% endif %}
-					<!--<br clear="all">
-			    <span class="headerg">Recommend this Game</span><br>
-			    Recommend this game to your friends.<br><br>
-          <strong>Recipient</strong><br>
-          <form>
-          	<input class="search-box" id="game-search" size="42" type="text"><br>
-			      <a href="boardgame5.html">Recommend to more friends</a>
-			      <br clear="all"><br> 
-            <strong>Message</strong><br>
-            <textarea class="text-area" id="message" name="message" rows="6" cols="36">You should play Ra.</textarea><br>
-
-            <a href="boardgame4.html"><input class="button" value="Recommend it" type="submit"></a>
-            Share on <img class="facebook-icon" src="http://www.supermeeple.com/static/images/facebook-icon-16x16.jpg">
-            <input name="facebook" value="true" checked="checked" id="facebook" type="checkbox">&nbsp;
-					</form>-->
- 				</div><!-- /game-detail-right -->
+				</div><!-- /game-detail-right -->
 
 				<!-- COMMENTS -->
 				<div id="comments">
-					<fb:comments href="http://{{host}}/game{{game.key.name}}/{{game.bgg_id|default_if_none:"0"}}" num_posts="10" width="440"></fb:comments>
+					<fb:comments href="http://{{host}}/game{{game.key.name}}" num_posts="10" width="440"></fb:comments>
 				</div>	
 			</div><!-- /game-detail -->	
 		</div><!-- /main -->	   			

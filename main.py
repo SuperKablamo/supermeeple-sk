@@ -255,16 +255,15 @@ class GameProfile(BaseHandler):
     in order to display Game Profile.  
     '''
     # Direct linking to Game Profile
-    def get(self, mid=None, bgg_id=None):
+    def get(self, mid=None):
         _trace = TRACE+'GameProfile:: get() '
         logging.info(_trace)
         user = self.current_user
-        _game = game.getGame(mid=mid, bgg_id=bgg_id)
+        _game = game.getGame(mid=mid)
         if _game is None:
             self.error(404)
             return            
         checkins = checkinbase.getGameCheckins(_game, 4)
-        high_scores = checkinbase.getGameHighScores(_game, 4)
         host = self.request.host # used for Facebook Like url 
         checked_in = checkinbase.isCheckedIn(user)   
         admin = users.is_current_user_admin()  
@@ -274,7 +273,6 @@ class GameProfile(BaseHandler):
             'host': host,
             'game': _game,
             'checkins': checkins,
-            'high_scores': high_scores,
             'current_user': user,
             'facebook_app_id': FACEBOOK_APP_ID
         }  
@@ -285,14 +283,9 @@ class GameProfile(BaseHandler):
         _trace = TRACE+'GameProfile:: post() '
         logging.info(_trace)
         user = self.current_user
-        game_ids = getBGGIDFromFB(self.request.get('game_id'))
-        mid = game_ids["mid"]
-        bgg_id = game_ids["bgg_id"]
+        mid = self.request.get('game_mid')
         if mid:
-            if bgg_id:
-                self.redirect('/game'+mid+'/'+bgg_id)
-            else:
-                self.redirect('/game'+mid+'/0') # 0 indicates no BGG_ID found
+            self.redirect('/game'+mid)
         else:
             self.error(500)
              
@@ -550,7 +543,7 @@ def isFacebook(path):
 ##############################################################################
 application = webapp.WSGIApplication([(r'/page/(.*)', Page),
                                       ('/game', GameProfile),
-                                      (r'/game(/m/.*)/(.*)', GameProfile),
+                                      (r'/game(/m/.*)', GameProfile),
                                       (r'/user/(.*)/.*', UserProfile),
                                       (r'/user/(.*)', UserProfile),
                                       ('/game-checkin', Checkin),
