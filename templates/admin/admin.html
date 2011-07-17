@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="http://www.facebook.com/2008/fbml">
+
+  <head>
+  	<title>{% block title %}Admin - SuperMeeple{% endblock %}</title>
+  	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+
+  	<link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+  	<link type="text/css" rel="stylesheet" href="http://freebaselibs.com/static/suggest/1.3/suggest.min.css" />
+	  {% block script %}
+		<script src="https://www.google.com/jsapi?key=ABQIAAAApPeof0WyN6ORT7NeNop5OxQzCjBYe5vlCOVyWiU0uoPj3BGQuRSCMoZNL35Fb-TSASFtH4zop1ES1g" type="text/javascript"></script>	
+		<script type="text/javascript">
+		  google.load("jquery", "1.4.2");
+		  google.load("jqueryui", "1.8.10");
+		</script>
+  	<script type="text/javascript" src="http://freebaselibs.com/static/suggest/1.3/suggest.min.js"></script>
+		{% endblock %}
+
+	  <!-- Freebase Jquery search -->
+		<script type="text/javascript">
+  		$(function() {
+    		$("#game-search").suggest({service_url:"http://api.freebase.com",
+				service_path:"/api/service/search",
+				flyout_service_url:"http://www.freebase.com"});
+				var inst = $("#game-search").data("suggest");
+				inst.options.ac_param.type = '/games/game';
+				inst.options.ac_param.mql_output = JSON.stringify([{id:null, mid:null,
+				name:null}]);
+        $("#game-search").bind("fb-select", function(e, data) {
+    			$("#game-id").val(data.id);
+    			$("#game-name").val(data.name);
+					$("#game-mid").val(data.mid);
+    		});
+  		});
+  	</script>
+
+  </head> 
+  <body>
+  <div id="container">
+    <div id="header">
+     	<div id="title">
+				 <h1 style="display:none;visibility:hidden">SuperMeeple</h1>	
+         <a href="/">
+         	<img src="/static/images/logo.png"/>
+         </a>
+    	</div>
+      <br/>
+    </div><!-- /header -->
+
+		<div id="content-top"></div>
+		
+		<div id="content"> 
+    	{% block main %}
+    	{% endblock %} 
+
+		</div><!-- /content -->
+		<div id="content-bottom"></div>		
+	 	<div id="footer">
+			<div class="text1216" id="footer">
+				&copy; Copyright 2011 SuperMeeple  |  <a href="/page/about">About Us</a>  |  <a href="/page/contact">Contact Us</a><br>
+			  Powered by <a target="_blank" href="http://code.google.com/appengine/">Google App Engine</a> + Data by <a target="_blank" href="http://www.freebase.com/">Freebase</a> &amp; <a target="_blank" href="http://boardgamegeek.com/">Board Game Geek</a></div>
+		</div><!-- /footer -->
+	</div><!-- /container -->
+  </body>
+</html>

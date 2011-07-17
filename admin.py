@@ -9,10 +9,10 @@
 ############################################################################## 
 from __future__ import with_statement
 
-import gamebase
 import meeple_tasks
 import models
 import utils
+from model import game
 from settings import *
 from utils import strToInt
 from utils import buildDataList
@@ -49,8 +49,8 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 ##############################################################################
 
 class Admin(webapp.RequestHandler):
-    """Provides Admin access to data-entry and initialization tasks.
-    """
+    '''Provides Admin access to data-entry and initialization tasks.
+    '''
     def get(self):
         logging.info('################### Admin:: get() ####################')
         badges = getBadges()
@@ -100,19 +100,23 @@ class Admin(webapp.RequestHandler):
         self.redirect('/admin/')  
 
 class GameEdit(webapp.RequestHandler):
-    """Provides Admin access to editing Game data.
-    """
+    '''Provides Admin access to editing Game data.
+    '''
     # Direct linking to Game Profile
-    def get(self, mid=None, bgg_id=None):
+    def get(self, mid=None):
         _trace = TRACE+'GameEdit:: '
-        logging.info(_trace+'get(mid = '+mid+', bgg_id = '+bgg_id+')')
-        game = gamebase.getGame(mid=mid, bgg_id=bgg_id)
-        matches = gamebase.getBGGMatches(game.name, exact=False)
+        logging.info(_trace+'get(mid = '+mid+')')
+        _game = game.getGame(mid=mid)
+        matches = game.getBGGMatches(_game.freebase_data['name'], exact=False)
+        if _game.freebase_data['bgg_id'] is not None:
+            bgg_data = game.parseBGGXML(_game.freebase_data['bgg_id'])
+        else: bgg_data = None    
         template_values = {
-            'game': game,
-            'matches': matches
+            'game': _game,
+            'matches': matches,
+            'bgg_data': bgg_data
         }  
-        generate(self, 'base_admin_game.html', template_values)
+        generate(self, 'admin/admin_game.html', template_values)
     
     # POST updated Game data.
     def post(self, mid=None, bgg_id=None):
@@ -301,7 +305,7 @@ def generate(self, template_name, template_values):
 
 ##############################################################################
 ##############################################################################
-application = webapp.WSGIApplication([(r'/admin/game(/m/.*)/(.*)', GameEdit),
+application = webapp.WSGIApplication([(r'/admin/game(/m/.*)', GameEdit),
                                       (r'/admin/game-update(/m/.*)/(.*)', GameEdit),
                                       (r'/admin/game-image-upload(/m/.*)/(.*)', GameImageUpload),
                                       (r'/admin/bgg-delete(/m/.*)/(.*)', BGGDelete),

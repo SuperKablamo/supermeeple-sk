@@ -198,6 +198,47 @@ def getFBGameBlurb(mid, length=800):
         return None
     return blurb
 
+def parseBGGXML(bgg_id):
+    '''Returns a dictionary of game data retrieved from BGGs XML API.
+    '''
+    _trace = TRACE+'parseBGGXML('+bgg_id+'):: '
+    logging.info(_trace)
+    
+    bgg_game_url = BGG_XML_URI + bgg_id
+    result = urllib2.urlopen(bgg_game_url).read()
+    try:
+        xml = ElementTree.fromstring(result)
+    except Exception:
+        logging.info(TRACE+'parseBGGXML() error parsing BGG')
+        return None  
+    decoded_result = result.decode("utf-8")
+    xml_text = db.Text(decoded_result)
+    bgg_data = {'name': findPrimaryName(xml),
+                'description': xml.findtext(".//description"),
+                'year_published': strToInt(xml.findtext(".//yearpublished")),
+                'min_players': strToInt(xml.findtext(".//minplayers")),
+                'max_players': strToInt(xml.findtext(".//maxplayers")),
+                'playing_time': strToInt(xml.findtext(".//playingtime")),
+                'age': strToInt(xml.findtext(".//age")),
+                'publishers': 
+                    buildDataList(xml.findall(".//boardgamepublisher")),
+                'artists': buildDataList(xml.findall(".//boardgameartist")),
+                'designers': 
+                    buildDataList(xml.findall(".//boardgamedesigner")),  
+                'expansions': 
+                    buildDataList(xml.findall(".//boardgameexpansion")),
+                'categories': 
+                    buildDataList(xml.findall(".//boardgamecategory")),
+                'mechanics': 
+                    buildDataList(xml.findall(".//boardgamemechanic")),
+                'subdomains': 
+                    buildDataList(xml.findall(".//boardgamesubdomain")),
+                'image_url': xml.findtext(".//image"),
+                'thumbnail_url':xml.findtext(".//thumbnail"),
+                'xml_text': xml_text}
+    
+    return bgg_data
+    
 def storeImageFromBGG(bgg_image_url):
     '''Returns a blob_key for an image fetched from BGG and stored to the 
     BlobStore.

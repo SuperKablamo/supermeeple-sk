@@ -59,11 +59,14 @@ body { background-color: #5a5a5a; }
 #fb-button { border:0 none; float:right; margin:3px 0 0 0; padding-right:42px; }    
 
 /*FULLBAR*/
-#fullbar { width:600px; float:left; padding:0 0 0 28px; min-height:600px; }
-#admin-block { border:solid 2px #939393; padding:0 6px; }
-#admin-block h2 { padding:12px 0; }
-#admin-block label { position:absolute; text-align:right; width:60px; }
-#admin-block .label { font-weight:bold; }
+#fullbar { width:720px; float:left; padding:0 0 0 28px; min-height:600px; }
+#admin-block { padding:10px 0; }
+#admin-block h2 { margin-top:10px; padding:8px 4px; background-color:#ccc; }
+#admin-block table { width:720px; }
+#admin-block table, #admin-block th, #admin-block td  { border: 1px solid #ccc; } 
+#admin-block table td, #admin-block table th { padding:8px 4px; vertical-align:top; }
+#admin-block table th { text-align:left; }
+#admin-block label { position:absolute; text-align:left; width:100px; font-weight:bold; }
 #admin-block input, #admin-block textarea, #admin-block select { margin:0 0 12px 70px; }
 #admin-block p { padding:0 0 4px 0; }
 #admin-block .badge { padding:4px 0 12px 0; border-top:dotted 2px #939393; }

@@ -209,13 +209,13 @@
 				<!--RECOMMEND GAME--> 
 				<div id="game-detail-right">
   				<div id="game-image">
-						<img alt="{{ game.freebase_data.name }}" title="{{ game.freebase_data.name }}" src="http://api.freebase.com/api/trans/image_thumb{{ game.key.name }}?maxwidth=150&maxheight=150"/>
+						<img alt="{{ game.freebase_data.name }}" title="{{ game.freebase_data.name }}" src="http://api.freebase.com/api/trans/image_thumb{{ game.key.name }}?maxwidth=180&maxheight=180"/>
 					</div>
 				</div><!-- /game-detail-right -->
 
 				<!-- COMMENTS -->
 				<div id="comments">
-					<fb:comments href="http://{{host}}/game{{game.key.name}}" num_posts="10" width="440"></fb:comments>
+					<fb:comments href="http://{{ host }}/game{{ game.key.name }}" num_posts="10" width="440"></fb:comments>
 				</div>	
 			</div><!-- /game-detail -->	
 		</div><!-- /main -->	   			
@@ -244,7 +244,7 @@
 						<h2>Game Checkin</h2>
 					</div>	
 					<div class="tip text12">
-						<p><strong>Playing {{game.name}}?</strong>  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
+						<p><strong>Playing {{ game.freebase_data.name }}?</strong>  Game check ins allow you to track plays, scores and wins, and earn badges.</p>
 					</div>
 					{% if current_user %}
 					{% if checked_in %}
@@ -257,15 +257,11 @@
 						<div id="spinner"></div>
 						<form name="input" id="checkin-form-inner" action="">
 							<fieldset>
-								<input type="hidden" name="mid" id="mid" value="{{game.key.name}}"/>
-								<input type="hidden" name="bgg-id" id="bgg-id" value="{{game.bgg_id}}"/>
-								<input type="hidden" name="name" id="name" value="{{game.name}}"/>
-								{% if game.image_url %}
-								<input type="hidden" name="thumbnail" id="thumbnail" value="{{game.image_url}}=s200"/>
-								{% else %}
+								<input type="hidden" name="mid" id="mid" value="{{ game.key.name }}"/>
+								<input type="hidden" name="bgg-id" id="bgg-id" value="{{ game.freebase_data.bgg_id }}"/>
+								<input type="hidden" name="name" id="name" value="{{ game.freebase_data.name }}"/>
 								<input type="hidden" name="thumbnail" id="thumbnail" value="http://api.freebase.com/api/trans/image_thumb{{c.game.mid}}?maxwidth=80&maxheight=100"/>							
-								{% endif %}
-								<textarea class="validate[maxSize[420]] text-area" id="message" name="message" rows="3" cols="28">Joining a game of {{game.name}}.</textarea><br/>
+								<textarea class="validate[maxSize[420]] text-area" id="message" name="message" rows="3" cols="28">Joining a game of {{ game.freebase_data.name }}.</textarea><br/>
 								<div id="checkin-form-submit">
 									<span id="share-text text10">Share on 
 									<img class="facebook-icon" src="/static/images/facebook-icon-16x16.jpg"/> 
@@ -293,13 +289,13 @@
 					<div class="tiny-checkin">
 						<div class="player-wrap">
 							<div class="player">
-					  		<a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}/{{c.player.name|slugify}}"><img alt="{{c.player.name}}" title="{{c.player.name}}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a>
-								<span class="text12"><a title="{{c.player.name}}" href="/user/{{c.player.fb_id}}/{{c.player.name|slugify}}">{{c.player.name}}</a></span>
-								<p class="text10">{{c.created|timesince}} ago</p>
+					  		<a title="{{ c.player.name}}" href="/user/{{ c.player.fb_id }}/{{ c.player.name|slugify }}"><img alt="{{ c.player.name }}" title="{{ c.player.name }}" src="http://graph.facebook.com/{{ c.player.fb_id }}/picture?type=square"/></a>
+								<span class="text12"><a title="{{ c.player.name }}" href="/user/{{ c.player.fb_id}}/{{ c.player.name|slugify }}">{{ c.player.name }}</a></span>
+								<p class="text10">{{ c.created|timesince }} ago</p>
 							</div>
 							<div class="badges">
 							{% for b in c.badges %}
-								<img alt="{{b.name}}" title="{{b.name}}" class="thumbnail-badge" title src="{{b.image_url}}=s25" />
+								<img alt="{{ b.name }}" title="{{ b.name }}" class="thumbnail-badge" title src="{{ b.image_url }}=s25" />
 						  {% endfor %}
 							</div>
 						</div><!-- /player-wrap -->						
@@ -307,7 +303,7 @@
 					<div class="liner"></div>
 					{% endfor %}
 				{% else %}
-					<p class="text12 info">Be the <strong>first</strong> to checkin to <br/>{{game.name}}!</p>
+					<p class="text12 info">Be the <strong>first</strong> to checkin to <br/>{{ game.freebase_data.name }}!</p>
 				{% endif %}	
 				</div><!-- /checkin-list -->	
 			</div><!-- /block -->	
