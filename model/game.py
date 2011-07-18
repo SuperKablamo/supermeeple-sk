@@ -198,6 +198,42 @@ def getFBGameBlurb(mid, length=800):
         return None
     return blurb
 
+def updateFreebase(mid, data, connect='update'):
+    '''Updates a Freebase Game with new data. 
+    '''
+    _trace = TRACE+'updateFreebase('+mid+'):: '
+    logging.info(_trace)
+    
+    if not FREEBASE.loggedin():
+        FREEBASE.login(username=FREEBASE_USER, password=FREEBASE_PSWD)
+    
+    keys = data.keys()
+    for k in keys:
+        if k == 'bgg_id':
+            query = {
+                "type":"/games/game",
+                "mid":mid,
+                "key":{
+                    "connect":connect,
+                    "namespace":BGG_NAMESPACE,
+                    "value":data[k]
+                    }
+                }        
+                
+        elif k == 'year':
+            query = {
+                "type":"/games/game",
+                "mid":mid,
+                "introduced":{
+                    "connect":connect,
+                    "value":data[k]
+                    }
+                }            
+            
+    logging.info(_trace + str(query))            
+    try: result = FREEBASE.mqlwrite(query)
+    except Exception: return
+
 def parseBGGXML(bgg_id):
     '''Returns a dictionary of game data retrieved from BGGs XML API.
     '''
@@ -270,30 +306,6 @@ def storeImageFromBGG(bgg_image_url):
             
     return image_blob_key
 
-def getBGGIDFromBGG(game_name):
-    """Returns the Board Game Geek Game ID from Board Game Geek.    
-    """
-    logging.info(TRACE+'getBGGIDFromBGG():: finding bgg_id')
-    logging.info(TRACE+'getBGGIDFromBGG():: game_name = ' + game_name)   
-    try:
-        game_url = BGG_XML_SEARCH + urllib2.quote(game_name.encode('utf8'))
-    except KeyError: # Most likely foreign characters in game_name
-        return None    
-    logging.info(TRACE+'getBGGIDFromBGG():: game_url = ' + game_url) 
-    try:
-        result = urllib2.urlopen(game_url).read()
-    except Exception:
-        return None
-    xml = ElementTree.fromstring(result)
-    try:
-        bgg_id = xml.find("./boardgame").attrib['objectid']
-    except AttributeError:
-        logging.info(TRACE+'getBGGIDFromBGG():: NO MATCH') 
-        return None    
-    logging.info(TRACE+'getBGGIDFromBGG():: MATCH FOUND!')         
-    logging.info(TRACE+'getBGGIDFromBGG():: bgg_id = ' + str(bgg_id)) 
-    return bgg_id
-
 def getBGGMatches(game_name, exact=True): 
     """Returns Board Game Geek Game IDs from Board Game Geek given a Game
     name.  If exact=True, then the search is for a single exact match.  If
@@ -327,20 +339,3 @@ def getBGGMatches(game_name, exact=True):
                 "year": x.findtext("./yearpublished")}
         matches.append(game)        
     return matches
-    
-def updateFreebaseBGGID(mid, bgg_id, connect='update'):
-    logging.info(TRACE+'updateFreebaseBGGID('+mid+','+bgg_id+')')    
-    if bgg_id == "0": return # Don't store 0
-    if not FREEBASE.loggedin():
-        FREEBASE.login(username=FREEBASE_USER, password=FREEBASE_PSWD)
-    query = {
-        "type":"/games/game",
-        "mid":mid,
-        "key":{
-            "connect":connect,
-            "namespace":BGG_NAMESPACE,
-            "value":bgg_id
-            }
-        }
-    try: result = FREEBASE.mqlwrite(query)
-    except Exception: return

@@ -119,22 +119,30 @@ class GameEdit(webapp.RequestHandler):
         generate(self, 'admin/admin_game.html', template_values)
     
     # POST updated Game data.
-    def post(self, mid=None, bgg_id=None):
+    def post(self, mid=None):
         _trace = TRACE+'GameEdit:: '
         logging.info(_trace+'post(mid = '+mid+', bgg_id = '+bgg_id+')')        
-        bgg_id_new = self.request.get('bgg-id')
-        asin = self.request.get('asin')
-        logging.info(_trace+'bgg_id_new = '+bgg_id_new)   
-        logging.info(_trace+'asin = '+asin)                
-        game = models.Game.get_by_key_name(mid)
-        if asin != "None": game.asin = asin
-        if bgg_id_new != "None": 
-            game.bgg_id = bgg_id_new
-            if bgg_id != bgg_id_new:
-                gamebase.updateFreebaseBGGID(mid, bgg_id_new)
-        game.put()
+        
+        edit_prop = self.request.get('edit-prop')
+        if edit_prop == 'bgg-id':
+            bgg_id = self.request.get('bgg-id')
+            logging.info(_trace+'bgg_id = '+bgg_id)  
+            game.updateFreebase(mid, {'bgg_id': bgg_id})
+        
+        elif edit_prop == 'asin':
+            asin = self.request.get('asin')
+            logging.info(_trace+'asin = '+asin)
+            _game = models.Game.get_by_key_name(mid)
+            _game.asin = asin
+            game.put()
+            
+        elif edit_prop == 'year':
+            year = self.request.get('year')
+            logging.info(_trace+'year = '+year)
+            game.updateFreebase(mid, {'year ': year})
+        
         memcache.delete(mid) # Clear old data from cache
-        self.redirect('/admin/game'+mid+'/'+bgg_id_new)
+        self.redirect('/admin/game'+mid)
 
 class GameImageUpload(webapp.RequestHandler):
     """Provides Admin access to upload Game image.

@@ -10,100 +10,125 @@
 			<h2>Freebase Data vs. Boardgamegeek.com Data</h2>
 			<table>
 				<tr>
-					<td style="width:10%;"></td>
+					<td style="width:15%;"></td>
 					<th style="width:40%;">Freebase</th>
 					<th style="width:40%;">Boardgamegeek.com</th>
-					<th style="width:10%;text-align:center;"><<</th>
+					<th class="update"><<</th>
 				</tr>	
 				<tr>
 					<th>ID:</th>
 					<td><a href="http://www.freebase.com/view{{ game.key.name }}">{{ game.key.name }}</a></td>
 					<td><a href="http://boardgamegeek.com/boardgame/{{ game.freebase_data.bgg_id }}">{{ game.freebase_data.bgg_id }}</a></td>
-					<td></td>
+					<td class="update"></td>
 				</tr>	
 				<tr>
 					<th>ASIN:</th>
 					<td>{{ game.asin }}</td>
-					<td></td>
-					<td></td>
+					<td class="na"></td>
+					<td class="update"></td>
 				</tr>				
 				<tr>
 					<th>Created:</th>
 					<td>{{ game.created }}</td>
-					<td></td>
-					<td></td>
+					<td class="na"></td>
+					<td class="update"></td>
 				</tr>	
 				<tr>
 					<th>Updated:</th>
 					<td>{{ game.updated }}</td>
-					<td></td>
-					<td></td>
+					<td class="na"></td>
+					<td class="update"></td>
 				</tr>
 				<tr>
 					<th>Designed by:</th>
 					<td>{{ game.freebase_data.designers|join:", " }}</td>
 					<td>{{ bgg_data.designers|join:", " }}</td>
-					<td></td>
+					<td class="update"></td>
 				</tr>
 				<tr>
 					<th>Published by:</th>
 					<td>{{ game.freebase_data.publishers|join:", " }}</td>
 					<td>{{ bgg_data.publishers|join:", " }}</td>
-					<td></td>					
+					<td class="update"></td>					
 				</tr>
 				<tr>
 					<th>Year:</th>
 					<td>{{ game.freebase_data.year_published }}</td>
 					<td>{{ bgg_data.year_published }}</td>
-					<td></td>					
+					<td class="update">
+						<form action="/admin/game-update{{ game.key.name }}" method="POST">
+							<fieldset>
+								<input type="hidden" name="year" id="year" value="{{ bgg_data.year_published }}"/>
+								<input type="submit" name="submit" value="<<">
+							</fieldset>
+						</form>
+					</td>					
 				</tr>
 				<tr>
 					<th># of players:</th>
 					<td>{{ game.freebase_data.min_players }} - {{ game.freebase_data.max_players }}</td>
 					<td>{{ bgg_data.min_players }} - {{ bgg_data.max_players }}</td>
-					<td></td>					
+					<td class="update"></td>					
 				</tr>	
 				<tr>
 					<th>Playing time:</th>																			
 					<td>{{ game.freebase_data.playing_time }}</td>
 					<td>{{ bgg_data.playing_time }}</td>
-					<td></td>																									
+					<td class="update"></td>																									
 				</tr>
 				<tr>
 					<th>Ages:</th>																			
 					<td>{{ game.freebase_data.age }} and up</td>		
 					<td>{{ bgg_data.age }} and up</td>	
-					<td></td>																						
+					<td class="update"></td>																						
 				</tr>					
 				<tr>
-					<th>Subjects / Categories:</th>																			
+					<th>Subjects:</th>																			
 					<td>{{ game.freebase_data.subjects|join:", " }}</td>
-					<td>{{ bgg_data.categories|join:", " }}</td>	
-					<td></td>																		
-				</tr>										
+					<td class="na"></td>	
+					<td class="update"></td>																		
+				</tr>		
 				<tr>
 					<th>Genres / Subdomains:</th>																			
 					<td>{{ game.freebase_data.genres|join:", " }}</td>	
-					<td>{{ bgg_data.subdomains|join:"," }}</td>																			
-				</tr>									
+					<td>{{ bgg_data.subdomains|join:", " }}</td>																			
+				</tr>	
+				<tr>
+					<th>Categories:</th>																			
+					<td class="na"></td>
+					<td>{{ bgg_data.categories|join:", " }}</td>	
+					<td class="update"></td>																		
+				</tr>
+				<tr>
+					<th>Mechanics:</th>																			
+					<td class="na"></td>	
+					<td>{{ bgg_data.mechanics|join:", " }}</td>		
+					<td class="update"></td>																	
+				</tr>												
 				<tr>
 					<th>Expansions:</th>																			
-					<td>{{ game.freebase_data.expansions|join:"," }}</td>				
-					<td>{{ bgg_data.expansions|join:"," }}</td>	
-					<td></td>																				
+					<td>{{ game.freebase_data.expansions|join:", " }}</td>				
+					<td>{{ bgg_data.expansions|join:", " }}</td>	
+					<td class="update"></td>																				
 				</tr>	
 				<tr>
 					<th>Description:</th>
 					<td>{{ game.freebase_data.description }}</td>
 					<td>{{ bgg_data.description }}</td>	
-					<td></td>				
+					<td class="update"></td>				
 				</tr>	
 				<tr>
 					<th>Image:</th>
 					<td><img alt="{{ game.freebase_data.name }}" title="{{ game.freebase_data.name }}" src="http://api.freebase.com/api/trans/image_thumb{{ game.key.name }}?maxwidth=180&maxheight=180"/></td>
 					<td><img src="{{ bgg_data.thumbnail_url }}"/></td>
+					<td class="update"></td>
+				</tr>	
+				<tr>
+					<th>YoutTube:</th>
 					<td></td>
-				</tr>													
+					<td class="na"></td>
+					<td class="update"></td>
+				</tr>																
 			</table>
 
 			<h2>Boardgamegeek.com Matches</h2>

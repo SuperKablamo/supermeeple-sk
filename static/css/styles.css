@@ -65,7 +65,10 @@ body { background-color: #5a5a5a; }
 #admin-block table { width:720px; }
 #admin-block table, #admin-block th, #admin-block td  { border: 1px solid #ccc; } 
 #admin-block table td, #admin-block table th { padding:8px 4px; vertical-align:top; }
+#admin-block td.na { background-color:#414040; }
+#admin-block td.update, #admin-block th.update { width:5%; text-align:center; }
 #admin-block table th { text-align:left; }
+#admin-block table input { margin:0; }
 #admin-block label { position:absolute; text-align:left; width:100px; font-weight:bold; }
 #admin-block input, #admin-block textarea, #admin-block select { margin:0 0 12px 70px; }
 #admin-block p { padding:0 0 4px 0; }
